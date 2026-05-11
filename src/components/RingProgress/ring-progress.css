@@ -1,0 +1,28 @@
+.ring-progress {
+	position: relative;
+	aspect-ratio: 1 / 1;
+	border-radius: 9999px;
+
+	background: conic-gradient(var(--rp-fore) var(--rp-deg), var(--rp-back) 0deg);
+
+	display: grid;
+	place-items: center;
+
+	transition: background 0.5s ease;
+}
+
+.ring-progress__inner {
+	position: absolute;
+	inset: var(--rp-inset);
+	border-radius: 9999px;
+	background: white;
+
+	display: grid;
+	place-items: center;
+}
+
+.ring-progress__text {
+	font-size: 0.9rem;
+	font-weight: 600;
+	color: #374151;
+}

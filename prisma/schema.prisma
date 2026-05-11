@@ -1,0 +1,128 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String               @id @default(cuid())
+  email        String               @unique
+  password     String
+  name         String
+  friends      Friend[]
+  trips        Trip[]
+  bills        Bill[]
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  isDeleted    Boolean              @default(false)
+}
+
+model Friend {
+  id                 String             @id @default(cuid())
+  user               User               @relation(fields: [userId], references: [id])
+  userId             String
+  name               String
+  description        String?
+  participationCount Int                @default(0)
+  isSelf             Boolean            @default(false)
+  tripMembers        TripMember[]
+  payerBills         Bill[]             @relation("PayerFriend")
+  owedBills          BillOwed[]
+  createdAt          DateTime           @default(now())
+  updatedAt          DateTime           @updatedAt
+  isDeleted          Boolean            @default(false)
+
+  @@index([userId])
+}
+
+model Trip {
+  id           String               @id @default(cuid())
+  user         User                 @relation(fields: [userId], references: [id])
+  userId       String
+  name         String
+  description  String?
+  members      TripMember[]
+  bills        Bill[]
+  createdAt    DateTime             @default(now())
+  updatedAt    DateTime             @updatedAt
+  isDeleted    Boolean              @default(false)
+
+  @@index([userId])
+}
+
+model TripMember {
+  id         String   @id @default(cuid())
+  trip       Trip     @relation(fields: [tripId], references: [id])
+  tripId     String
+  friend     Friend   @relation(fields: [friendId], references: [id])
+  friendId   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  isDeleted  Boolean  @default(false)
+
+  @@unique([tripId, friendId])
+  @@index([tripId])
+  @@index([friendId])
+}
+
+model Bill {
+  id            String       @id @default(cuid())
+  user          User         @relation(fields: [userId], references: [id])
+  userId        String
+  payer         Friend       @relation("PayerFriend", fields: [payerId], references: [id])
+  payerId       String
+  currency      String
+  paymentMethod String
+  name          String
+  description   String?
+  category      String
+  status        ExpenseStatus
+  owedFriends   BillOwed[]
+  trip          Trip?        @relation(fields: [tripId], references: [id])
+  tripId        String?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  isDeleted     Boolean      @default(false)
+
+  @@index([userId])
+  @@index([payerId])
+  @@index([tripId])
+}
+
+model BillOwed {
+  id         String   @id @default(cuid())
+  bill       Bill     @relation(fields: [billId], references: [id])
+  billId     String
+  friend     Friend   @relation(fields: [friendId], references: [id])
+  friendId   String
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  isDeleted  Boolean  @default(false)
+
+  @@unique([billId, friendId])
+  @@index([billId])
+  @@index([friendId])
+}
+
+model EmailVerification {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+enum ExpenseStatus {
+  UNPAID            // 未付钱
+  UNRETURNED        // 未还钱
+  PARTIALLY_RETURNED // 还了一部分钱
+  SETTLED           // 结清
+}
+
