@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { verifyJwtToken } from '@/lib/jwt';
-
+import { verifyJwtToken } from '@/src/lib/jwt';
 function verifyToken(token: string) {
   return verifyJwtToken(token);
 }
