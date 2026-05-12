@@ -974,6 +974,9 @@ export const BillScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   payerId: 'payerId',
+  amount: 'amount',
+  latitude: 'latitude',
+  longitude: 'longitude',
   currency: 'currency',
   paymentMethod: 'paymentMethod',
   name: 'name',
@@ -1135,16 +1138,16 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
 
 
 /**
- * Reference to a field of type 'ExpenseStatus'
+ * Reference to a field of type 'Float'
  */
-export type EnumExpenseStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExpenseStatus'>
+export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
     
 
 
 /**
- * Reference to a field of type 'Float'
+ * Reference to a field of type 'ExpenseStatus'
  */
-export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+export type EnumExpenseStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ExpenseStatus'>
     
 
 /**

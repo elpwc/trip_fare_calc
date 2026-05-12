@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 const menuItems = [
   { label: '一览', href: '/' },
   { label: '历史', href: '/history' },
-  { label: '人物', href: '/people' },
+  { label: '人物', href: '/friends' },
   { label: '账户', href: '/user' },
 ];
 

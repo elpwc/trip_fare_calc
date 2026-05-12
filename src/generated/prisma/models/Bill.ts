@@ -20,14 +20,31 @@ export type BillModel = runtime.Types.Result.DefaultSelection<Prisma.$BillPayloa
 
 export type AggregateBill = {
   _count: BillCountAggregateOutputType | null
+  _avg: BillAvgAggregateOutputType | null
+  _sum: BillSumAggregateOutputType | null
   _min: BillMinAggregateOutputType | null
   _max: BillMaxAggregateOutputType | null
+}
+
+export type BillAvgAggregateOutputType = {
+  amount: number | null
+  latitude: number | null
+  longitude: number | null
+}
+
+export type BillSumAggregateOutputType = {
+  amount: number | null
+  latitude: number | null
+  longitude: number | null
 }
 
 export type BillMinAggregateOutputType = {
   id: string | null
   userId: string | null
   payerId: string | null
+  amount: number | null
+  latitude: number | null
+  longitude: number | null
   currency: string | null
   paymentMethod: string | null
   name: string | null
@@ -44,6 +61,9 @@ export type BillMaxAggregateOutputType = {
   id: string | null
   userId: string | null
   payerId: string | null
+  amount: number | null
+  latitude: number | null
+  longitude: number | null
   currency: string | null
   paymentMethod: string | null
   name: string | null
@@ -60,6 +80,9 @@ export type BillCountAggregateOutputType = {
   id: number
   userId: number
   payerId: number
+  amount: number
+  latitude: number
+  longitude: number
   currency: number
   paymentMethod: number
   name: number
@@ -74,10 +97,25 @@ export type BillCountAggregateOutputType = {
 }
 
 
+export type BillAvgAggregateInputType = {
+  amount?: true
+  latitude?: true
+  longitude?: true
+}
+
+export type BillSumAggregateInputType = {
+  amount?: true
+  latitude?: true
+  longitude?: true
+}
+
 export type BillMinAggregateInputType = {
   id?: true
   userId?: true
   payerId?: true
+  amount?: true
+  latitude?: true
+  longitude?: true
   currency?: true
   paymentMethod?: true
   name?: true
@@ -94,6 +132,9 @@ export type BillMaxAggregateInputType = {
   id?: true
   userId?: true
   payerId?: true
+  amount?: true
+  latitude?: true
+  longitude?: true
   currency?: true
   paymentMethod?: true
   name?: true
@@ -110,6 +151,9 @@ export type BillCountAggregateInputType = {
   id?: true
   userId?: true
   payerId?: true
+  amount?: true
+  latitude?: true
+  longitude?: true
   currency?: true
   paymentMethod?: true
   name?: true
@@ -161,6 +205,18 @@ export type BillAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalA
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: BillAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: BillSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: BillMinAggregateInputType
@@ -191,6 +247,8 @@ export type BillGroupByArgs<ExtArgs extends runtime.Types.Extensions.InternalArg
   take?: number
   skip?: number
   _count?: BillCountAggregateInputType | true
+  _avg?: BillAvgAggregateInputType
+  _sum?: BillSumAggregateInputType
   _min?: BillMinAggregateInputType
   _max?: BillMaxAggregateInputType
 }
@@ -199,6 +257,9 @@ export type BillGroupByOutputType = {
   id: string
   userId: string
   payerId: string
+  amount: number
+  latitude: number | null
+  longitude: number | null
   currency: string
   paymentMethod: string
   name: string
@@ -210,6 +271,8 @@ export type BillGroupByOutputType = {
   updatedAt: Date
   isDeleted: boolean
   _count: BillCountAggregateOutputType | null
+  _avg: BillAvgAggregateOutputType | null
+  _sum: BillSumAggregateOutputType | null
   _min: BillMinAggregateOutputType | null
   _max: BillMaxAggregateOutputType | null
 }
@@ -236,6 +299,9 @@ export type BillWhereInput = {
   id?: Prisma.StringFilter<"Bill"> | string
   userId?: Prisma.StringFilter<"Bill"> | string
   payerId?: Prisma.StringFilter<"Bill"> | string
+  amount?: Prisma.FloatFilter<"Bill"> | number
+  latitude?: Prisma.FloatNullableFilter<"Bill"> | number | null
+  longitude?: Prisma.FloatNullableFilter<"Bill"> | number | null
   currency?: Prisma.StringFilter<"Bill"> | string
   paymentMethod?: Prisma.StringFilter<"Bill"> | string
   name?: Prisma.StringFilter<"Bill"> | string
@@ -256,6 +322,9 @@ export type BillOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   payerId?: Prisma.SortOrder
+  amount?: Prisma.SortOrder
+  latitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  longitude?: Prisma.SortOrderInput | Prisma.SortOrder
   currency?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   name?: Prisma.SortOrder
@@ -280,6 +349,9 @@ export type BillWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.BillWhereInput | Prisma.BillWhereInput[]
   userId?: Prisma.StringFilter<"Bill"> | string
   payerId?: Prisma.StringFilter<"Bill"> | string
+  amount?: Prisma.FloatFilter<"Bill"> | number
+  latitude?: Prisma.FloatNullableFilter<"Bill"> | number | null
+  longitude?: Prisma.FloatNullableFilter<"Bill"> | number | null
   currency?: Prisma.StringFilter<"Bill"> | string
   paymentMethod?: Prisma.StringFilter<"Bill"> | string
   name?: Prisma.StringFilter<"Bill"> | string
@@ -300,6 +372,9 @@ export type BillOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   payerId?: Prisma.SortOrder
+  amount?: Prisma.SortOrder
+  latitude?: Prisma.SortOrderInput | Prisma.SortOrder
+  longitude?: Prisma.SortOrderInput | Prisma.SortOrder
   currency?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   name?: Prisma.SortOrder
@@ -311,8 +386,10 @@ export type BillOrderByWithAggregationInput = {
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
   _count?: Prisma.BillCountOrderByAggregateInput
+  _avg?: Prisma.BillAvgOrderByAggregateInput
   _max?: Prisma.BillMaxOrderByAggregateInput
   _min?: Prisma.BillMinOrderByAggregateInput
+  _sum?: Prisma.BillSumOrderByAggregateInput
 }
 
 export type BillScalarWhereWithAggregatesInput = {
@@ -322,6 +399,9 @@ export type BillScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"Bill"> | string
   userId?: Prisma.StringWithAggregatesFilter<"Bill"> | string
   payerId?: Prisma.StringWithAggregatesFilter<"Bill"> | string
+  amount?: Prisma.FloatWithAggregatesFilter<"Bill"> | number
+  latitude?: Prisma.FloatNullableWithAggregatesFilter<"Bill"> | number | null
+  longitude?: Prisma.FloatNullableWithAggregatesFilter<"Bill"> | number | null
   currency?: Prisma.StringWithAggregatesFilter<"Bill"> | string
   paymentMethod?: Prisma.StringWithAggregatesFilter<"Bill"> | string
   name?: Prisma.StringWithAggregatesFilter<"Bill"> | string
@@ -336,6 +416,9 @@ export type BillScalarWhereWithAggregatesInput = {
 
 export type BillCreateInput = {
   id?: string
+  amount: number
+  latitude?: number | null
+  longitude?: number | null
   currency: string
   paymentMethod: string
   name: string
@@ -355,6 +438,9 @@ export type BillUncheckedCreateInput = {
   id?: string
   userId: string
   payerId: string
+  amount: number
+  latitude?: number | null
+  longitude?: number | null
   currency: string
   paymentMethod: string
   name: string
@@ -370,6 +456,9 @@ export type BillUncheckedCreateInput = {
 
 export type BillUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -389,6 +478,9 @@ export type BillUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   payerId?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -406,6 +498,9 @@ export type BillCreateManyInput = {
   id?: string
   userId: string
   payerId: string
+  amount: number
+  latitude?: number | null
+  longitude?: number | null
   currency: string
   paymentMethod: string
   name: string
@@ -420,6 +515,9 @@ export type BillCreateManyInput = {
 
 export type BillUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -435,6 +533,9 @@ export type BillUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   payerId?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -467,6 +568,9 @@ export type BillCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   payerId?: Prisma.SortOrder
+  amount?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   name?: Prisma.SortOrder
@@ -479,10 +583,19 @@ export type BillCountOrderByAggregateInput = {
   isDeleted?: Prisma.SortOrder
 }
 
+export type BillAvgOrderByAggregateInput = {
+  amount?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
+}
+
 export type BillMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   payerId?: Prisma.SortOrder
+  amount?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   name?: Prisma.SortOrder
@@ -499,6 +612,9 @@ export type BillMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   userId?: Prisma.SortOrder
   payerId?: Prisma.SortOrder
+  amount?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
   currency?: Prisma.SortOrder
   paymentMethod?: Prisma.SortOrder
   name?: Prisma.SortOrder
@@ -509,6 +625,12 @@ export type BillMinOrderByAggregateInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   isDeleted?: Prisma.SortOrder
+}
+
+export type BillSumOrderByAggregateInput = {
+  amount?: Prisma.SortOrder
+  latitude?: Prisma.SortOrder
+  longitude?: Prisma.SortOrder
 }
 
 export type BillScalarRelationFilter = {
@@ -642,6 +764,22 @@ export type BillUncheckedUpdateManyWithoutTripNestedInput = {
   deleteMany?: Prisma.BillScalarWhereInput | Prisma.BillScalarWhereInput[]
 }
 
+export type FloatFieldUpdateOperationsInput = {
+  set?: number
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
+export type NullableFloatFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type EnumExpenseStatusFieldUpdateOperationsInput = {
   set?: $Enums.ExpenseStatus
 }
@@ -662,6 +800,9 @@ export type BillUpdateOneRequiredWithoutOwedFriendsNestedInput = {
 
 export type BillCreateWithoutUserInput = {
   id?: string
+  amount: number
+  latitude?: number | null
+  longitude?: number | null
   currency: string
   paymentMethod: string
   name: string
@@ -679,6 +820,9 @@ export type BillCreateWithoutUserInput = {
 export type BillUncheckedCreateWithoutUserInput = {
   id?: string
   payerId: string
+  amount: number
+  latitude?: number | null
+  longitude?: number | null
   currency: string
   paymentMethod: string
   name: string
@@ -725,6 +869,9 @@ export type BillScalarWhereInput = {
   id?: Prisma.StringFilter<"Bill"> | string
   userId?: Prisma.StringFilter<"Bill"> | string
   payerId?: Prisma.StringFilter<"Bill"> | string
+  amount?: Prisma.FloatFilter<"Bill"> | number
+  latitude?: Prisma.FloatNullableFilter<"Bill"> | number | null
+  longitude?: Prisma.FloatNullableFilter<"Bill"> | number | null
   currency?: Prisma.StringFilter<"Bill"> | string
   paymentMethod?: Prisma.StringFilter<"Bill"> | string
   name?: Prisma.StringFilter<"Bill"> | string
@@ -739,6 +886,9 @@ export type BillScalarWhereInput = {
 
 export type BillCreateWithoutPayerInput = {
   id?: string
+  amount: number
+  latitude?: number | null
+  longitude?: number | null
   currency: string
   paymentMethod: string
   name: string
@@ -756,6 +906,9 @@ export type BillCreateWithoutPayerInput = {
 export type BillUncheckedCreateWithoutPayerInput = {
   id?: string
   userId: string
+  amount: number
+  latitude?: number | null
+  longitude?: number | null
   currency: string
   paymentMethod: string
   name: string
@@ -797,6 +950,9 @@ export type BillUpdateManyWithWhereWithoutPayerInput = {
 
 export type BillCreateWithoutTripInput = {
   id?: string
+  amount: number
+  latitude?: number | null
+  longitude?: number | null
   currency: string
   paymentMethod: string
   name: string
@@ -815,6 +971,9 @@ export type BillUncheckedCreateWithoutTripInput = {
   id?: string
   userId: string
   payerId: string
+  amount: number
+  latitude?: number | null
+  longitude?: number | null
   currency: string
   paymentMethod: string
   name: string
@@ -855,6 +1014,9 @@ export type BillUpdateManyWithWhereWithoutTripInput = {
 
 export type BillCreateWithoutOwedFriendsInput = {
   id?: string
+  amount: number
+  latitude?: number | null
+  longitude?: number | null
   currency: string
   paymentMethod: string
   name: string
@@ -873,6 +1035,9 @@ export type BillUncheckedCreateWithoutOwedFriendsInput = {
   id?: string
   userId: string
   payerId: string
+  amount: number
+  latitude?: number | null
+  longitude?: number | null
   currency: string
   paymentMethod: string
   name: string
@@ -903,6 +1068,9 @@ export type BillUpdateToOneWithWhereWithoutOwedFriendsInput = {
 
 export type BillUpdateWithoutOwedFriendsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -921,6 +1089,9 @@ export type BillUncheckedUpdateWithoutOwedFriendsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   payerId?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -936,6 +1107,9 @@ export type BillUncheckedUpdateWithoutOwedFriendsInput = {
 export type BillCreateManyUserInput = {
   id?: string
   payerId: string
+  amount: number
+  latitude?: number | null
+  longitude?: number | null
   currency: string
   paymentMethod: string
   name: string
@@ -950,6 +1124,9 @@ export type BillCreateManyUserInput = {
 
 export type BillUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -967,6 +1144,9 @@ export type BillUpdateWithoutUserInput = {
 export type BillUncheckedUpdateWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   payerId?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -983,6 +1163,9 @@ export type BillUncheckedUpdateWithoutUserInput = {
 export type BillUncheckedUpdateManyWithoutUserInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   payerId?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -998,6 +1181,9 @@ export type BillUncheckedUpdateManyWithoutUserInput = {
 export type BillCreateManyPayerInput = {
   id?: string
   userId: string
+  amount: number
+  latitude?: number | null
+  longitude?: number | null
   currency: string
   paymentMethod: string
   name: string
@@ -1012,6 +1198,9 @@ export type BillCreateManyPayerInput = {
 
 export type BillUpdateWithoutPayerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1029,6 +1218,9 @@ export type BillUpdateWithoutPayerInput = {
 export type BillUncheckedUpdateWithoutPayerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1045,6 +1237,9 @@ export type BillUncheckedUpdateWithoutPayerInput = {
 export type BillUncheckedUpdateManyWithoutPayerInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1061,6 +1256,9 @@ export type BillCreateManyTripInput = {
   id?: string
   userId: string
   payerId: string
+  amount: number
+  latitude?: number | null
+  longitude?: number | null
   currency: string
   paymentMethod: string
   name: string
@@ -1074,6 +1272,9 @@ export type BillCreateManyTripInput = {
 
 export type BillUpdateWithoutTripInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1092,6 +1293,9 @@ export type BillUncheckedUpdateWithoutTripInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   payerId?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1108,6 +1312,9 @@ export type BillUncheckedUpdateManyWithoutTripInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   userId?: Prisma.StringFieldUpdateOperationsInput | string
   payerId?: Prisma.StringFieldUpdateOperationsInput | string
+  amount?: Prisma.FloatFieldUpdateOperationsInput | number
+  latitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
+  longitude?: Prisma.NullableFloatFieldUpdateOperationsInput | number | null
   currency?: Prisma.StringFieldUpdateOperationsInput | string
   paymentMethod?: Prisma.StringFieldUpdateOperationsInput | string
   name?: Prisma.StringFieldUpdateOperationsInput | string
@@ -1154,6 +1361,9 @@ export type BillSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   id?: boolean
   userId?: boolean
   payerId?: boolean
+  amount?: boolean
+  latitude?: boolean
+  longitude?: boolean
   currency?: boolean
   paymentMethod?: boolean
   name?: boolean
@@ -1177,6 +1387,9 @@ export type BillSelectScalar = {
   id?: boolean
   userId?: boolean
   payerId?: boolean
+  amount?: boolean
+  latitude?: boolean
+  longitude?: boolean
   currency?: boolean
   paymentMethod?: boolean
   name?: boolean
@@ -1189,7 +1402,7 @@ export type BillSelectScalar = {
   isDeleted?: boolean
 }
 
-export type BillOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "payerId" | "currency" | "paymentMethod" | "name" | "description" | "category" | "status" | "tripId" | "createdAt" | "updatedAt" | "isDeleted", ExtArgs["result"]["bill"]>
+export type BillOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "userId" | "payerId" | "amount" | "latitude" | "longitude" | "currency" | "paymentMethod" | "name" | "description" | "category" | "status" | "tripId" | "createdAt" | "updatedAt" | "isDeleted", ExtArgs["result"]["bill"]>
 export type BillInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   payer?: boolean | Prisma.FriendDefaultArgs<ExtArgs>
@@ -1210,6 +1423,9 @@ export type $BillPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     id: string
     userId: string
     payerId: string
+    amount: number
+    latitude: number | null
+    longitude: number | null
     currency: string
     paymentMethod: string
     name: string
@@ -1596,6 +1812,9 @@ export interface BillFieldRefs {
   readonly id: Prisma.FieldRef<"Bill", 'String'>
   readonly userId: Prisma.FieldRef<"Bill", 'String'>
   readonly payerId: Prisma.FieldRef<"Bill", 'String'>
+  readonly amount: Prisma.FieldRef<"Bill", 'Float'>
+  readonly latitude: Prisma.FieldRef<"Bill", 'Float'>
+  readonly longitude: Prisma.FieldRef<"Bill", 'Float'>
   readonly currency: Prisma.FieldRef<"Bill", 'String'>
   readonly paymentMethod: Prisma.FieldRef<"Bill", 'String'>
   readonly name: Prisma.FieldRef<"Bill", 'String'>

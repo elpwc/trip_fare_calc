@@ -78,6 +78,9 @@ model Bill {
   userId        String
   payer         Friend       @relation("PayerFriend", fields: [payerId], references: [id])
   payerId       String
+  amount        Float
+  latitude      Float?
+  longitude     Float?
   currency      String
   paymentMethod String
   name          String

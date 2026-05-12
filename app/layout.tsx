@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import BottomMenu from '@/src/components/BottomMenu';
 import { AuthProvider } from '@/src/utils/auth-provider';
+import 'leaflet/dist/leaflet.css';
 import "./globals.css";
 
 const geistSans = Geist({
