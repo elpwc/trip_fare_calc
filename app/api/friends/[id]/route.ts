@@ -19,7 +19,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name, description } = await request.json();
+    const { name, description, isSelf } = await request.json();
     const { id: friendId } = await params;
 
     const friend = await prisma.friend.findFirst({
@@ -35,6 +35,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       data: {
         ...(name !== undefined && { name }),
         ...(description !== undefined && { description }),
+        ...(isSelf !== undefined && { isSelf }),
       },
     });
 

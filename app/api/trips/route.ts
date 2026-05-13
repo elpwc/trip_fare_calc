@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
         members: {
           include: {
             friend: {
-              select: { id: true, name: true, description: true, participationCount: true },
+              select: { id: true, name: true, description: true, participationCount: true, isSelf: true },
             },
           },
         },
@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
             id: true,
             payerId: true,
             amount: true,
+            currency: true,
             latitude: true,
             longitude: true,
             owedFriends: true,
@@ -84,7 +85,7 @@ export async function POST(request: NextRequest) {
         members: {
           include: {
             friend: {
-              select: { id: true, name: true, description: true, participationCount: true },
+              select: { id: true, name: true, description: true, participationCount: true, isSelf: true },
             },
           },
         },

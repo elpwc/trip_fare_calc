@@ -2,21 +2,30 @@
 
 import React from 'react';
 
-type Friend = {
+// 测试用的成员数据（包含isSelf字段）
+const testMembers = [
+  { id: '1', name: '张三', participationCount: 5, description: '', isSelf: false },
+  { id: '2', name: '李四', participationCount: 3, description: '', isSelf: true },
+  { id: '3', name: '王五', participationCount: 8, description: '', isSelf: false },
+  { id: '4', name: '赵六', participationCount: 2, description: '', isSelf: false },
+  { id: '5', name: 'Alice', participationCount: 4, description: '', isSelf: false },
+  { id: '6', name: 'Bob', participationCount: 6, description: '', isSelf: false },
+];
+
+type TripMember = {
   id: string;
   name: string;
   participationCount: number;
   description: string;
-  trips: any[];
   isSelf: boolean;
 };
 
 type FriendListProps = {
-  friends: Friend[];
-  onFriendClick: (friend: Friend) => void;
+  friends: TripMember[];
+  onFriendClick: (friend: TripMember) => void;
 };
 
-const FriendList: React.FC<FriendListProps> = ({
+const FriendListTest: React.FC<FriendListProps> = ({
   friends,
   onFriendClick,
 }) => {
@@ -56,10 +65,11 @@ const FriendList: React.FC<FriendListProps> = ({
     // 如果是英文，取前两个字符
     return name.substring(0, 2);
   };
+
   const getFriendPosition = (index: number, total: number) => {
     if (total === 0) return { x: 0, y: 0 };
     const angle = (index / total) * 2 * Math.PI;
-    const radius = 150; // Adjust radius as needed
+    const radius = 150;
     return {
       x: Math.cos(angle) * radius,
       y: Math.sin(angle) * radius,
@@ -76,7 +86,7 @@ const FriendList: React.FC<FriendListProps> = ({
   const maxParticipation = Math.max(...friends.map(f => f.participationCount), 0);
 
   return (
-    <div className="relative w-full h-full flex items-center justify-center">
+    <div className="relative w-full h-96 flex items-center justify-center bg-gray-100">
       {friends.map((friend, index) => {
         const position = getFriendPosition(index, friends.length);
         const size = getFriendSize(friend.participationCount, maxParticipation);
@@ -105,15 +115,22 @@ const FriendList: React.FC<FriendListProps> = ({
           </div>
         );
       })}
-      {friends.length === 0 && (
-        <div className="text-center text-slate-500">
-          <div className="text-4xl mb-4">👥</div>
-          <div className="text-lg font-medium">还没有好友</div>
-          <div className="mt-2 text-sm">点击右下角的加号按钮添加第一位好友</div>
-        </div>
-      )}
     </div>
   );
 };
 
-export default FriendList;
+export default function FriendListTestPage() {
+  const handleFriendClick = (friend: TripMember) => {
+    alert(`点击了朋友: ${friend.name}${friend.isSelf ? ' (本人)' : ''}`);
+  };
+
+  return (
+    <div className="p-8">
+      <h1 className="text-2xl font-bold mb-4">朋友列表测试</h1>
+      <p className="mb-4 text-gray-600">
+        测试功能：根据名称自动生成不同背景色，最多显示两个文字，本人显示橙色"我"标识
+      </p>
+      <FriendListTest friends={testMembers} onFriendClick={handleFriendClick} />
+    </div>
+  );
+}
