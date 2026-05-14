@@ -6,47 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { getAuthHeaders } from '@/src/utils/auth';
 import { CURRENCIES, Currency, CURRENCY_DEFINITIONS, formatAmount } from '@/src/utils/currencies';
 import { FlagSVG } from '@/src/components/FlagSVG';
-
-type Friend = {
-	id: string;
-	name: string;
-};
-
-type BillOwed = {
-	id: string;
-	friendId: string;
-};
-
-type Bill = {
-	id: string;
-	payerId: string;
-	amount: number;
-	currency: string;
-	owedFriends: BillOwed[];
-	name: string;
-	category: string;
-	status: string;
-};
-
-type Trip = {
-	id: string;
-	name: string;
-	description?: string;
-	members: Friend[];
-	bills: Bill[];
-};
-
-type FlowItem = {
-	id: string;
-	fromId: string;
-	toId: string;
-	fromName: string;
-	toName: string;
-	amount: number;
-	currency: string;
-	originalTotals: { currency: string; amount: number }[];
-	createdAt: string;
-};
+import { Friend, Bill, BillOwed, Trip, FlowItem } from '@/src/types';
 
 type SettledRecord = FlowItem & {
 	settledAt: string;
@@ -213,19 +173,21 @@ export default function SettlePage() {
 			if (!owedIds.length) return;
 
 			const share = bill.amount / owedIds.length;
-			const conversionRate = bill.currency === selectedCurrency ? 1 : exchangeInfo.rates[bill.currency];
-			const convertedShare = bill.currency === selectedCurrency ? share : conversionRate ? share / conversionRate : 0;
+			const billCurrency = bill.currency || 'CNY';
+			const conversionRate = billCurrency === selectedCurrency ? 1 : exchangeInfo.rates[billCurrency];
+			const convertedShare = billCurrency === selectedCurrency ? share : conversionRate ? share / conversionRate : 0;
 
 			owedIds.forEach((owedId) => {
 				const key = `${owedId}|${bill.payerId}`;
 				const existing = flowMap.get(key) ?? { amount: 0, originalTotals: {} };
 				existing.amount += convertedShare;
-				existing.originalTotals[bill.currency] = (existing.originalTotals[bill.currency] ?? 0) + share;
+				existing.originalTotals[billCurrency] = (existing.originalTotals[billCurrency] ?? 0) + share;
 				flowMap.set(key, existing);
 			});
 		});
 
 		const processed = new Set<string>();
+
 		const items: FlowItem[] = [];
 
 		for (const [key, bucket] of flowMap.entries()) {
@@ -376,12 +338,14 @@ export default function SettlePage() {
 													<span className="text-3xl">{item.toName}</span>
 												</div>
 												<div className="w-full flex flex-row">
-													<div className='w-full'>
+													<div className="w-full">
 														<p className="text-4xl w-full text-center">{formatAmount(item.amount, selectedCurrency)}</p>
 
 														{hasConversion && exchangeInfo ? (
 															<div className="mt-1 rounded-3xl p-0 text-[10px] text-slate-400 dark:bg-slate-900 dark:text-slate-400 flex flex-row flex-wrap">
-																<p className="mt-0 w-min text-nowrap">{item.originalTotals.map((origin) => `${origin.currency} ${origin.amount.toFixed(2)}`).join('，')}</p>
+																<p className="mt-0 w-min text-nowrap">
+																	{item.originalTotals.map((origin) => `${origin.currency} ${origin.amount.toFixed(2)}`).join('，')}
+																</p>
 																<p className="mt-0 w-min text-nowrap p-0">
 																	({item.originalTotals.map((origin) => `${getConversionRateText(origin.currency, exchangeInfo.rates, selectedCurrency)}`).join('；')}{' '}
 																	, {exchangeInfo.date})
@@ -392,7 +356,7 @@ export default function SettlePage() {
 													<button
 														type="button"
 														onClick={() => handleSettleItem(item)}
-							className="rounded-full border border-slate-300 bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 text-nowrap h-min"
+														className="rounded-full border border-slate-300 bg-green-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100 text-nowrap h-min"
 													>
 														结清
 													</button>

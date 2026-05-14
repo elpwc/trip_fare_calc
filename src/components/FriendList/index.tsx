@@ -1,15 +1,8 @@
 'use client';
 
 import React from 'react';
-
-type Friend = {
-  id: string;
-  name: string;
-  participationCount: number;
-  description: string;
-  trips: any[];
-  isSelf: boolean;
-};
+import FriendIcon, { getBackgroundColor, getDisplayText } from '@/src/components/FriendIcon';
+import { Friend } from '@/src/types';
 
 type FriendListProps = {
   friends: Friend[];
@@ -20,42 +13,6 @@ const FriendList: React.FC<FriendListProps> = ({
   friends,
   onFriendClick,
 }) => {
-  // 根据名称生成不同的背景色
-  const getBackgroundColor = (name: string) => {
-    const colors = [
-      'bg-blue-500',
-      'bg-green-500',
-      'bg-purple-500',
-      'bg-pink-500',
-      'bg-indigo-500',
-      'bg-red-500',
-      'bg-yellow-500',
-      'bg-teal-500',
-      'bg-orange-500',
-      'bg-cyan-500',
-      'bg-lime-500',
-      'bg-emerald-500',
-      'bg-violet-500',
-      'bg-fuchsia-500',
-      'bg-rose-500',
-      'bg-sky-500',
-    ];
-
-    // 使用名称的字符码和来决定颜色
-    const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return colors[hash % colors.length];
-  };
-
-  // 获取显示文字（最多两个字符）
-  const getDisplayText = (name: string) => {
-    if (name.length <= 2) return name;
-    // 如果是中文，取前两个字符
-    if (/[\u4e00-\u9fa5]/.test(name)) {
-      return name.substring(0, 2);
-    }
-    // 如果是英文，取前两个字符
-    return name.substring(0, 2);
-  };
   const getFriendPosition = (index: number, total: number) => {
     if (total === 0) return { x: 0, y: 0 };
     const angle = (index / total) * 2 * Math.PI;

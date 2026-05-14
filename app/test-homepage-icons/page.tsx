@@ -1,6 +1,8 @@
 'use client';
 
 import React from 'react';
+import FriendIcon, { getBackgroundColor, getDisplayText } from '@/src/components/FriendIcon';
+import { TripMember } from '@/src/types';
 
 // 测试用的成员数据（包含isSelf字段）
 const testMembers = [
@@ -12,52 +14,7 @@ const testMembers = [
   { id: '6', name: 'Bob', participationCount: 6, description: '', isSelf: false },
 ];
 
-type TripMember = {
-  id: string;
-  name: string;
-  participationCount: number;
-  description: string;
-  isSelf: boolean;
-};
-
 const HomepageIconTest: React.FC = () => {
-  // 根据名称生成不同的背景色
-  const getBackgroundColor = (name: string) => {
-    const colors = [
-      'bg-blue-500',
-      'bg-green-500',
-      'bg-purple-500',
-      'bg-pink-500',
-      'bg-indigo-500',
-      'bg-red-500',
-      'bg-yellow-500',
-      'bg-teal-500',
-      'bg-orange-500',
-      'bg-cyan-500',
-      'bg-lime-500',
-      'bg-emerald-500',
-      'bg-violet-500',
-      'bg-fuchsia-500',
-      'bg-rose-500',
-      'bg-sky-500',
-    ];
-
-    // 使用名称的字符码和来决定颜色
-    const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    return colors[hash % colors.length];
-  };
-
-  // 获取显示文字（最多两个字符）
-  const getDisplayText = (name: string) => {
-    if (name.length <= 2) return name;
-    // 如果是中文，取前两个字符
-    if (/[\u4e00-\u9fa5]/.test(name)) {
-      return name.substring(0, 2);
-    }
-    // 如果是英文，取前两个字符
-    return name.substring(0, 2);
-  };
-
   return (
     <div className="p-8">
       <h1 className="text-2xl font-bold mb-4">一览页Icon样式测试</h1>

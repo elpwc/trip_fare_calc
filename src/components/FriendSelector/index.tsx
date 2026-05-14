@@ -1,12 +1,9 @@
 'use client';
 
 import React from 'react';
+import { Member } from '@/src/types';
 
-type Friend = {
-  id: string;
-  name: string;
-  participationCount: number;
-};
+type Friend = Member;
 
 type FriendSelectorProps = {
   friends: Friend[];

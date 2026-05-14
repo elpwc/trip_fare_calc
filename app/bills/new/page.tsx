@@ -4,16 +4,13 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Modal } from '@/src/components/Modal';
+import FriendIcon from '@/src/components/FriendIcon';
 import { getAuthHeaders } from '@/src/utils/auth';
 import { CURRENCIES, Currency, CURRENCY_DEFINITIONS, getCurrencyName } from '@/src/utils/currencies';
 import { FlagSVG } from '@/src/components/FlagSVG';
+import { Member } from '@/src/types';
 
-type Friend = {
-	id: string;
-	name: string;
-	description: string;
-	participationCount: number;
-};
+type Friend = Member;
 
 const CATEGORIES = [
 	{ key: '吃饭', label: '吃饭', bg: 'bg-orange-500', text: 'text-white' },
@@ -60,7 +57,6 @@ export default function NewBillPage() {
 
 	const [isPaymentMethodModalOpen, setIsPaymentMethodModalOpen] = useState(false);
 	const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
-	const [isPayerModalOpen, setIsPayerModalOpen] = useState(false);
 
 	useEffect(() => {
 		if (!tripId) return;
@@ -121,6 +117,9 @@ export default function NewBillPage() {
 		}
 
 		try {
+			// 如果没有填写description，则使用category作为description
+			const finalDescription = description.trim() || category;
+
 			const response = await fetch('/api/bills', {
 				method: 'POST',
 				headers: {
@@ -134,7 +133,7 @@ export default function NewBillPage() {
 					currency,
 					paymentMethod,
 					name: billName.trim(),
-					description,
+					description: finalDescription,
 					category,
 					status,
 					owedFriendIds,
@@ -155,7 +154,6 @@ export default function NewBillPage() {
 		}
 	};
 
-	const selectedPayerName = tripMembers.find((f) => f.id === payerId)?.name || '选择付钱人';
 
 	return (
 		<div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
@@ -222,12 +220,26 @@ export default function NewBillPage() {
 					</div>
 
 					{/* Row 4: Payer Selection */}
-					<div className="flex items-center justify-between border-4 border-slate-300 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-900 px-4 py-4">
-						<span className="text-base font-semibold">付钱人</span>
-						<button onClick={() => setIsPayerModalOpen(true)} className="flex items-center gap-3 hover:opacity-75 transition">
-							<span className="text-sm font-semibold text-blue-600">{selectedPayerName}</span>
-							<div className="w-10 h-10 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">{selectedPayerName.charAt(0).toUpperCase()}</div>
-						</button>
+					<div className="border-4 border-slate-300 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-900 p-4">
+						<div className="mb-4 flex items-center justify-between">
+							<span className="text-base font-semibold">付钱人</span>
+						</div>
+
+						{/* All Friends for Payer Selection */}
+						<div className="flex flex-wrap gap-2 justify-center">
+							{tripMembers.map((friend) => (
+								<button
+									key={friend.id}
+									onClick={() => setPayerId(friend.id)}
+									className={`flex flex-col min-w-16 items-center gap-1 p-2 rounded-lg transition ${
+										payerId === friend.id ? 'bg-blue-50 dark:bg-blue-900/30 ring-2 ring-blue-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800'
+									}`}
+								>
+									<FriendIcon name={friend.name} size="lg" isSelf={friend.isSelf}/>
+									<span className="text-xs font-semibold text-center max-w-14 truncate">{friend.name}</span>
+								</button>
+							))}
+						</div>
 					</div>
 
 					{/* Row 5: Owed Friends Selection */}
@@ -235,55 +247,23 @@ export default function NewBillPage() {
 						<div className="mb-4 flex items-center justify-between">
 							<span className="text-base font-semibold">欠钱人</span>
 							<button onClick={handleSelectAllFriends} className="px-3 py-1 text-xs font-semibold bg-slate-200 dark:bg-slate-800 rounded-full hover:bg-slate-300 dark:hover:bg-slate-700">
-								全部人
+								全部
 							</button>
 						</div>
 
-						{/* Selected Friends */}
-						<div className="mb-4 min-h-16 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-lg p-3 flex flex-wrap gap-2 items-center">
-							<AnimatePresence>
-								{owedFriendIds.map((friendId) => {
-									const friend = tripMembers.find((f) => f.id === friendId);
-									if (!friend) return null;
-									return (
-										<motion.button
-											key={friendId}
-											layoutId={`friend-${friendId}`}
-											initial={{ scale: 0, opacity: 0 }}
-											animate={{ scale: 1, opacity: 1 }}
-											exit={{ scale: 0, opacity: 0 }}
-											onClick={() => handleToggleFriend(friendId)}
-											className="flex flex-col items-center gap-1 group"
-										>
-											<div className="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold group-hover:ring-2 group-hover:ring-blue-300 transition">
-												{friend.name.charAt(0).toUpperCase()}
-											</div>
-											<span className="text-xs font-semibold text-center max-w-12 truncate">{friend.name}</span>
-										</motion.button>
-									);
-								})}
-							</AnimatePresence>
-							{owedFriendIds.length === 0 && <span className="text-sm text-slate-500">点击下方选择欠钱人</span>}
-						</div>
-
 						{/* All Friends */}
-						<div className="flex flex-wrap gap-2">
+						<div className="flex flex-wrap gap-2 justify-center">
 							{tripMembers.map((friend) => (
-								<motion.button
+								<button
 									key={friend.id}
-									layoutId={`friend-${friend.id}`}
 									onClick={() => handleToggleFriend(friend.id)}
-									className={`flex flex-col items-center gap-1 p-2 rounded-lg transition ${
-										owedFriendIds.includes(friend.id) ? 'bg-blue-50 dark:bg-blue-900/30' : 'hover:bg-slate-50 dark:hover:bg-slate-800'
+									className={`flex flex-col min-w-16 items-center gap-1 p-2 rounded-lg transition ${
+										owedFriendIds.includes(friend.id) ? 'bg-blue-50 dark:bg-blue-900/30 ring-2 ring-blue-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800'
 									}`}
 								>
-									<div
-										className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-white ${owedFriendIds.includes(friend.id) ? 'bg-blue-600' : 'bg-slate-400'}`}
-									>
-										{friend.name.charAt(0).toUpperCase()}
-									</div>
+									<FriendIcon name={friend.name} size="lg" isSelf={friend.isSelf}/>
 									<span className="text-xs font-semibold text-center max-w-14 truncate">{friend.name}</span>
-								</motion.button>
+								</button>
 							))}
 						</div>
 					</div>
@@ -398,29 +378,6 @@ export default function NewBillPage() {
 						>
 							<FlagSVG currency={curr} />
 							{curr.code}
-						</button>
-					))}
-				</div>
-			</Modal>
-
-			{/* Payer Modal */}
-			<Modal isOpen={isPayerModalOpen} onClose={() => setIsPayerModalOpen(false)} title="选择付钱人" showOkButton={false} showCancelButton cancelText="关闭">
-				<div className="grid grid-cols-2 gap-3">
-					{tripMembers.map((friend) => (
-						<button
-							key={friend.id}
-							onClick={() => {
-								setPayerId(friend.id);
-								setIsPayerModalOpen(false);
-							}}
-							className={`flex flex-col items-center gap-2 py-4 px-3 border-3 rounded-lg transition ${
-								payerId === friend.id ? 'border-blue-600 bg-blue-50 dark:bg-blue-900/30' : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-blue-500'
-							}`}
-						>
-							<div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-white ${payerId === friend.id ? 'bg-blue-600' : 'bg-slate-400'}`}>
-								{friend.name.charAt(0).toUpperCase()}
-							</div>
-							<span className="text-sm font-semibold text-center">{friend.name}</span>
 						</button>
 					))}
 				</div>

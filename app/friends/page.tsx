@@ -4,15 +4,7 @@ import { Modal } from '@/src/components/Modal';
 import { getAuthHeaders } from '@/src/utils/auth';
 import FriendList from '@/src/components/FriendList';
 import React, { useState, useEffect } from 'react';
-
-type Friend = {
-	id: string;
-	name: string;
-	description: string;
-	participationCount: number;
-	trips: { id: string; name: string; date: string }[];
-	isSelf: boolean;
-};
+import { Friend } from '@/src/types';
 
 const FriendsPage: React.FC = () => {
 	const [friends, setFriends] = useState<Friend[]>([]);

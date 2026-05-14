@@ -5,46 +5,9 @@ import { useRouter } from 'next/navigation';
 import { Modal } from '@/src/components/Modal';
 import FriendSelector from '@/src/components/FriendSelector';
 import BillMap from '@/src/components/BillMap';
+import FriendIcon from '@/src/components/FriendIcon';
 import { getAuthHeaders } from '@/src/utils/auth';
-
-type Friend = {
-	id: string;
-	name: string;
-	description: string;
-	participationCount: number;
-	trips: { id: string; name: string; date: string }[];
-};
-
-type TripMember = {
-	id: string;
-	name: string;
-	description: string;
-	participationCount: number;
-	isSelf: boolean;
-};
-
-type Trip = {
-	id: string;
-	name: string;
-	description: string;
-	createdAt: string;
-	members: TripMember[];
-	bills: any[];
-};
-
-type Bill = {
-	id: string;
-	payerId: string;
-	amount: number;
-	latitude: number | null;
-	longitude: number | null;
-	owedFriends: any[];
-	name: string;
-	category: string;
-	status: string;
-	paymentMethod?: string;
-	description?: string;
-};
+import { Friend, TripMember, Trip, Bill } from '@/src/types';
 
 export default function HomePage() {
 	const router = useRouter();
@@ -62,43 +25,6 @@ export default function HomePage() {
 	const [selectedFriendsForTrip, setSelectedFriendsForTrip] = useState<string[]>([]);
 	const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 	const [mapTileLayer, setMapTileLayer] = useState<'osm' | 'satellite'>('osm');
-
-	// 根据名称生成不同的背景色
-	const getBackgroundColor = (name: string) => {
-		const colors = [
-			'bg-blue-500',
-			'bg-green-500',
-			'bg-purple-500',
-			'bg-pink-500',
-			'bg-indigo-500',
-			'bg-red-500',
-			'bg-yellow-500',
-			'bg-teal-500',
-			'bg-orange-500',
-			'bg-cyan-500',
-			'bg-lime-500',
-			'bg-emerald-500',
-			'bg-violet-500',
-			'bg-fuchsia-500',
-			'bg-rose-500',
-			'bg-sky-500',
-		];
-
-		// 使用名称的字符码和来决定颜色
-		const hash = name.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-		return colors[hash % colors.length];
-	};
-
-	// 获取显示文字（最多两个字符）
-	const getDisplayText = (name: string) => {
-		if (name.length <= 2) return name;
-		// 如果是中文，取前两个字符
-		if (/[\u4e00-\u9fa5]/.test(name)) {
-			return name.substring(0, 2);
-		}
-		// 如果是英文，取前两个字符
-		return name.substring(0, 2);
-	};
 
 	useEffect(() => {
 		fetchTrips();
@@ -352,14 +278,7 @@ export default function HomePage() {
 									}}
 									className="cursor-pointer"
 								>
-									<div className={`relative w-12 h-12 ${getBackgroundColor(member.name)} rounded-full flex items-center justify-center text-white font-bold`}>
-										{getDisplayText(member.name)}
-										{member.isSelf && (
-											<div className="absolute -bottom-1 -right-1 bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-md">
-												我
-											</div>
-										)}
-									</div>
+									<FriendIcon name={member.name} size="lg" isSelf={member.isSelf} />
 								</button>
 								<p className="max-w-18 truncate text-xs text-slate-700 dark:text-slate-300">{member.name}</p>
 							</div>
@@ -406,25 +325,18 @@ export default function HomePage() {
 									{currentBills.map((bill, index) => (
 										<tr key={bill.id} className={`border-b ${index === currentBills.length - 1 ? '' : 'border-slate-200'} dark:border-slate-800`}>
 											<td className="px-3 py-1">
-												<div className={`w-8 h-8 ${getBackgroundColor((currentTrip?.members || []).find((m) => m.id === bill.payerId)?.name || '?')} rounded-full flex items-center justify-center text-white font-bold text-xs`}>
-													{getDisplayText((currentTrip?.members || []).find((m) => m.id === bill.payerId)?.name || '?')}
-												</div>
+												<FriendIcon
+													name={(currentTrip?.members || []).find((m) => m.id === bill.payerId)?.name || '?'}
+													size="md"
+													isSelf={(currentTrip?.members || []).find((m) => m.id === bill.payerId)?.isSelf}
+												/>
 											</td>
 											<td className="px-3 py-1 font-semibold text-slate-900 dark:text-slate-100">¥{bill.amount}</td>
 											<td className="px-3 py-1">
 												<div className="flex flex-wrap items-center gap-1">
 													{bill.owedFriends.slice(0, 4).map((owed: any) => {
 														const member = (currentTrip?.members || []).find((m) => m.id === owed.friendId);
-														return (
-															<div key={owed.id} className={`relative w-6 h-6 ${getBackgroundColor(member?.name || '?')} rounded-full flex items-center justify-center text-white font-bold text-xs`}>
-																{getDisplayText(member?.name || '?')}
-																{member?.isSelf && (
-																	<div className="absolute -bottom-0.5 -right-0.5 bg-orange-500 text-white rounded-full w-3 h-3 flex items-center justify-center text-[8px] font-bold">
-																		我
-																	</div>
-																)}
-															</div>
-														);
+														return <FriendIcon key={owed.id} name={member?.name || '?'} size="sm" isSelf={member?.isSelf} />;
 													})}
 													{bill.owedFriends.length > 4 ? (
 														<span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-slate-100 px-1 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
