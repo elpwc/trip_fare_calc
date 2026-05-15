@@ -187,19 +187,25 @@ const FriendsPage: React.FC = () => {
 	const maxParticipation = Math.max(...friends.map((f) => f.participationCount), 0);
 
 	return (
-		<div className="relative w-full min-h-screen bg-gray-100 flex items-center justify-center px-4 py-2">
-			<div className="relative w-full max-w-4xl h-[calc(100vh)] rounded-3xl border border-slate-200 bg-white/80 shadow-sm backdrop-blur">
-				<FriendList friends={friends} onFriendClick={handleFriendClick} />
+		<div className="relative w-full min-h-screen bg-gray-100 flex justify-center px-4 py-2">
+			<div className="w-full">
+				<div>
+					<p className="text-4xl px-2 pt-4">旅伴一览</p>
+					<p className="text-[12px] px-2 py-2 text-gray-500">在这里提前设置好所有旅伴，方便在新建旅行和记账时快速选择</p>
+				</div>
+				<div className="relative w-full max-w-4xl h-[calc(100vh-250px)] rounded-3xl border border-slate-200 bg-white/80 shadow-sm backdrop-blur">
+					<FriendList friends={friends} onFriendClick={handleFriendClick} />
+				</div>
 			</div>
 
-			{/* Add Friend Button */}
 			<button
-				className="fixed z-50 bottom-26 right-6 bg-green-500 text-white rounded-full w-12 h-12 flex items-center justify-center text-2xl font-bold shadow-lg hover:bg-green-600"
+				type="button"
 				onClick={() => setIsAddingFriend(true)}
+				className="fixed z-50 bottom-26 right-6 h-16 w-16 items-center justify-center rounded-full bg-emerald-600 text-white shadow-2xl shadow-emerald-600/40 transition hover:bg-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-300/60"
+				aria-label="添加旅伴"
 			>
-				+
+				<span className="text-3xl font-bold leading-none">+</span>
 			</button>
-
 			{/* Friend Modal */}
 			<Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="" showCloseButton={false} className="max-w-md">
 				{selectedFriend && (
