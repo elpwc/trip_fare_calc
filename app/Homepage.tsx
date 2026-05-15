@@ -8,6 +8,7 @@ import BillMap from '@/src/components/BillMap';
 import FriendIcon from '@/src/components/FriendIcon';
 import { getAuthHeaders } from '@/src/utils/auth';
 import { Friend, TripMember, Trip, Bill } from '@/src/types';
+import { CURRENCY_DEFINITIONS } from '@/src/utils/currencies';
 
 export default function HomePage() {
 	const router = useRouter();
@@ -331,7 +332,7 @@ export default function HomePage() {
 													isSelf={(currentTrip?.members || []).find((m) => m.id === bill.payerId)?.isSelf}
 												/>
 											</td>
-											<td className="px-3 py-1 font-semibold text-slate-900 dark:text-slate-100">¥{bill.amount}</td>
+											<td className="px-3 py-1 font-semibold text-slate-900 dark:text-slate-100">{bill.amount + CURRENCY_DEFINITIONS[bill.currency ?? 'CNY'].suffix}</td>
 											<td className="px-3 py-1">
 												<div className="flex flex-wrap items-center gap-1">
 													{bill.owedFriends.slice(0, 4).map((owed: any) => {
