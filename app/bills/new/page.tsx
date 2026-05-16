@@ -154,14 +154,16 @@ export default function NewBillPage() {
 		}
 	};
 
-
 	return (
 		<div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
 			<div className="max-w-2xl mx-auto px-4 py-8 pb-24">
 				{/* Header */}
 				<div className="mb-8 flex items-center justify-between">
-					<button onClick={() => router.back()} className="text-sm font-semibold text-blue-600 hover:text-blue-500">
-						← 返回
+					<button onClick={() => router.back()} className="flex text-[18px] font-semibold text-blue-600 hover:text-blue-500">
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+							<path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z" />
+						</svg>
+						返回
 					</button>
 					<h1 className="text-3xl font-bold">新建账单</h1>
 					<div className="w-12" />
@@ -235,7 +237,7 @@ export default function NewBillPage() {
 										payerId === friend.id ? 'bg-blue-50 dark:bg-blue-900/30 ring-2 ring-blue-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800'
 									}`}
 								>
-									<FriendIcon name={friend.name} size="lg" isSelf={friend.isSelf}/>
+									<FriendIcon name={friend.name} size="lg" isSelf={friend.isSelf} />
 									<span className="text-xs font-semibold text-center max-w-14 truncate">{friend.name}</span>
 								</button>
 							))}
@@ -261,7 +263,7 @@ export default function NewBillPage() {
 										owedFriendIds.includes(friend.id) ? 'bg-blue-50 dark:bg-blue-900/30 ring-2 ring-blue-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800'
 									}`}
 								>
-									<FriendIcon name={friend.name} size="lg" isSelf={friend.isSelf}/>
+									<FriendIcon name={friend.name} size="lg" isSelf={friend.isSelf} />
 									<span className="text-xs font-semibold text-center max-w-14 truncate">{friend.name}</span>
 								</button>
 							))}

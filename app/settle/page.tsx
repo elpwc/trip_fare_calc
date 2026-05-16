@@ -265,17 +265,18 @@ export default function SettlePage() {
 			<div className="max-w-5xl mx-auto px-4 py-8 pb-24">
 				<div className="mb-2 flex flex-wrap items-start justify-between gap-4">
 					<div className="space-y-1">
-						<p className="text-sm uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">旅行结算</p>
+						<div className="flex items-center gap-2">
+							<button onClick={() => router.push('/')} className="flex text-[18px] font-semibold text-blue-600 hover:text-blue-500">
+								<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+									<path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z" />
+								</svg>
+								返回
+							</button>
+							<p className="text-[18px] uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">旅行结算</p>
+						</div>
 						<h1 className="text-4xl font-bold">{trip.name}</h1>
 					</div>
 					<div className="flex flex-wrap items-center gap-3">
-						<button
-							type="button"
-							onClick={() => router.push('/')}
-							className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
-						>
-							返回首页
-						</button>
 						<select
 							value={selectedCurrency}
 							onChange={(event) => setSelectedCurrency(event.target.value)}
@@ -289,10 +290,36 @@ export default function SettlePage() {
 						</select>
 						<button
 							type="button"
+							disabled={exchangeLoading}
 							onClick={() => setRateRefreshKey((current) => current + 1)}
 							className="rounded-full border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100"
 						>
-							刷新汇率
+							{exchangeLoading ? (
+								<span className="flex items-center gap-1">
+									正在获取
+									<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+										<path d="M2.5 15a.5.5 0 1 1 0-1h1v-1a4.5 4.5 0 0 1 2.557-4.06c.29-.139.443-.377.443-.59v-.7c0-.213-.154-.451-.443-.59A4.5 4.5 0 0 1 3.5 3V2h-1a.5.5 0 0 1 0-1h11a.5.5 0 0 1 0 1h-1v1a4.5 4.5 0 0 1-2.557 4.06c-.29.139-.443.377-.443.59v.7c0 .213.154.451.443.59A4.5 4.5 0 0 1 12.5 13v1h1a.5.5 0 0 1 0 1zm2-13v1c0 .537.12 1.045.337 1.5h6.326c.216-.455.337-.963.337-1.5V2zm3 6.35c0 .701-.478 1.236-1.011 1.492A3.5 3.5 0 0 0 4.5 13s.866-1.299 3-1.48zm1 0v3.17c2.134.181 3 1.48 3 1.48a3.5 3.5 0 0 0-1.989-3.158C8.978 9.586 8.5 9.052 8.5 8.351z" />
+									</svg>
+								</span>
+							) : exchangeError ? (
+								<span className="flex items-center gap-1">
+									获取失败
+									<span className="text-red-600">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+											<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z" />
+										</svg>
+									</span>
+								</span>
+							) : (
+								<span className="flex items-center gap-1">
+									刷新汇率
+									<span className="text-green-600">
+										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+											<path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z" />
+										</svg>
+									</span>
+								</span>
+							)}
 						</button>
 					</div>
 				</div>
@@ -315,7 +342,7 @@ export default function SettlePage() {
 
 				<section className="mt-4 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
 					<div className="flex items-center justify-between gap-3">
-						<div>
+						<div className="flex items-center gap-2 flex-wrap">
 							<p className="text-base font-semibold">算钱结果</p>
 							<p className="mt-0 text-sm text-slate-500 dark:text-slate-400">不计算已结清账单</p>
 						</div>
