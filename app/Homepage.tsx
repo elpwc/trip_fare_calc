@@ -316,8 +316,7 @@ export default function HomePage() {
 					</button>
 					<button
 						type="button"
-						onClick={() => {
-						}}
+						onClick={() => {}}
 						className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 					>
 						<span></span>
@@ -330,7 +329,7 @@ export default function HomePage() {
 						<p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">参与者</p>
 					</div>
 
-					<div className="mt-2 flex gap-3 overflow-x-auto pb-2">
+					<div className="mt-2 flex gap-3 overflow-x-auto">
 						{(currentTrip?.members || []).map((member) => (
 							<div key={member.id} className="flex min-w-16 flex-col items-center gap-2 text-center">
 								<button
@@ -340,7 +339,7 @@ export default function HomePage() {
 									}}
 									className="cursor-pointer"
 								>
-									<FriendIcon name={member.name} size="lg" isSelf={member.isSelf} />
+									<FriendIcon name={member.name} size="md" isSelf={member.isSelf} />
 								</button>
 								<p className="max-w-18 truncate text-xs text-slate-700 dark:text-slate-300">{member.name}</p>
 							</div>
@@ -349,7 +348,7 @@ export default function HomePage() {
 						<button
 							type="button"
 							onClick={() => setIsAddMemberModalOpen(true)}
-							className="flex h-12 w-12 items-center justify-center rounded-full border border-dashed border-slate-300 bg-white text-lg font-semibold text-slate-600 transition hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
+							className="flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-slate-300 bg-white text-lg font-semibold text-slate-600 transition hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
 							aria-label="添加成员"
 						>
 							+
@@ -357,8 +356,8 @@ export default function HomePage() {
 					</div>
 				</section>
 
-				<section className="mt-4">
-					<div className="mt-3 overflow-hidden rounded-3xl border border-slate-200 bg-white/95 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+				<section className="mt-0 -mx-4">
+					<div className="mt-3 overflow-hidden border border-slate-200 bg-white/95 shadow-sm dark:border-slate-700 dark:bg-slate-900">
 						<div className="h-32 cursor-pointer" onClick={() => setIsMapModalOpen(true)}>
 							<BillMap bills={currentBills} interactive={false} tileLayer="osm" />
 						</div>
@@ -377,11 +376,8 @@ export default function HomePage() {
 									<tr>
 										<th className="px-3 py-3">付钱人</th>
 										<th className="px-3 py-3">金额</th>
-										<th className="px-3 py-3">欠钱人</th>
 										<th className="px-3 py-3">名称</th>
-										<th className="px-3 py-3">类型</th>
-										<th className="px-3 py-3">创建人</th>
-										<th className="px-3 py-3">时间</th>
+										<th className="px-3 py-3">创建人/日期</th>
 										<th className="px-3 py-3">状态</th>
 									</tr>
 								</thead>
@@ -402,8 +398,6 @@ export default function HomePage() {
 											<td className="px-3 py-1 font-semibold text-slate-900 dark:text-slate-100">
 												{bill.amount}
 												{CURRENCY_DEFINITIONS[bill.currency || 'CNY']?.suffix || '¥'}
-											</td>
-											<td className="px-3 py-1">
 												<div className="flex flex-wrap items-center gap-1">
 													{bill.owedFriends.slice(0, 4).map((owed: any) => {
 														const member = (currentTrip?.members || []).find((m) => m.id === owed.friendId);
@@ -416,30 +410,32 @@ export default function HomePage() {
 													) : null}
 												</div>
 											</td>
-											<td className="px-3 py-1 text-slate-700 dark:text-slate-300">{bill.name}</td>
-											<td className="px-3 py-1">
-												<span className="inline-flex rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+											<td className="px-3 py-1 text-slate-700 dark:text-slate-300">
+												<p className="inline-flex w-max rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
 													{bill.category}
-												</span>
+												</p>
+												<p>{bill.name}</p>
+												
 											</td>
+
 											<td className="px-3 py-1">
-												{bill.createdById && bill.createdById !== currentUserMemberId ? (
-													<span className="text-[10px] text-slate-500 dark:text-slate-400">
-														{(currentTrip?.members || []).find((m) => m.id === bill.createdById)?.name || '未知'}
-													</span>
-												) : (
-													<span className="text-[10px] text-slate-500 dark:text-slate-400">-</span>
-												)}
-											</td>
-											<td className="px-3 py-1">
-												<span className="text-[10px] text-slate-500 dark:text-slate-400">
-													{new Date(bill.createdAt).toLocaleDateString('zh-CN', {
-														month: '2-digit',
-														day: '2-digit',
-														hour: '2-digit',
-														minute: '2-digit',
-													})}
-												</span>
+												<div>
+													{bill.createdById && bill.createdById !== currentUserMemberId ? (
+														<p className="text-[10px] text-slate-500 dark:text-slate-400">
+															{(currentTrip?.members || []).find((m) => m.id === bill.createdById)?.name || '我'}
+														</p>
+													) : (
+														<p className="text-[10px] text-slate-500 dark:text-slate-400">-</p>
+													)}
+													<p className="text-[10px] text-slate-500 dark:text-slate-400">
+														{new Date(bill.createdAt).toLocaleDateString('zh-CN', {
+															month: '2-digit',
+															day: '2-digit',
+															hour: '2-digit',
+															minute: '2-digit',
+														})}
+													</p>
+												</div>
 											</td>
 											<td className="px-3 py-1">
 												<span
@@ -449,7 +445,7 @@ export default function HomePage() {
 															: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
 													}`}
 												>
-													{bill.status === 'SETTLED' ? '已结算' : '待结算'}
+													{bill.status === 'SETTLED' ? '清' : '未'}
 												</span>
 											</td>
 										</tr>
