@@ -26,6 +26,8 @@ export default function HomePage() {
 	const [selectedFriendsForTrip, setSelectedFriendsForTrip] = useState<string[]>([]);
 	const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 	const [mapTileLayer, setMapTileLayer] = useState<'osm' | 'satellite'>('osm');
+	const [isEditTripModalOpen, setIsEditTripModalOpen] = useState(false);
+	const [editTripName, setEditTripName] = useState('');
 
 	useEffect(() => {
 		fetchTrips();
@@ -67,6 +69,8 @@ export default function HomePage() {
 	};
 
 	const currentTrip = useMemo(() => trips.find((trip) => trip.id === selectedTripId) || null, [trips, selectedTripId]);
+
+	const currentUserMemberId = useMemo(() => currentTrip?.members.find((member) => member.isSelf)?.id || null, [currentTrip]);
 
 	const currentBills = useMemo(() => currentTrip?.bills || [], [currentTrip]);
 
@@ -154,6 +158,32 @@ export default function HomePage() {
 			await fetchTrips();
 		} catch (error) {
 			console.error('Failed to remove member:', error);
+		}
+	};
+
+	const handleBillClick = (bill: Bill) => {
+		router.push(`/bills/${bill.id}/edit?tripId=${selectedTripId}`);
+	};
+
+	const handleEditTrip = async () => {
+		if (!currentTrip || !editTripName.trim()) return;
+
+		try {
+			const response = await fetch(`/api/trips/${currentTrip.id}`, {
+				method: 'PATCH',
+				headers: {
+					...getAuthHeaders(),
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ name: editTripName.trim() }),
+			});
+			if (response.ok) {
+				setIsEditTripModalOpen(false);
+				setEditTripName('');
+				await fetchTrips();
+			}
+		} catch (error) {
+			console.error('Failed to update trip:', error);
 		}
 	};
 
@@ -272,6 +302,29 @@ export default function HomePage() {
 					</button>
 				</header>
 
+				<section className="mt-3">
+					<button
+						type="button"
+						onClick={() => {
+							setEditTripName(currentTrip?.name || '');
+							setIsEditTripModalOpen(true);
+						}}
+						className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+					>
+						<span></span>
+						编辑旅行名称
+					</button>
+					<button
+						type="button"
+						onClick={() => {
+						}}
+						className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+					>
+						<span></span>
+						删除旅行
+					</button>
+				</section>
+
 				<section className="mt-2">
 					<div className="flex items-center justify-between gap-3">
 						<p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">参与者</p>
@@ -327,12 +380,18 @@ export default function HomePage() {
 										<th className="px-3 py-3">欠钱人</th>
 										<th className="px-3 py-3">名称</th>
 										<th className="px-3 py-3">类型</th>
+										<th className="px-3 py-3">创建人</th>
+										<th className="px-3 py-3">时间</th>
 										<th className="px-3 py-3">状态</th>
 									</tr>
 								</thead>
 								<tbody>
 									{currentBills.map((bill, index) => (
-										<tr key={bill.id} className={`border-b ${index === currentBills.length - 1 ? '' : 'border-slate-200'} dark:border-slate-800`}>
+										<tr
+											key={bill.id}
+											className={`border-b cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${index === currentBills.length - 1 ? '' : 'border-slate-200'} dark:border-slate-800`}
+											onClick={() => handleBillClick(bill)}
+										>
 											<td className="px-3 py-1">
 												<FriendIcon
 													name={(currentTrip?.members || []).find((m) => m.id === bill.payerId)?.name || '?'}
@@ -340,7 +399,10 @@ export default function HomePage() {
 													isSelf={(currentTrip?.members || []).find((m) => m.id === bill.payerId)?.isSelf}
 												/>
 											</td>
-											<td className="px-3 py-1 font-semibold text-slate-900 dark:text-slate-100">{bill.amount + CURRENCY_DEFINITIONS[bill.currency ?? 'CNY'].suffix}</td>
+											<td className="px-3 py-1 font-semibold text-slate-900 dark:text-slate-100">
+												{bill.amount}
+												{CURRENCY_DEFINITIONS[bill.currency || 'CNY']?.suffix || '¥'}
+											</td>
 											<td className="px-3 py-1">
 												<div className="flex flex-wrap items-center gap-1">
 													{bill.owedFriends.slice(0, 4).map((owed: any) => {
@@ -358,6 +420,25 @@ export default function HomePage() {
 											<td className="px-3 py-1">
 												<span className="inline-flex rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
 													{bill.category}
+												</span>
+											</td>
+											<td className="px-3 py-1">
+												{bill.createdById && bill.createdById !== currentUserMemberId ? (
+													<span className="text-[10px] text-slate-500 dark:text-slate-400">
+														{(currentTrip?.members || []).find((m) => m.id === bill.createdById)?.name || '未知'}
+													</span>
+												) : (
+													<span className="text-[10px] text-slate-500 dark:text-slate-400">-</span>
+												)}
+											</td>
+											<td className="px-3 py-1">
+												<span className="text-[10px] text-slate-500 dark:text-slate-400">
+													{new Date(bill.createdAt).toLocaleDateString('zh-CN', {
+														month: '2-digit',
+														day: '2-digit',
+														hour: '2-digit',
+														minute: '2-digit',
+													})}
 												</span>
 											</td>
 											<td className="px-3 py-1">
@@ -507,6 +588,22 @@ export default function HomePage() {
 						</div>
 					</div>
 				)}
+			</Modal>
+
+			{/* Edit Trip Modal */}
+			<Modal isOpen={isEditTripModalOpen} onClose={() => setIsEditTripModalOpen(false)} title="编辑旅行名称" onOk={handleEditTrip} okText="保存" showOkButton showCancelButton cancelText="取消">
+				<div className="space-y-4">
+					<div>
+						<label className="block text-sm font-medium mb-2">旅行名称</label>
+						<input
+							type="text"
+							value={editTripName}
+							onChange={(e) => setEditTripName(e.target.value)}
+							placeholder="输入新的旅行名称"
+							className="w-full px-3 py-2 border rounded dark:bg-slate-800 dark:border-slate-700"
+						/>
+					</div>
+				</div>
 			</Modal>
 		</div>
 	);

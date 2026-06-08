@@ -43,6 +43,8 @@ export async function GET(request: NextRequest) {
             status: true,
             paymentMethod: true,
             description: true,
+            createdAt: true,
+            userId: true,
           },
         },
       },
@@ -52,7 +54,10 @@ export async function GET(request: NextRequest) {
     const tripsWithDetails = trips.map(trip => ({
       ...trip,
       members: trip.members.map(tm => tm.friend),
-      bills: trip.bills,
+      bills: trip.bills.map((bill) => ({
+        ...bill,
+        createdById: bill.userId,
+      })),
     }));
 
     return NextResponse.json(tripsWithDetails);

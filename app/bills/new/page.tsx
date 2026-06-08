@@ -12,6 +12,10 @@ import { Member } from '@/src/types';
 
 type Friend = Member;
 
+type BillOwed = {
+	friendId: string;
+};
+
 const CATEGORIES = [
 	{ key: '吃饭', label: '吃饭', bg: 'bg-orange-500', text: 'text-white' },
 	{ key: '酒店', label: '酒店', bg: 'bg-purple-500', text: 'text-white' },
@@ -34,10 +38,11 @@ const STATUSES = [
 
 const PAYMENT_METHODS = ['现金', '支付宝', '微信', '银行转账', 'PayPay', '信用卡', 'PayPal', 'ApplePay', '其他'];
 
-export default function NewBillPage() {
+export default function NewBillPage({ billId }: { billId?: string } = {}) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const tripId = searchParams.get('tripId');
+	const [effectiveTripId, setEffectiveTripId] = useState<string | null>(tripId);
 
 	const [amount, setAmount] = useState('');
 	const [currency, setCurrency] = useState('CNY');
@@ -57,12 +62,53 @@ export default function NewBillPage() {
 
 	const [isPaymentMethodModalOpen, setIsPaymentMethodModalOpen] = useState(false);
 	const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
+	const [isLoaded, setIsLoaded] = useState(!Boolean(billId));
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	useEffect(() => {
 		if (!tripId) return;
+		setEffectiveTripId(tripId);
 		fetchTripsAndFriends();
 		acquireLocation();
 	}, [tripId]);
+
+	useEffect(() => {
+		if (!billId) return;
+		fetchBill();
+	}, [billId]);
+
+	const fetchBill = async () => {
+		try {
+			const response = await fetch(`/api/bills/${billId}`, {
+				headers: getAuthHeaders(),
+			});
+
+			if (!response.ok) {
+				const errorData = await response.json();
+				setErrorMessage(errorData?.error || '获取账单失败');
+				return;
+			}
+
+			const data = await response.json();
+			setAmount(String(data.amount ?? ''));
+			setCurrency(data.currency || 'CNY');
+			setPaymentMethod(data.paymentMethod || '现金');
+			setCategory(data.category || '吃饭');
+			setBillName(data.name || '');
+			setPayerId(data.payerId || '');
+			setOwedFriendIds((data.owedFriends || []).map((owed: BillOwed) => owed.friendId));
+			setDescription(data.description || '');
+			setStatus(data.status || 'UNRETURNED');
+			setLatitude(data.latitude ?? null);
+			setLongitude(data.longitude ?? null);
+			setTripMembers(data.tripMembers || data.trip?.members || []);
+			setEffectiveTripId(data.tripId || tripId);
+			setIsLoaded(true);
+		} catch (error) {
+			console.error('Failed to fetch bill:', error);
+			setErrorMessage('获取账单失败');
+		}
+	};
 
 	const fetchTripsAndFriends = async () => {
 		try {
@@ -110,47 +156,66 @@ export default function NewBillPage() {
 		setOwedFriendIds((prev) => (prev.includes(friendId) ? prev.filter((id) => id !== friendId) : [...prev, friendId]));
 	};
 
+	if (!isLoaded) {
+		return (
+			<div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
+				<div className="max-w-2xl mx-auto px-4 py-12 text-center text-slate-600 dark:text-slate-300">加载中...</div>
+			</div>
+		);
+	}
+
+	if (errorMessage) {
+		return (
+			<div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
+				<div className="max-w-2xl mx-auto px-4 py-12 text-center text-red-600 dark:text-red-400">{errorMessage}</div>
+			</div>
+		);
+	}
+
 	const handleCreateBill = async () => {
-		if (!tripId || !amount || !payerId || !billName.trim()) {
+		const selectedTripId = effectiveTripId || tripId;
+		if (!selectedTripId || !amount || !payerId || !billName.trim()) {
 			alert('请填写必需信息');
 			return;
 		}
 
 		try {
-			// 如果没有填写description，则使用category作为description
 			const finalDescription = description.trim() || category;
+			const requestBody = {
+				tripId: selectedTripId,
+				payerId,
+				amount: Number(amount),
+				currency,
+				paymentMethod,
+				name: billName.trim(),
+				description: finalDescription,
+				category,
+				status,
+				owedFriendIds,
+				latitude,
+				longitude,
+			};
 
-			const response = await fetch('/api/bills', {
-				method: 'POST',
+			const url = billId ? `/api/bills/${billId}` : '/api/bills';
+			const method = billId ? 'PATCH' : 'POST';
+			const response = await fetch(url, {
+				method,
 				headers: {
 					...getAuthHeaders(),
 					'Content-Type': 'application/json',
 				},
-				body: JSON.stringify({
-					tripId,
-					payerId,
-					amount: Number(amount),
-					currency,
-					paymentMethod,
-					name: billName.trim(),
-					description: finalDescription,
-					category,
-					status,
-					owedFriendIds,
-					latitude,
-					longitude,
-				}),
+				body: JSON.stringify(requestBody),
 			});
 
 			if (response.ok) {
-				router.push(`/?tripId=${tripId}`);
+				router.push(`/?tripId=${selectedTripId}`);
 			} else {
 				const errorData = await response.json();
-				alert(`创建账单失败: ${errorData.error}`);
+				alert(`${billId ? '更新' : '创建'}账单失败: ${errorData.error || '未知错误'}`);
 			}
 		} catch (error) {
-			console.error('Failed to create bill:', error);
-			alert('创建账单失败');
+			console.error('Failed to submit bill:', error);
+			alert(`${billId ? '更新' : '创建'}账单失败`);
 		}
 	};
 
@@ -165,7 +230,7 @@ export default function NewBillPage() {
 						</svg>
 						返回
 					</button>
-					<h1 className="text-3xl font-bold">新建账单</h1>
+					<h1 className="text-3xl font-bold">{billId ? '编辑账单' : '新建账单'}</h1>
 					<div className="w-12" />
 				</div>
 
@@ -334,7 +399,7 @@ export default function NewBillPage() {
 							onClick={handleCreateBill}
 							className="flex-1 py-4 px-4 border-4 border-emerald-600 bg-emerald-600 text-white rounded-2xl font-bold text-base hover:bg-emerald-500 hover:border-emerald-500 transition"
 						>
-							创建账单
+							{billId ? '保存修改' : '创建账单'}
 						</button>
 					</div>
 				</div>

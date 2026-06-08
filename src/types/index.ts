@@ -49,6 +49,8 @@ export type Bill = {
 	description?: string;
 	latitude: number | null;
 	longitude: number | null;
+	createdAt: string;
+	createdById?: string;
 };
 
 /**
