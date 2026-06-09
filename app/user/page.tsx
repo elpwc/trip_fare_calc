@@ -1,10 +1,11 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { FormEvent, Suspense, useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/src/utils/auth-provider';
 import { Modal } from '@/src/components/Modal';
-import { getAuthHeaders } from '@/src/utils/auth';
+import { getAuthHeaders, resolveAuthErrorMessage } from '@/src/utils/auth';
+import { apiPath } from '@/src/config/paths';
 import ReceiptPanel from '@/src/components/settings/ReceiptPanel';
 import TicketLink from '@/src/components/settings/TicketLink';
 import Perforation from '@/src/components/settings/Perforation';
@@ -53,9 +54,23 @@ function PreferencesSection() {
 }
 
 export default function UserPage() {
-	const router = useRouter();
+	return (
+		<Suspense fallback={<UserPageFallback />}>
+			<UserPageContent />
+		</Suspense>
+	);
+}
+
+function UserPageFallback() {
 	const { t } = usePreferences();
-	const { user, loading, error, login, register, logout, changePassword, updateName, updateEmail, registerEmail } = useAuth();
+	return <div className="settings-paper min-h-screen px-4 py-10 text-center text-sm text-app-muted">{t('common.loading')}</div>;
+}
+
+function UserPageContent() {
+	const router = useRouter();
+	const searchParams = useSearchParams();
+	const { t } = usePreferences();
+	const { user, loading, login, register, logout, changePassword, updateName, updateEmail, registerEmail } = useAuth();
 	const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
 	const [email, setEmail] = useState('');
 	const [name, setName] = useState('');
@@ -69,6 +84,14 @@ export default function UserPage() {
 	const [joinMessage, setJoinMessage] = useState('');
 	const [isJoining, setIsJoining] = useState(false);
 
+	useEffect(() => {
+		const auth = searchParams.get('auth');
+		if (auth === 'login' || auth === 'register') {
+			setAuthMode(auth);
+			setMessage('');
+		}
+	}, [searchParams]);
+
 	const handleLogin = async (event: FormEvent) => {
 		event.preventDefault();
 		setMessage('');
@@ -76,7 +99,7 @@ export default function UserPage() {
 			await login(email, password);
 			setAuthMode(null);
 		} catch (err) {
-			setMessage((err as Error).message);
+			setMessage(resolveAuthErrorMessage(err, t));
 		}
 	};
 
@@ -98,7 +121,7 @@ export default function UserPage() {
 			await register(email, name, password, code);
 			setAuthMode(null);
 		} catch (err) {
-			setMessage((err as Error).message);
+			setMessage(resolveAuthErrorMessage(err, t));
 		}
 	};
 
@@ -108,7 +131,7 @@ export default function UserPage() {
 			await registerEmail(email);
 			setMessage(t('user.codeSent'));
 		} catch (err) {
-			setMessage((err as Error).message);
+			setMessage(resolveAuthErrorMessage(err, t));
 		}
 	};
 
@@ -138,7 +161,7 @@ export default function UserPage() {
 		setJoinMessage('');
 
 		try {
-			const response = await fetch('/api/share', {
+			const response = await fetch(apiPath('/api/share'), {
 				method: 'POST',
 				headers: {
 					...getAuthHeaders(),
@@ -266,7 +289,6 @@ export default function UserPage() {
 										) : null}
 
 										{message ? <p className="text-app-danger text-sm">{message}</p> : null}
-										{error ? <p className="text-app-danger text-sm">{error}</p> : null}
 
 										<button type="submit" className="settings-btn-primary w-full">
 											{authMode === 'login' ? t('user.submitLogin') : t('user.submitRegister')}
@@ -318,7 +340,7 @@ export default function UserPage() {
 												await updateName(newName);
 												setMessage(t('user.nameUpdated'));
 											} catch (err) {
-												setMessage((err as Error).message);
+												setMessage(resolveAuthErrorMessage(err, t));
 											}
 										}
 									}}
@@ -335,7 +357,7 @@ export default function UserPage() {
 												await updateEmail(newEmail);
 												setMessage(t('user.emailUpdated'));
 											} catch (err) {
-												setMessage((err as Error).message);
+												setMessage(resolveAuthErrorMessage(err, t));
 											}
 										}
 									}}
@@ -353,7 +375,7 @@ export default function UserPage() {
 											await changePassword(oldPassword, newPassword);
 											setMessage(t('user.passwordUpdated'));
 										} catch (err) {
-											setMessage((err as Error).message);
+											setMessage(resolveAuthErrorMessage(err, t));
 										}
 									}}
 								>

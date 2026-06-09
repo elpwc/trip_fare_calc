@@ -9,8 +9,10 @@ import BillMap from '@/src/components/BillMap';
 import HomeBillList from '@/src/components/HomeBillList';
 import FriendIcon from '@/src/components/FriendIcon';
 import { getAuthHeaders } from '@/src/utils/auth';
+import { apiPath, withBasePath } from '@/src/config/paths';
 import { Friend, TripMember, Trip, Bill } from '@/src/types';
 import { usePreferences } from '@/src/utils/preferences-provider';
+import { useRequireAuth } from '@/src/utils/use-require-auth';
 import type { Locale } from '@/src/utils/preferences/constants';
 
 const DATE_LOCALE_MAP: Record<Locale, string> = {
@@ -22,6 +24,7 @@ const DATE_LOCALE_MAP: Record<Locale, string> = {
 export default function HomePage() {
 	const router = useRouter();
 	const { t, locale } = usePreferences();
+	const { guardAuth, AuthRequiredModal } = useRequireAuth();
 	const dateLocale = DATE_LOCALE_MAP[locale];
 	const [trips, setTrips] = useState<Trip[]>([]);
 	const [friends, setFriends] = useState<Friend[]>([]);
@@ -69,7 +72,7 @@ export default function HomePage() {
 
 	const fetchTrips = async () => {
 		try {
-			const response = await fetch('/api/trips', {
+			const response = await fetch(apiPath('/api/trips'), {
 				headers: getAuthHeaders(),
 			});
 			if (response.ok) {
@@ -83,7 +86,7 @@ export default function HomePage() {
 
 	const fetchFriends = async () => {
 		try {
-			const response = await fetch('/api/friends', {
+			const response = await fetch(apiPath('/api/friends'), {
 				headers: getAuthHeaders(),
 			});
 			if (response.ok) {
@@ -103,7 +106,7 @@ export default function HomePage() {
 		if (!newTripName.trim()) return;
 
 		try {
-			const response = await fetch('/api/trips', {
+			const response = await fetch(apiPath('/api/trips'), {
 				method: 'POST',
 				headers: {
 					...getAuthHeaders(),
@@ -127,7 +130,7 @@ export default function HomePage() {
 
 				// Add selected friends to the trip
 				for (const friendId of selectedFriendsForTrip) {
-					await fetch(`/api/trips/${newTrip.id}/members`, {
+					await fetch(apiPath(`/api/trips/${newTrip.id}/members`), {
 						method: 'POST',
 						headers: {
 							...getAuthHeaders(),
@@ -149,7 +152,7 @@ export default function HomePage() {
 
 		try {
 			for (const friendId of selectedFriendsForTrip) {
-				await fetch(`/api/trips/${currentTrip.id}/members`, {
+				await fetch(apiPath(`/api/trips/${currentTrip.id}/members`), {
 					method: 'POST',
 					headers: {
 						...getAuthHeaders(),
@@ -170,7 +173,7 @@ export default function HomePage() {
 		if (!currentTrip || !selectedMember) return;
 
 		try {
-			await fetch(`/api/trips/${currentTrip.id}/members`, {
+			await fetch(apiPath(`/api/trips/${currentTrip.id}/members`), {
 				method: 'DELETE',
 				headers: {
 					...getAuthHeaders(),
@@ -187,14 +190,14 @@ export default function HomePage() {
 	};
 
 	const handleBillClick = (bill: Bill) => {
-		router.push(`/bills/${bill.id}/edit?tripId=${selectedTripId}`);
+		guardAuth(() => router.push(`/bills/${bill.id}/edit?tripId=${selectedTripId}`));
 	};
 
 	const handleEditTrip = async () => {
 		if (!currentTrip || !editTripName.trim()) return;
 
 		try {
-			const response = await fetch(`/api/trips/${currentTrip.id}`, {
+			const response = await fetch(apiPath(`/api/trips/${currentTrip.id}`), {
 				method: 'PATCH',
 				headers: {
 					...getAuthHeaders(),
@@ -214,7 +217,7 @@ export default function HomePage() {
 
 	const fetchShareInfo = async (tripId: string) => {
 		try {
-			const response = await fetch(`/api/trips/${tripId}/share`, {
+			const response = await fetch(apiPath(`/api/trips/${tripId}/share`), {
 				headers: getAuthHeaders(),
 			});
 			if (!response.ok) {
@@ -224,7 +227,7 @@ export default function HomePage() {
 
 			const data = await response.json();
 			if (data.shareToken) {
-				setShareUrl(`${window.location.origin}/share?token=${data.shareToken}`);
+				setShareUrl(`${window.location.origin}${withBasePath(`/share?token=${data.shareToken}`)}`);
 			} else {
 				setShareUrl('');
 			}
@@ -235,10 +238,12 @@ export default function HomePage() {
 
 	const openShareModal = () => {
 		if (!currentTrip?.isOwner) return;
-		setSharePassword('');
-		setShareMessage('');
-		fetchShareInfo(currentTrip.id);
-		setIsShareModalOpen(true);
+		guardAuth(() => {
+			setSharePassword('');
+			setShareMessage('');
+			fetchShareInfo(currentTrip.id);
+			setIsShareModalOpen(true);
+		});
 	};
 
 	const handleCreateShare = async () => {
@@ -252,7 +257,7 @@ export default function HomePage() {
 		setShareMessage('');
 
 		try {
-			const response = await fetch(`/api/trips/${currentTrip.id}/share`, {
+			const response = await fetch(apiPath(`/api/trips/${currentTrip.id}/share`), {
 				method: 'POST',
 				headers: {
 					...getAuthHeaders(),
@@ -263,7 +268,7 @@ export default function HomePage() {
 
 			const data = await response.json();
 			if (response.ok) {
-				setShareUrl(`${window.location.origin}/share?token=${data.shareToken}`);
+				setShareUrl(`${window.location.origin}${withBasePath(`/share?token=${data.shareToken}`)}`);
 				setShareMessage(t('home.share.generated'));
 			} else {
 				setShareMessage(data.error || t('home.share.generateFailed'));
@@ -291,7 +296,7 @@ export default function HomePage() {
 		if (!currentTrip) return;
 
 		try {
-			const response = await fetch(`/api/trips/${currentTrip.id}`, {
+			const response = await fetch(apiPath(`/api/trips/${currentTrip.id}`), {
 				method: 'DELETE',
 				headers: getAuthHeaders(),
 			});
@@ -317,7 +322,7 @@ export default function HomePage() {
 				<div className="app-empty mt-8">
 					<p className="settings-display text-xl">{t('home.noTripsTitle')}</p>
 					<p className="mt-2 text-[12px]">{t('home.noTripsHint')}</p>
-					<button type="button" onClick={() => setIsNewTripModalOpen(true)} className="settings-btn-primary mt-4">
+					<button type="button" onClick={() => guardAuth(() => setIsNewTripModalOpen(true))} className="settings-btn-primary mt-4">
 						+ {t('home.newTrip')}
 					</button>
 				</div>
@@ -355,6 +360,7 @@ export default function HomePage() {
 						</div>
 					</div>
 				</Modal>
+				{AuthRequiredModal}
 			</AppShell>
 		);
 	}
@@ -394,7 +400,7 @@ export default function HomePage() {
 					) : null}
 				</div>
 
-				<button type="button" onClick={() => setIsNewTripModalOpen(true)} className="app-header-add shrink-0" aria-label={t('home.newTrip')}>
+				<button type="button" onClick={() => guardAuth(() => setIsNewTripModalOpen(true))} className="app-header-add shrink-0" aria-label={t('home.newTrip')}>
 					+
 				</button>
 			</header>
@@ -403,15 +409,17 @@ export default function HomePage() {
 				{currentTrip && !currentTrip.isOwner ? <span className="app-tag app-tag-share">{t('home.shareFrom', { name: currentTrip.ownerName ?? '' })}</span> : null}
 				<button
 					type="button"
-					onClick={() => {
-						setEditTripName(currentTrip?.name || '');
-						setIsEditTripModalOpen(true);
-					}}
+					onClick={() =>
+						guardAuth(() => {
+							setEditTripName(currentTrip?.name || '');
+							setIsEditTripModalOpen(true);
+						})
+					}
 					className="app-toolbar-chip"
 				>
 					{t('home.rename')}
 				</button>
-				<button type="button" onClick={() => setIsDeleteTripModalOpen(true)} className="app-toolbar-chip">
+				<button type="button" onClick={() => guardAuth(() => setIsDeleteTripModalOpen(true))} className="app-toolbar-chip">
 					{currentTrip?.isOwner === false ? t('common.remove') : t('common.delete')}
 				</button>
 				<span className="app-label ml-auto">{currentBills.length} {t('common.billsUnit')}</span>
@@ -433,7 +441,7 @@ export default function HomePage() {
 							<p className="max-w-11 truncate text-[10px]">{member.name}</p>
 						</button>
 					))}
-					<button type="button" onClick={() => setIsAddMemberModalOpen(true)} className="app-toolbar-chip h-6 min-w-6 px-1" aria-label={t('home.addMember')}>
+					<button type="button" onClick={() => guardAuth(() => setIsAddMemberModalOpen(true))} className="app-toolbar-chip h-6 min-w-6 px-1" aria-label={t('home.addMember')}>
 						+
 					</button>
 				</div>
@@ -458,7 +466,7 @@ export default function HomePage() {
 			</section>
 
 			<div className="app-fab-bar">
-				<button type="button" onClick={() => router.push(`/settle?tripId=${selectedTripId}`)} className="app-fab app-fab-settle">
+				<button type="button" onClick={() => guardAuth(() => router.push(`/settle?tripId=${selectedTripId}`))} className="app-fab app-fab-settle">
 					{t('home.settle')}
 				</button>
 				{currentTrip?.isOwner ? (
@@ -468,7 +476,7 @@ export default function HomePage() {
 						</svg>
 					</button>
 				) : null}
-				<button type="button" onClick={() => router.push(`/bills/new?tripId=${selectedTripId}`)} className="app-fab app-fab-icon app-fab-add" aria-label={t('home.newBill')}>
+				<button type="button" onClick={() => guardAuth(() => router.push(`/bills/new?tripId=${selectedTripId}`))} className="app-fab app-fab-icon app-fab-add" aria-label={t('home.newBill')}>
 					+
 				</button>
 			</div>
@@ -621,6 +629,7 @@ export default function HomePage() {
 			>
 				<p className="modal-hint">{currentTrip?.isOwner === false ? t('home.modal.removeTripHint') : t('home.modal.deleteTripHint')}</p>
 			</Modal>
+			{AuthRequiredModal}
 		</AppShell>
 	);
 }

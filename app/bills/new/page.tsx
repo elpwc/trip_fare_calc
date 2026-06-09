@@ -6,6 +6,7 @@ import { Modal } from '@/src/components/Modal';
 import AppShell from '@/src/components/layout/AppShell';
 import FriendIcon from '@/src/components/FriendIcon';
 import { getAuthHeaders } from '@/src/utils/auth';
+import { apiPath } from '@/src/config/paths';
 import { Currency, CURRENCY_DEFINITIONS } from '@/src/utils/currencies';
 import { FlagSVG } from '@/src/components/FlagSVG';
 import { Member } from '@/src/types';
@@ -142,7 +143,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 
 	const fetchBill = async () => {
 		try {
-			const response = await fetch(`/api/bills/${billId}`, {
+			const response = await fetch(apiPath(`/api/bills/${billId}`), {
 				headers: getAuthHeaders(),
 			});
 
@@ -175,7 +176,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 
 	const fetchTripsAndFriends = async () => {
 		try {
-			const response = await fetch('/api/trips', {
+			const response = await fetch(apiPath('/api/trips'), {
 				headers: getAuthHeaders(),
 			});
 			if (response.ok) {
@@ -222,7 +223,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 				longitude,
 			};
 
-			const url = billId ? `/api/bills/${billId}` : '/api/bills';
+			const url = billId ? apiPath(`/api/bills/${billId}`) : apiPath('/api/bills');
 			const method = billId ? 'PATCH' : 'POST';
 			const response = await fetch(url, {
 				method,

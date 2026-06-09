@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import AppShell from '@/src/components/layout/AppShell';
 import TripHistoryCard from '@/src/components/TripHistoryCard';
 import { getAuthHeaders } from '@/src/utils/auth';
+import { apiPath } from '@/src/config/paths';
 import { usePreferences } from '@/src/utils/preferences-provider';
 import type { MessageKey } from '@/src/utils/i18n/messages';
 import { Trip } from '@/src/types';
@@ -32,7 +33,7 @@ export default function HistoryPage() {
 
   const fetchTrips = async () => {
     try {
-      const response = await fetch('/api/trips', { headers: getAuthHeaders() });
+      const response = await fetch(apiPath('/api/trips'), { headers: getAuthHeaders() });
       if (response.ok) setTrips(await response.json());
     } catch (error) {
       console.error('Failed to load trips:', error);

@@ -1,3 +1,8 @@
+import { AuthRequestError, resolveAuthErrorMessage } from './auth-errors';
+import { apiPath } from '@/src/config/paths';
+
+export { AuthRequestError, resolveAuthErrorMessage };
+
 export type AuthUser = {
   id: string;
   name: string;
@@ -5,7 +10,7 @@ export type AuthUser = {
   createdAt?: string;
 };
 
-const API_ROOT = '/api/auth';
+const API_ROOT = apiPath('/api/auth');
 const STORAGE_KEY = 'tripFareCalc_token';
 const USER_STORAGE_KEY = 'tripFareCalc_user';
 
@@ -75,7 +80,7 @@ async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
 
   const payload = await response.json();
   if (!response.ok) {
-    throw new Error(payload?.error || response.statusText || '请求失败');
+    throw new AuthRequestError(payload?.error || 'REQUEST_FAILED');
   }
 
   return payload as T;

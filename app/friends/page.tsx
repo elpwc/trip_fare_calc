@@ -3,14 +3,17 @@
 import { Modal } from '@/src/components/Modal';
 import AppShell from '@/src/components/layout/AppShell';
 import { getAuthHeaders } from '@/src/utils/auth';
+import { apiPath } from '@/src/config/paths';
 import FriendList from '@/src/components/FriendList';
 import FriendIcon from '@/src/components/FriendIcon';
 import { usePreferences } from '@/src/utils/preferences-provider';
+import { useRequireAuth } from '@/src/utils/use-require-auth';
 import React, { useState, useEffect } from 'react';
 import { Friend } from '@/src/types';
 
 const FriendsPage: React.FC = () => {
 	const { t, locale } = usePreferences();
+	const { guardAuth, AuthRequiredModal } = useRequireAuth();
 	const [friends, setFriends] = useState<Friend[]>([]);
 	const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
 	const [isModalOpen, setIsModalOpen] = useState(false);
@@ -29,7 +32,7 @@ const FriendsPage: React.FC = () => {
 
 	const fetchFriends = async () => {
 		try {
-			const response = await fetch('/api/friends', {
+			const response = await fetch(apiPath('/api/friends'), {
 				headers: getAuthHeaders(),
 			});
 			if (response.ok) {
@@ -51,7 +54,7 @@ const FriendsPage: React.FC = () => {
 	const handleUpdateName = async () => {
 		if (!selectedFriend || !newName.trim()) return;
 		try {
-			const response = await fetch(`/api/friends/${selectedFriend.id}`, {
+			const response = await fetch(apiPath(`/api/friends/${selectedFriend.id}`), {
 				method: 'PATCH',
 				headers: {
 					...getAuthHeaders(),
@@ -72,7 +75,7 @@ const FriendsPage: React.FC = () => {
 	const handleUpdateDescription = async () => {
 		if (!selectedFriend) return;
 		try {
-			const response = await fetch(`/api/friends/${selectedFriend.id}`, {
+			const response = await fetch(apiPath(`/api/friends/${selectedFriend.id}`), {
 				method: 'PATCH',
 				headers: {
 					...getAuthHeaders(),
@@ -95,7 +98,7 @@ const FriendsPage: React.FC = () => {
 
 		if (selectedFriend.isSelf) {
 			try {
-				const response = await fetch(`/api/friends/${selectedFriend.id}`, {
+				const response = await fetch(apiPath(`/api/friends/${selectedFriend.id}`), {
 					method: 'PATCH',
 					headers: {
 						...getAuthHeaders(),
@@ -114,7 +117,7 @@ const FriendsPage: React.FC = () => {
 			try {
 				const currentSelfFriend = friends.find((f) => f.isSelf);
 				if (currentSelfFriend) {
-					await fetch(`/api/friends/${currentSelfFriend.id}`, {
+					await fetch(apiPath(`/api/friends/${currentSelfFriend.id}`), {
 						method: 'PATCH',
 						headers: {
 							...getAuthHeaders(),
@@ -125,7 +128,7 @@ const FriendsPage: React.FC = () => {
 					setFriends(friends.map((f) => (f.id === currentSelfFriend.id ? { ...f, isSelf: false } : f)));
 				}
 
-				const response = await fetch(`/api/friends/${selectedFriend.id}`, {
+				const response = await fetch(apiPath(`/api/friends/${selectedFriend.id}`), {
 					method: 'PATCH',
 					headers: {
 						...getAuthHeaders(),
@@ -146,7 +149,7 @@ const FriendsPage: React.FC = () => {
 	const handleDeleteFriend = async () => {
 		if (!selectedFriend) return;
 		try {
-			const response = await fetch(`/api/friends/${selectedFriend.id}`, {
+			const response = await fetch(apiPath(`/api/friends/${selectedFriend.id}`), {
 				method: 'DELETE',
 				headers: getAuthHeaders(),
 			});
@@ -162,7 +165,7 @@ const FriendsPage: React.FC = () => {
 	const handleAddFriend = async () => {
 		if (!newFriendName.trim()) return;
 		try {
-			const response = await fetch('/api/friends', {
+			const response = await fetch(apiPath('/api/friends'), {
 				method: 'POST',
 				headers: {
 					...getAuthHeaders(),
@@ -209,7 +212,7 @@ const FriendsPage: React.FC = () => {
 			</div>
 
 			<div className="app-fab-bar">
-				<button type="button" onClick={() => setIsAddingFriend(true)} className="app-fab app-fab-icon app-fab-add" aria-label={t('friends.addFriend')}>
+				<button type="button" onClick={() => guardAuth(() => setIsAddingFriend(true))} className="app-fab app-fab-icon app-fab-add" aria-label={t('friends.addFriend')}>
 					+
 				</button>
 			</div>
@@ -332,6 +335,7 @@ const FriendsPage: React.FC = () => {
 					</button>
 				</div>
 			</Modal>
+			{AuthRequiredModal}
 		</AppShell>
 	);
 };

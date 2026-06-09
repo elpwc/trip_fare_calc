@@ -58,7 +58,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setToken(result.token);
       setUser(result.user);
     } catch (err) {
-      setError((err as Error).message);
       throw err;
     } finally {
       setLoading(false);
@@ -74,7 +73,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setToken(result.token);
       setUser(result.user);
     } catch (err) {
-      setError((err as Error).message);
       throw err;
     } finally {
       setLoading(false);

@@ -7,6 +7,7 @@ import AppShell from '@/src/components/layout/AppShell';
 import { Modal } from '@/src/components/Modal';
 import FriendIcon from '@/src/components/FriendIcon';
 import { getAuthHeaders } from '@/src/utils/auth';
+import { apiPath } from '@/src/config/paths';
 import { useAuth } from '@/src/utils/auth-provider';
 import { usePreferences } from '@/src/utils/preferences-provider';
 import { Bill, Trip, TripMember } from '@/src/types';
@@ -50,7 +51,7 @@ function SharePageContent() {
 	const loadSharedTrip = async (inputPassword: string) => {
 		if (!token) return null;
 
-		const response = await fetch(`/api/share?token=${encodeURIComponent(token)}&password=${encodeURIComponent(inputPassword)}`, {
+		const response = await fetch(apiPath(`/api/share?token=${encodeURIComponent(token)}&password=${encodeURIComponent(inputPassword)}`), {
 			headers: getAuthHeaders(),
 		});
 
@@ -95,7 +96,7 @@ function SharePageContent() {
 		setJoinMessage('');
 
 		try {
-			const response = await fetch('/api/share', {
+			const response = await fetch(apiPath('/api/share'), {
 				method: 'POST',
 				headers: {
 					...getAuthHeaders(),

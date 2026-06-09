@@ -4,6 +4,7 @@ import { Suspense, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import AppShell from '@/src/components/layout/AppShell';
 import { getAuthHeaders } from '@/src/utils/auth';
+import { apiPath } from '@/src/config/paths';
 import { formatAmount } from '@/src/utils/currencies';
 import SettleSpendingChart from '@/src/components/settle/SettleSpendingChart';
 import { buildNestedChartData, type ChartDimension } from '@/src/utils/settle-chart';
@@ -109,7 +110,7 @@ function SettlePageContent() {
 		async function loadTrip() {
 			setIsLoading(true);
 			try {
-				const response = await fetch('/api/trips', { headers: getAuthHeaders(), cache: 'no-store' });
+				const response = await fetch(apiPath('/api/trips'), { headers: getAuthHeaders(), cache: 'no-store' });
 				const data = await response.json();
 				if (!response.ok) throw new Error(data?.error || t('settle.fetchTripFailed'));
 				const currentTrip = (data as Trip[]).find((item) => item.id === tripId) || null;
