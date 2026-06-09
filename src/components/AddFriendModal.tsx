@@ -6,6 +6,7 @@ import { apiPath } from '@/src/config/paths';
 import { getAuthHeaders } from '@/src/utils/auth';
 import { usePreferences } from '@/src/utils/preferences-provider';
 import { ONBOARDING_FRIEND_ADDED_EVENT } from '@/src/utils/onboarding/storage';
+import { Friend } from '../types';
 
 type AddFriendModalProps = {
 	isOpen: boolean;
