@@ -26,6 +26,18 @@ export const en = {
 	'prefs.theme': 'Theme',
 	'prefs.language': 'Language',
 
+	'pwa.promptTitle': 'Add to desktop?',
+	'pwa.promptBody': 'You can also add it later in Settings.',
+	'pwa.promptSetup': 'Set up',
+	'pwa.promptNever': "Don't ask again",
+	'pwa.sectionTitle': 'Desktop App',
+	'pwa.sectionDesc': 'Install to your home screen or desktop for quick, app-like access.',
+	'pwa.installDesktop': 'Install as desktop app',
+	'pwa.installed': 'Already installed',
+	'pwa.installUnavailable': 'One-click install is not available in this browser. Use the install option in the address bar.',
+	'pwa.installDismissed': 'Install cancelled. You can try again anytime in Settings.',
+	'pwa.iosHint': 'In Safari, tap Share, then choose "Add to Home Screen".',
+
 	'common.ok': 'OK',
 	'common.cancel': 'Cancel',
 	'common.close': 'Close',

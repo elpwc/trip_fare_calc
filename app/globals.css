@@ -421,7 +421,7 @@ html.dark .app-panel {
 }
 
 .app-toolbar-chip {
-	@apply border border-[#1a1814] bg-[#fffdf8] dark:border-[#f4efe4] dark:bg-[#1c1a18] dark:text-[#f4efe4];
+	@apply border border-[#1a1814] bg-[#fffdf8] text-[black] dark:border-[#f4efe4] dark:bg-[#1c1a18] dark:text-[#f4efe4];
 	padding: 0.2rem 0.45rem;
 	font-family: var(--font-geist-mono), ui-monospace, monospace;
 	font-size: 10px;
@@ -713,11 +713,11 @@ html.dark .app-header-add:hover {
 }
 
 .app-btn-compact-primary {
-	@apply bg-[#2a9d8f] text-[#fffdf8];
+	@apply bg-[#9fdfd7] text-[black];
 }
 
 .app-btn-compact-danger {
-	@apply bg-[#e85d4c] text-[#fffdf8];
+	@apply bg-[#e85d4c] text-[black];
 }
 
 .text-app-accent {
@@ -725,7 +725,7 @@ html.dark .app-header-add:hover {
 }
 
 .app-btn-compact {
-	@apply border border-[#1a1814] bg-[#fffdf8] dark:border-[#f4efe4] dark:bg-[#121110] dark:text-[#f4efe4];
+	@apply border border-[#1a1814] dark:border-[#f4efe4] dark:bg-[#121110] dark:text-[#f4efe4];
 	padding: 0.15rem 0.45rem;
 	font-family: var(--font-geist-mono), ui-monospace, monospace;
 	font-size: 9px;

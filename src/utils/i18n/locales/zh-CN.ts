@@ -26,6 +26,18 @@ export const zhCN = {
 	'prefs.theme': '主题',
 	'prefs.language': '语言',
 
+	'pwa.promptTitle': '是否添加为桌面 App？',
+	'pwa.promptBody': '也可以稍后在设置中添加。',
+	'pwa.promptSetup': '设置',
+	'pwa.promptNever': '不再提示',
+	'pwa.sectionTitle': '桌面 App',
+	'pwa.sectionDesc': '安装到主屏幕或桌面，像原生应用一样快速打开。',
+	'pwa.installDesktop': '设置为桌面 App',
+	'pwa.installed': '已添加为桌面 App',
+	'pwa.installUnavailable': '当前浏览器暂不支持一键安装，请使用地址栏/设置中的「安装应用」/「添加至手机」选项。',
+	'pwa.installDismissed': '安装已取消，可随时在设置中重试。',
+	'pwa.iosHint': '请在 Safari 中点击分享，然后选择「添加到主屏幕」。',
+
 	'common.ok': '确定',
 	'common.cancel': '取消',
 	'common.close': '关闭',

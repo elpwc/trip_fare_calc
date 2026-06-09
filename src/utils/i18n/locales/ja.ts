@@ -26,6 +26,18 @@ export const ja = {
 	'prefs.theme': 'テーマ',
 	'prefs.language': '言語',
 
+	'pwa.promptTitle': 'ホーム画面に追加しますか？',
+	'pwa.promptBody': '後から設定画面でも追加できます。',
+	'pwa.promptSetup': '設定',
+	'pwa.promptNever': '今後表示しない',
+	'pwa.sectionTitle': 'デスクトップ App',
+	'pwa.sectionDesc': 'ホーム画面やデスクトップに追加して、アプリのように素早く開けます。',
+	'pwa.installDesktop': 'デスクトップ App として設定',
+	'pwa.installed': 'デスクトップ App として追加済み',
+	'pwa.installUnavailable': 'このブラウザではワンタップインストールに対応していません。アドレスバーのインストールオプションをご利用ください。',
+	'pwa.installDismissed': 'インストールがキャンセルされました。設定からいつでも再試行できます。',
+	'pwa.iosHint': 'Safari で共有をタップし、「ホーム画面に追加」を選んでください。',
+
 	'common.ok': 'OK',
 	'common.cancel': 'キャンセル',
 	'common.close': '閉じる',

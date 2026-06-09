@@ -1,8 +1,10 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import BottomMenu from '@/src/components/BottomMenu';
+import PwaInstallPrompt from '@/src/components/PwaInstallPrompt';
 import { AuthProvider } from '@/src/utils/auth-provider';
 import { PageTitleSync, PreferencesProvider } from '@/src/utils/preferences-provider';
+import { PwaProvider } from '@/src/utils/pwa/pwa-provider';
 import { zhCN } from '@/src/utils/i18n/locales/zh-CN';
 import 'leaflet/dist/leaflet.css';
 import './globals.css';
@@ -23,6 +25,18 @@ export const metadata: Metadata = {
 		template: `${zhCN['app.name']} - %s`,
 	},
 	description: zhCN['app.description'],
+	appleWebApp: {
+		capable: true,
+		title: zhCN['app.name'],
+		statusBarStyle: 'default',
+	},
+};
+
+export const viewport: Viewport = {
+	themeColor: [
+		{ media: '(prefers-color-scheme: light)', color: '#2a9d8f' },
+		{ media: '(prefers-color-scheme: dark)', color: '#121110' },
+	],
 };
 
 const themeInitScript = `(function(){try{var t=localStorage.getItem('tripFareCalc:theme')||'system';var l=localStorage.getItem('tripFareCalc:language')||'zh-CN';document.documentElement.lang=l;document.documentElement.dataset.theme=t;if(t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}})();`;
@@ -39,11 +53,14 @@ export default function RootLayout({
 			</head>
 			<body className="min-h-full flex flex-col">
 				<PreferencesProvider>
-					<AuthProvider>
-						<PageTitleSync />
-						{children}
-					</AuthProvider>
-					<BottomMenu />
+					<PwaProvider>
+						<AuthProvider>
+							<PageTitleSync />
+							{children}
+						</AuthProvider>
+						<PwaInstallPrompt />
+						<BottomMenu />
+					</PwaProvider>
 				</PreferencesProvider>
 			</body>
 		</html>

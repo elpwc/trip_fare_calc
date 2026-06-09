@@ -10,6 +10,7 @@ import TicketLink from '@/src/components/settings/TicketLink';
 import Perforation from '@/src/components/settings/Perforation';
 import receipt_up_img from '@/src/assets/img/receipt_up.png';
 import receipt_down_img from '@/src/assets/img/receipt_down.png';
+import PwaInstallButton from '@/src/components/PwaInstallButton';
 import { usePreferences } from '@/src/utils/preferences-provider';
 import type { ThemeMode } from '@/src/utils/preferences/constants';
 
@@ -53,6 +54,9 @@ function PreferencesSection() {
 						</button>
 					))}
 				</div>
+			</div>
+			<div className="border-t border-dashed border-[#1a1814]/15 pt-5 dark:border-[#f4efe4]/10">
+				<PwaInstallButton />
 			</div>
 		</div>
 	);
@@ -325,29 +329,7 @@ export default function UserPage() {
 								<div className="settings-stamp shrink-0 -rotate-6">ON BOARD</div>
 							</div>
 							<div className="settings-barcode mt-5 rounded-sm" aria-hidden />
-						</ReceiptPanel>
-
-						<Perforation />
-
-						<ReceiptPanel label="TRIP ACCESS" serial="MENU-01">
-							<div className="space-y-3">
-								<TicketLink
-									index="01"
-									title={t('user.joinByLink')}
-									desc={t('user.joinByLinkDesc')}
-									tag="NEW"
-									onClick={() => {
-										setJoinMessage('');
-										setIsJoinModalOpen(true);
-									}}
-								/>
-							</div>
-						</ReceiptPanel>
-
-						<Perforation />
-
-						<ReceiptPanel label="ACCOUNT" serial="MENU-02">
-							<div className="space-y-3">
+							<div className="mt-5 space-y-3 border-t border-dashed border-[#1a1814]/15 pt-5 dark:border-[#f4efe4]/10">
 								<TicketLink
 									index="02"
 									title={t('user.changeEmail')}
@@ -385,13 +367,30 @@ export default function UserPage() {
 
 						<Perforation />
 
-						<ReceiptPanel label="PREFERENCES" serial="MENU-03">
+						<ReceiptPanel label="TRIP ACCESS" serial="MENU-01">
+							<div className="space-y-3">
+								<TicketLink
+									index="01"
+									title={t('user.joinByLink')}
+									desc={t('user.joinByLinkDesc')}
+									tag="NEW"
+									onClick={() => {
+										setJoinMessage('');
+										setIsJoinModalOpen(true);
+									}}
+								/>
+							</div>
+						</ReceiptPanel>
+
+						<Perforation />
+
+						<ReceiptPanel label="PREFERENCES" serial="MENU-02">
 							<PreferencesSection />
 						</ReceiptPanel>
 
 						<Perforation />
 
-						<ReceiptPanel label="MORE" serial="MENU-04">
+						<ReceiptPanel label="MORE" serial="MENU-03">
 							<div className="grid gap-3 sm:grid-cols-2">
 								<TicketLink href="/user/feedback" index="04" title={t('user.feedbackLink')} desc="" />
 								<TicketLink href="/user/about" index="05" title={t('user.aboutLink')} desc="" />
