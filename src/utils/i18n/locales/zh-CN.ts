@@ -424,6 +424,9 @@ export const zhCN = {
 	'test.homepage.amount': '金额',
 	'test.homepage.debtors': '欠钱人',
 
+	'realtime.billCreated': '{name} 添加了账单「{bill}」',
+	'realtime.billUpdated': '{name} 更新了账单「{bill}」',
+
 	'onboarding.stepIndicator': '步骤 {current}/{total}',
 	'onboarding.skipStep': '跳过这一步',
 	'onboarding.skip': '跳过全部引导',

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Modal } from '@/src/components/Modal';
 import AppShell from '@/src/components/layout/AppShell';
@@ -9,7 +9,12 @@ import BillMap from '@/src/components/BillMap';
 import HomeBillList from '@/src/components/HomeBillList';
 import FriendIcon from '@/src/components/FriendIcon';
 import AddFriendModal from '@/src/components/AddFriendModal';
+import TripBillToastStack, { useTripBillToasts } from '@/src/components/TripBillToastStack';
 import { getAuthHeaders } from '@/src/utils/auth';
+import { useAuth } from '@/src/utils/auth-provider';
+import { formatAmount } from '@/src/utils/currencies';
+import { useTripRealtime } from '@/src/utils/use-trip-realtime';
+import type { TripBillEvent } from '@/src/types/trip-realtime';
 import { apiPath, withBasePath } from '@/src/config/paths';
 import { Friend, TripMember, Trip, Bill } from '@/src/types';
 import { usePreferences } from '@/src/utils/preferences-provider';
@@ -26,7 +31,9 @@ const DATE_LOCALE_MAP: Record<Locale, string> = {
 export default function HomePage() {
 	const router = useRouter();
 	const { t, locale } = usePreferences();
+	const { user } = useAuth();
 	const { guardAuth, AuthRequiredModal } = useRequireAuth();
+	const { toasts, pushToast, dismissToast } = useTripBillToasts();
 	const dateLocale = DATE_LOCALE_MAP[locale];
 	const [trips, setTrips] = useState<Trip[]>([]);
 	const [friends, setFriends] = useState<Friend[]>([]);
@@ -52,28 +59,9 @@ export default function HomePage() {
 	const [isDeleteTripModalOpen, setIsDeleteTripModalOpen] = useState(false);
 	const [isAddFriendModalOpen, setIsAddFriendModalOpen] = useState(false);
 
-	useEffect(() => {
-		fetchTrips();
-		fetchFriends();
-	}, []);
-
 	const searchParams = useSearchParams();
 
-	useEffect(() => {
-		if (trips.length === 0) return;
-
-		const queryTripId = searchParams.get('tripId');
-		if (queryTripId && trips.some((trip) => trip.id === queryTripId)) {
-			setSelectedTripId(queryTripId);
-			return;
-		}
-
-		if (!selectedTripId) {
-			setSelectedTripId(trips[0].id);
-		}
-	}, [trips, selectedTripId, searchParams]);
-
-	const fetchTrips = async () => {
+	const fetchTrips = useCallback(async () => {
 		try {
 			const response = await fetch(apiPath('/api/trips'), {
 				headers: getAuthHeaders(),
@@ -85,7 +73,7 @@ export default function HomePage() {
 		} catch (error) {
 			console.error('Failed to fetch trips:', error);
 		}
-	};
+	}, []);
 
 	const fetchFriends = async () => {
 		try {
@@ -100,6 +88,25 @@ export default function HomePage() {
 			console.error('Failed to fetch friends:', error);
 		}
 	};
+
+	useEffect(() => {
+		fetchTrips();
+		fetchFriends();
+	}, [fetchTrips]);
+
+	useEffect(() => {
+		if (trips.length === 0) return;
+
+		const queryTripId = searchParams.get('tripId');
+		if (queryTripId && trips.some((trip) => trip.id === queryTripId)) {
+			setSelectedTripId(queryTripId);
+			return;
+		}
+
+		if (!selectedTripId) {
+			setSelectedTripId(trips[0].id);
+		}
+	}, [trips, selectedTripId, searchParams]);
 
 	const currentTrip = useMemo(() => trips.find((trip) => trip.id === selectedTripId) || null, [trips, selectedTripId]);
 
@@ -120,6 +127,26 @@ export default function HomePage() {
 			};
 		});
 	}, [currentBills, currentTrip?.members]);
+
+	const handleRemoteBillEvent = useCallback(
+		(event: TripBillEvent) => {
+			const detail = formatAmount(event.amount, event.currency);
+			if (event.type === 'bill:created') {
+				pushToast(t('realtime.billCreated', { name: event.actorName, bill: event.billName }), detail);
+				return;
+			}
+			pushToast(t('realtime.billUpdated', { name: event.actorName, bill: event.billName }), detail);
+		},
+		[pushToast, t],
+	);
+
+	useTripRealtime({
+		tripId: selectedTripId,
+		userId: user?.id,
+		enabled: !!user && !!selectedTripId,
+		onRemoteEvent: handleRemoteBillEvent,
+		onRefresh: fetchTrips,
+	});
 
 	const handleCreateTrip = async () => {
 		if (!newTripName.trim()) return;
@@ -381,12 +408,14 @@ export default function HomePage() {
 					</div>
 				</Modal>
 				{AuthRequiredModal}
+				<TripBillToastStack toasts={toasts} onDismiss={dismissToast} />
 			</AppShell>
 		);
 	}
 
 	return (
 		<AppShell tight>
+			<TripBillToastStack toasts={toasts} onDismiss={dismissToast} />
 			<header className="flex items-stretch gap-1.5">
 				<div className="relative min-w-0 flex-1">
 					<button type="button" onClick={() => setIsTripDropdownOpen(!isTripDropdownOpen)} className="app-trip-select">

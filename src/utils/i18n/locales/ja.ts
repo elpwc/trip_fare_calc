@@ -424,6 +424,9 @@ export const ja = {
 	'test.homepage.amount': '金額',
 	'test.homepage.debtors': '負担者',
 
+	'realtime.billCreated': '{name} が請求「{bill}」を追加しました',
+	'realtime.billUpdated': '{name} が請求「{bill}」を更新しました',
+
 	'onboarding.stepIndicator': 'ステップ {current}/{total}',
 	'onboarding.skipStep': 'このステップをスキップ',
 	'onboarding.skip': 'ガイド全体をスキップ',

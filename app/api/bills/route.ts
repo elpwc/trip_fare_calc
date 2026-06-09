@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyJwtToken } from '@/src/lib/jwt';
 import { getTripAccess } from '@/lib/trip-access';
+import { notifyTripBillChange } from '@/lib/trip-realtime';
 import type { ExpenseStatus } from '@prisma/client';
 
 type BillRequestBody = {
@@ -92,6 +93,16 @@ export async function POST(request: NextRequest) {
       include: {
         owedFriends: true,
       },
+    });
+
+    void notifyTripBillChange({
+      type: 'bill:created',
+      tripId,
+      billId: bill.id,
+      actorUserId: userId,
+      billName: bill.name,
+      amount: bill.amount,
+      currency: bill.currency,
     });
 
     return NextResponse.json(bill);

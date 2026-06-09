@@ -424,6 +424,9 @@ export const en = {
 	'test.homepage.amount': 'Amount',
 	'test.homepage.debtors': 'Owed by',
 
+	'realtime.billCreated': '{name} added bill "{bill}"',
+	'realtime.billUpdated': '{name} updated bill "{bill}"',
+
 	'onboarding.stepIndicator': 'Step {current}/{total}',
 	'onboarding.skipStep': 'Skip this step',
 	'onboarding.skip': 'Skip entire tour',

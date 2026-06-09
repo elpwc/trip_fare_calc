@@ -1036,3 +1036,82 @@ html.dark .app-settle-chart-legend {
   background: transparent !important;
   border: none !important;
 }
+
+.trip-bill-toast-stack {
+  position: fixed;
+  top: 0.75rem;
+  right: 0.75rem;
+  z-index: 100010;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: min(18rem, calc(100vw - 1.5rem));
+  pointer-events: none;
+}
+
+.trip-bill-toast {
+  pointer-events: auto;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  border: 2px solid #1a1814;
+  background: rgba(255, 253, 248, 0.96);
+  padding: 0.65rem 0.55rem 0.65rem 0.75rem;
+  box-shadow: 4px 4px 0 rgba(26, 24, 20, 0.14);
+  animation: tripToastIn 0.28s ease;
+}
+
+html.dark .trip-bill-toast {
+  border-color: #f4efe4;
+  background: rgba(28, 26, 24, 0.96);
+  box-shadow: 4px 4px 0 rgba(244, 239, 228, 0.08);
+}
+
+.trip-bill-toast-body {
+  min-width: 0;
+  flex: 1;
+}
+
+.trip-bill-toast-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.trip-bill-toast-detail {
+  margin-top: 0.2rem;
+  font-size: 0.75rem;
+  color: #2a9d8f;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+html.dark .trip-bill-toast-detail {
+  color: #5fd3c4;
+}
+
+.trip-bill-toast-close {
+  flex-shrink: 0;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 1px solid rgba(26, 24, 20, 0.2);
+  background: transparent;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+html.dark .trip-bill-toast-close {
+  border-color: rgba(244, 239, 228, 0.15);
+  color: #f4efe4;
+}
+
+@keyframes tripToastIn {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
