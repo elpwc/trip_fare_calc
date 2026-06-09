@@ -129,6 +129,64 @@ html.dark .settings-perforation {
 	background-image: repeating-linear-gradient(90deg, #f4efe4 0 6px, transparent 6px 12px);
 }
 
+.about-link-card {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	padding: 0.75rem 0.85rem;
+	text-decoration: none;
+	transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+	@apply border-2 border-[#1a1814] bg-[#fffdf8] text-[#1a1814] dark:border-[#f4efe4] dark:bg-[#1c1a18] dark:text-[#f4efe4];
+	box-shadow: 2px 2px 0 rgba(26, 24, 20, 0.08);
+}
+
+html.dark .about-link-card {
+	box-shadow: 2px 2px 0 rgba(244, 239, 228, 0.06);
+}
+
+.about-link-card:hover {
+	transform: translate(-1px, -1px);
+	box-shadow: 3px 3px 0 rgba(26, 24, 20, 0.1);
+}
+
+html.dark .about-link-card:hover {
+	box-shadow: 3px 3px 0 rgba(244, 239, 228, 0.08);
+}
+
+.about-link-icon {
+	display: inline-flex;
+	height: 2.5rem;
+	width: 2.5rem;
+	flex-shrink: 0;
+	align-items: center;
+	justify-content: center;
+	border: 2px solid #1a1814;
+}
+
+html.dark .about-link-icon {
+	border-color: #f4efe4;
+}
+
+.about-link-icon-github {
+	background: #1a1814;
+	color: #f4efe4;
+}
+
+html.dark .about-link-icon-github {
+	background: #f4efe4;
+	color: #1a1814;
+}
+
+.about-link-icon-mail {
+	background: #2a9d8f;
+	color: #fffdf8;
+}
+
+html.dark .about-link-icon-mail {
+	background: #5fd3c4;
+	color: #1a1814;
+}
+
 .settings-input {
 	@apply w-full border-2 border-[#1a1814] bg-[#fffdf8] text-[#1a1814] outline-none dark:border-[#f4efe4] dark:bg-[#121110] dark:text-[#f4efe4];
 	padding: 0.5rem 0.5rem;

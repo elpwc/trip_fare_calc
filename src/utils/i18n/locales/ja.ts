@@ -1,5 +1,5 @@
 export const ja = {
-	'app.name': '割勘',
+	'app.name': '割勘 - TripFareCalc',
 	'app.description': '旅行の割り勘・精算ツール',
 
 	'page.home': '請求',
@@ -310,6 +310,9 @@ export const ja = {
 	'user.promptNewPassword': '新しいパスワードを入力してください',
 
 	'about.intro': 'Vibe Coding by UNI\n個人用の旅行精算アプリ',
+	'about.linksSection': 'リンク',
+	'about.github': 'GitHub リポジトリ',
+	'about.developerEmail': '開発者メール',
 	'about.step1Title': '旅行を作成',
 	'about.step1Desc': '旅行を追加し、すべての旅伴を招待',
 	'about.step2Title': '請求を記録',

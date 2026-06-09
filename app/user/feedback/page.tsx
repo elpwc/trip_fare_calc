@@ -19,8 +19,33 @@ export default function FeedbackPage() {
 	const { t } = usePreferences();
 	const [openIndex, setOpenIndex] = useState<number | null>(0);
 
+	const milestoneKeys = [
+		{ step: '01', titleKey: 'about.step1Title', descKey: 'about.step1Desc' },
+		{ step: '02', titleKey: 'about.step2Title', descKey: 'about.step2Desc' },
+		{ step: '03', titleKey: 'about.step3Title', descKey: 'about.step3Desc' },
+		{ step: '04', titleKey: 'about.step4Title', descKey: 'about.step4Desc' },
+	] as const satisfies ReadonlyArray<{ step: string; titleKey: MessageKey; descKey: MessageKey }>;
+
 	return (
 		<SettingsShell title={t('page.feedback')} subtitle="" stamp="HELP" backHref="/user">
+			<ReceiptPanel label="HOW IT WORKS" serial="GUIDE">
+				<div className="space-y-0">
+					{milestoneKeys.map((item, index) => (
+						<div key={item.step} className={`flex gap-4 py-4 ${index !== milestoneKeys.length - 1 ? 'border-b border-dashed border-[#1a1814]/15 dark:border-[#f4efe4]/10' : ''}`}>
+							<div className="settings-mono flex h-10 w-10 shrink-0 items-center justify-center border-2 border-[#1a1814] bg-[#2a9d8f] text-[11px] font-bold text-[#fffdf8] dark:border-[#f4efe4] dark:bg-[#5fd3c4] dark:text-[#1a1814]">
+								{item.step}
+							</div>
+							<div>
+								<p className="font-semibold">{t(item.titleKey)}</p>
+								<p className="text-app-muted mt-1 text-[13px] leading-relaxed">{t(item.descKey)}</p>
+							</div>
+						</div>
+					))}
+				</div>
+			</ReceiptPanel>
+
+			<Perforation />
+
 			<ReceiptPanel label={t('feedback.faqSection')} serial="NO.001">
 				<div className="space-y-3">
 					{faqKeys.map((item, index) => {
@@ -35,9 +60,7 @@ export default function FeedbackPage() {
 									<span className="settings-mono text-app-danger shrink-0">{open ? '−' : '+'}</span>
 								</button>
 								{open ? (
-									<div className="text-app-muted border-t border-dashed border-[#1a1814]/15 px-4 py-3 text-[13px] leading-relaxed dark:border-[#f4efe4]/10">
-										{t(item.aKey)}
-									</div>
+									<div className="text-app-muted border-t border-dashed border-[#1a1814]/15 px-4 py-3 text-[13px] leading-relaxed dark:border-[#f4efe4]/10">{t(item.aKey)}</div>
 								) : null}
 							</div>
 						);

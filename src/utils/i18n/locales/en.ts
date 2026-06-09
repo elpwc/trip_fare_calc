@@ -1,5 +1,5 @@
 export const en = {
-	'app.name': 'SplitBill',
+	'app.name': 'TripFareCalc',
 	'app.description': 'Travel expense splitting and settlement tool',
 
 	'page.home': 'Bills',
@@ -310,6 +310,9 @@ export const en = {
 	'user.promptNewPassword': 'Please enter a new password',
 
 	'about.intro': 'Vibe Coding by UNI\nA personal travel settlement app',
+	'about.linksSection': 'Links',
+	'about.github': 'GitHub Repository',
+	'about.developerEmail': 'Developer Email',
 	'about.step1Title': 'Create a Trip',
 	'about.step1Desc': 'Add a trip and invite all your travel companions',
 	'about.step2Title': 'Record Every Bill',

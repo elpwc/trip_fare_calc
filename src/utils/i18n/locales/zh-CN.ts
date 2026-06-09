@@ -1,5 +1,5 @@
 export const zhCN = {
-	'app.name': '算钱',
+	'app.name': '算钱 - TripFareCalc',
 	'app.description': '旅行 AA 账单与结算工具',
 
 	'page.home': '账单',
@@ -10,7 +10,7 @@ export const zhCN = {
 	'page.share': '分享',
 	'page.newBill': '新建账单',
 	'page.editBill': '编辑账单',
-	'page.feedback': '疑问与反馈',
+	'page.feedback': '说明与常见问题',
 	'page.about': '关于',
 	'page.testFriends': '测试旅伴',
 	'page.testHomepageIcons': '测试图标',
@@ -291,7 +291,7 @@ export const zhCN = {
 	'user.currentEmail': '当前：{email}',
 	'user.changePassword': '修改密码',
 	'user.changePasswordDesc': '定期更换密码，保护旅途账单',
-	'user.feedbackLink': '疑问与反馈',
+	'user.feedbackLink': '说明与常见问题',
 	'user.feedbackDesc': '常见问题与意见入口',
 	'user.aboutLink': '关于',
 	'user.aboutDesc': '了解旅行结算的故事',
@@ -309,7 +309,10 @@ export const zhCN = {
 	'user.promptOldPassword': '请输入当前密码',
 	'user.promptNewPassword': '请输入新密码',
 
-	'about.intro': 'Vibe Coding by UNI\n个人用的旅行结算App',
+	'about.intro': 'Vibe Coding by UNI\n个人用的旅行结算 App',
+	'about.linksSection': '链接',
+	'about.github': 'GitHub 仓库',
+	'about.developerEmail': '开发者邮箱',
 	'about.step1Title': '新建旅行',
 	'about.step1Desc': '添加一次出行，拉上所有旅伴',
 	'about.step2Title': '记录每个账单',
