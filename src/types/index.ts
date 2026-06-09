@@ -61,8 +61,10 @@ export type Trip = {
 	name: string;
 	description?: string;
 	createdAt: string;
+	startDate?: string;
 	members: TripMember[];
 	bills: Bill[];
+	createdById?: string;
 };
 
 /**

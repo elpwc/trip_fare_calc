@@ -26,7 +26,7 @@ export default function BottomMenu() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-200/80 bg-white/95 px-3 py-2 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95">
+    <nav className="fixed inset-x-0 bottom-0 z-114514 border-t border-slate-200/80 bg-white/95 px-3 py-2 backdrop-blur dark:border-slate-800 dark:bg-slate-950/95">
       <div className="mx-auto flex max-w-245 items-center justify-between gap-1">
         {menuItems.map((item) => {
           const active =

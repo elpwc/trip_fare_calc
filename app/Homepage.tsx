@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Modal } from '@/src/components/Modal';
 import FriendSelector from '@/src/components/FriendSelector';
 import BillMap from '@/src/components/BillMap';
@@ -34,11 +34,21 @@ export default function HomePage() {
 		fetchFriends();
 	}, []);
 
+	const searchParams = useSearchParams();
+
 	useEffect(() => {
-		if (trips.length > 0 && !selectedTripId) {
+		if (trips.length === 0) return;
+
+		const queryTripId = searchParams.get('tripId');
+		if (queryTripId && trips.some((trip) => trip.id === queryTripId)) {
+			setSelectedTripId(queryTripId);
+			return;
+		}
+
+		if (!selectedTripId) {
 			setSelectedTripId(trips[0].id);
 		}
-	}, [trips, selectedTripId]);
+	}, [trips, selectedTripId, searchParams]);
 
 	const fetchTrips = async () => {
 		try {
