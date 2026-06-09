@@ -24,3 +24,245 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* ── Settings / Receipt aesthetic ── */
+.settings-paper {
+  background: #f4efe4;
+  color: #1a1814;
+}
+
+.settings-paper-grid {
+  background-image:
+    linear-gradient(rgba(26, 24, 20, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(26, 24, 20, 0.035) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+.settings-display {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 700;
+}
+
+.settings-mono {
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+}
+
+.settings-stamp {
+  border: 3px double #e85d4c;
+  color: #e85d4c;
+  padding: 0.45rem 0.65rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  opacity: 0.88;
+}
+
+.settings-receipt {
+  position: relative;
+  background: #fffdf8;
+  border: 2px solid #1a1814;
+  box-shadow: 6px 6px 0 rgba(26, 24, 20, 0.12);
+}
+
+.settings-receipt-teeth {
+  height: 10px;
+  margin-top: -1px;
+  background:
+    linear-gradient(135deg, #fffdf8 33.33%, transparent 33.33%) -8px 0,
+    linear-gradient(225deg, #fffdf8 33.33%, transparent 33.33%) -8px 0;
+  background-size: 16px 10px;
+  background-color: transparent;
+}
+
+.settings-ticket {
+  border: 2px solid #1a1814;
+  background: linear-gradient(90deg, rgba(42, 157, 143, 0.08) 0%, rgba(42, 157, 143, 0.08) 12px, #fffdf8 12px);
+  box-shadow: 3px 3px 0 rgba(26, 24, 20, 0.08);
+}
+
+.settings-ticket-hole {
+  width: 10px;
+  height: 10px;
+  margin-top: 0.35rem;
+  border-radius: 999px;
+  border: 2px solid #1a1814;
+  background: #f4efe4;
+  box-shadow: inset 0 0 0 2px #fffdf8;
+}
+
+.settings-perforation {
+  height: 1px;
+  background-image: repeating-linear-gradient(90deg, #1a1814 0 6px, transparent 6px 12px);
+  opacity: 0.25;
+}
+
+.settings-input {
+  width: 100%;
+  border: 2px solid #1a1814;
+  background: #fffdf8;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  outline: none;
+  transition: box-shadow 0.15s ease;
+}
+
+.settings-input:focus {
+  box-shadow: 4px 4px 0 #2a9d8f;
+}
+
+.settings-btn-primary {
+  border: 2px solid #1a1814;
+  background: #e85d4c;
+  color: #fffdf8;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  box-shadow: 4px 4px 0 #1a1814;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.settings-btn-primary:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 5px 5px 0 #1a1814;
+}
+
+.settings-btn-primary:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 #1a1814;
+}
+
+.settings-btn-ghost {
+  border: 2px solid #1a1814;
+  background: transparent;
+  color: #1a1814;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  transition: background 0.12s ease;
+}
+
+.settings-btn-ghost:hover {
+  background: rgba(26, 24, 20, 0.06);
+}
+
+.settings-chip {
+  border: 2px solid #1a1814;
+  padding: 0.45rem 0.85rem;
+  font-family: var(--font-geist-mono), ui-monospace, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  transition: all 0.12s ease;
+}
+
+.settings-chip-active {
+  background: #1a1814;
+  color: #f4efe4;
+  box-shadow: 3px 3px 0 #2a9d8f;
+}
+
+.settings-faq-item {
+  border: 2px solid #1a1814;
+  background: #fffdf8;
+}
+
+.settings-barcode {
+  height: 44px;
+  background:
+    repeating-linear-gradient(90deg, #1a1814 0 2px, transparent 2px 5px, #1a1814 5px 6px, transparent 6px 10px);
+  opacity: 0.85;
+}
+
+@media (prefers-color-scheme: dark) {
+  .settings-paper {
+    background: #121110;
+    color: #f4efe4;
+  }
+
+  .settings-paper-grid {
+    background-image:
+      linear-gradient(rgba(244, 239, 228, 0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(244, 239, 228, 0.04) 1px, transparent 1px);
+  }
+
+  .settings-stamp {
+    border-color: #ff7a68;
+    color: #ff7a68;
+  }
+
+  .settings-receipt {
+    background: #1c1a18;
+    border-color: #f4efe4;
+    box-shadow: 6px 6px 0 rgba(244, 239, 228, 0.06);
+  }
+
+  .settings-receipt-teeth {
+    background:
+      linear-gradient(135deg, #1c1a18 33.33%, transparent 33.33%) -8px 0,
+      linear-gradient(225deg, #1c1a18 33.33%, transparent 33.33%) -8px 0;
+    background-size: 16px 10px;
+  }
+
+  .settings-ticket {
+    border-color: #f4efe4;
+    background: linear-gradient(90deg, rgba(95, 211, 196, 0.1) 0%, rgba(95, 211, 196, 0.1) 12px, #1c1a18 12px);
+    box-shadow: 3px 3px 0 rgba(244, 239, 228, 0.05);
+  }
+
+  .settings-ticket-hole {
+    border-color: #f4efe4;
+    background: #121110;
+    box-shadow: inset 0 0 0 2px #1c1a18;
+  }
+
+  .settings-perforation {
+    background-image: repeating-linear-gradient(90deg, #f4efe4 0 6px, transparent 6px 12px);
+  }
+
+  .settings-input {
+    border-color: #f4efe4;
+    background: #121110;
+    color: #f4efe4;
+  }
+
+  .settings-input:focus {
+    box-shadow: 4px 4px 0 #5fd3c4;
+  }
+
+  .settings-btn-primary {
+    border-color: #f4efe4;
+    box-shadow: 4px 4px 0 #f4efe4;
+  }
+
+  .settings-btn-ghost {
+    border-color: #f4efe4;
+    color: #f4efe4;
+  }
+
+  .settings-btn-ghost:hover {
+    background: rgba(244, 239, 228, 0.08);
+  }
+
+  .settings-chip {
+    border-color: #f4efe4;
+  }
+
+  .settings-chip-active {
+    background: #f4efe4;
+    color: #1a1814;
+    box-shadow: 3px 3px 0 #5fd3c4;
+  }
+
+  .settings-faq-item {
+    border-color: #f4efe4;
+    background: #1c1a18;
+  }
+
+  .settings-barcode {
+    background:
+      repeating-linear-gradient(90deg, #f4efe4 0 2px, transparent 2px 5px, #f4efe4 5px 6px, transparent 6px 10px);
+  }
+}
+
