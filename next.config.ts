@@ -10,6 +10,11 @@ const nextConfig: NextConfig = {
 	env: {
 		NEXT_PUBLIC_BASE_PATH: BASE_PATH,
 	},
+	serverExternalPackages: ['@prisma/client', 'prisma'],
+	outputFileTracingIncludes: {
+		'/*': ['./node_modules/.prisma/client/**/*'],
+		'/api/**/*': ['./node_modules/.prisma/client/**/*'],
+	},
 	//assetPrefix: '/simticket',
 	compress: true,
 };
