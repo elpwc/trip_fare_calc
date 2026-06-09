@@ -2,7 +2,7 @@
 
 import React from 'react';
 import AppShell from '@/src/components/layout/AppShell';
-import { getBackgroundColor, getDisplayText } from '@/src/components/FriendIcon';
+import FriendIcon from '@/src/components/FriendIcon';
 import { TripMember } from '@/src/types';
 import { usePreferences } from '@/src/utils/preferences-provider';
 
@@ -18,10 +18,9 @@ const testMembers = [
 type FriendListProps = {
 	friends: TripMember[];
 	onFriendClick: (friend: TripMember) => void;
-	selfLabel: string;
 };
 
-const FriendListTest: React.FC<FriendListProps> = ({ friends, onFriendClick, selfLabel }) => {
+const FriendListTest: React.FC<FriendListProps> = ({ friends, onFriendClick }) => {
 	const getFriendPosition = (index: number, total: number) => {
 		if (total === 0) return { x: 0, y: 0 };
 		const angle = (index / total) * 2 * Math.PI;
@@ -57,15 +56,15 @@ const FriendListTest: React.FC<FriendListProps> = ({ friends, onFriendClick, sel
 						onClick={() => onFriendClick(friend)}
 					>
 						<div
-							className={`relative ${getBackgroundColor(friend.name)} flex items-center justify-center rounded-full font-bold text-white shadow-md`}
+							className={`relative flex items-center justify-center`}
 							style={{ width: size, height: size }}
 						>
-							{getDisplayText(friend.name)}
-							{friend.isSelf && (
-								<div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-orange-500 text-xs font-bold text-white shadow-md">
-									{selfLabel}
-								</div>
-							)}
+							<FriendIcon
+								name={friend.name}
+								size="lg"
+								isSelf={friend.isSelf}
+								style={{ width: size, height: size, fontSize: Math.max(10, Math.round(size * 0.24)) }}
+							/>
 						</div>
 						<span className="mt-1 max-w-16 truncate text-center text-xs text-app-muted">{friend.name}</span>
 					</div>
@@ -91,7 +90,7 @@ export default function FriendListTestPage() {
 		<AppShell>
 			<h1 className="mb-4 text-2xl font-bold">{t('page.testFriends')}</h1>
 			<p className="mb-4 text-app-muted">{t('test.friends.desc')}</p>
-			<FriendListTest friends={testMembers} onFriendClick={handleFriendClick} selfLabel={t('common.self')} />
+			<FriendListTest friends={testMembers} onFriendClick={handleFriendClick} />
 		</AppShell>
 	);
 }

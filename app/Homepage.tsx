@@ -6,13 +6,12 @@ import { Modal } from '@/src/components/Modal';
 import AppShell from '@/src/components/layout/AppShell';
 import FriendSelector from '@/src/components/FriendSelector';
 import BillMap from '@/src/components/BillMap';
+import HomeBillList from '@/src/components/HomeBillList';
 import FriendIcon from '@/src/components/FriendIcon';
 import { getAuthHeaders } from '@/src/utils/auth';
-import { Friend, TripMember, Trip, Bill, BillOwed } from '@/src/types';
-import { CURRENCY_DEFINITIONS } from '@/src/utils/currencies';
+import { Friend, TripMember, Trip, Bill } from '@/src/types';
 import { usePreferences } from '@/src/utils/preferences-provider';
 import type { Locale } from '@/src/utils/preferences/constants';
-import { getBillCategoryLabelKey } from '@/src/utils/bill-category';
 
 const DATE_LOCALE_MAP: Record<Locale, string> = {
 	'zh-CN': 'zh-CN',
@@ -97,8 +96,6 @@ export default function HomePage() {
 	};
 
 	const currentTrip = useMemo(() => trips.find((trip) => trip.id === selectedTripId) || null, [trips, selectedTripId]);
-
-	const currentUserMemberId = useMemo(() => currentTrip?.members.find((member) => member.isSelf)?.id || null, [currentTrip]);
 
 	const currentBills = useMemo(() => currentTrip?.bills || [], [currentTrip]);
 
@@ -432,7 +429,7 @@ export default function HomePage() {
 							}}
 							className="flex min-w-11 flex-col items-center gap-0.5"
 						>
-							<FriendIcon name={member.name} size="sm" isSelf={member.isSelf} />
+							<FriendIcon name={member.name} size="md" isSelf={member.isSelf} />
 							<p className="max-w-11 truncate text-[10px]">{member.name}</p>
 						</button>
 					))}
@@ -456,61 +453,7 @@ export default function HomePage() {
 						<span className="app-label">{t('home.billList')}</span>
 						<span className="settings-mono text-[10px] text-app-muted">{t('home.tapToEdit')}</span>
 					</div>
-					<div className="overflow-x-auto">
-						<table className="app-data-table">
-							<thead>
-								<tr>
-									<th>{t('table.payer')}</th>
-									<th>{t('table.amountSplit')}</th>
-									<th>{t('table.item')}</th>
-									<th>{t('table.time')}</th>
-									<th>{t('table.status')}</th>
-								</tr>
-							</thead>
-							<tbody>
-								{currentBills.map((bill) => (
-									<tr key={bill.id} onClick={() => handleBillClick(bill)}>
-										<td>
-											<FriendIcon
-												name={(currentTrip?.members || []).find((m) => m.id === bill.payerId)?.name || '?'}
-												size="sm"
-												isSelf={(currentTrip?.members || []).find((m) => m.id === bill.payerId)?.isSelf}
-											/>
-										</td>
-										<td>
-											<p className="app-amount">
-												{bill.amount}
-												{CURRENCY_DEFINITIONS[bill.currency || 'CNY']?.suffix || '¥'}
-											</p>
-											<div className="mt-0.5 flex flex-wrap items-center gap-0.5">
-												{bill.owedFriends.slice(0, 5).map((owed: BillOwed) => {
-													const member = (currentTrip?.members || []).find((m) => m.id === owed.friendId);
-													return <FriendIcon key={owed.id} name={member?.name || '?'} size="sm" isSelf={member?.isSelf} />;
-												})}
-												{bill.owedFriends.length > 5 ? <span className="settings-mono text-[9px]">+{bill.owedFriends.length - 5}</span> : null}
-											</div>
-										</td>
-										<td>
-											<span className="app-tag">{t(getBillCategoryLabelKey(bill.category))}</span>
-											<p className="mt-0.5 max-w-28 truncate text-[11px] leading-tight">{bill.name}</p>
-										</td>
-										<td>
-											{bill.createdById && bill.createdById !== currentUserMemberId ? (
-												<p className="text-[10px] leading-tight text-app-muted">{(currentTrip?.members || []).find((m) => m.id === bill.createdById)?.name}</p>
-											) : null}
-											<p className="settings-mono text-[10px] leading-tight text-app-muted">
-												{new Date(bill.createdAt).toLocaleDateString(dateLocale, { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
-											</p>
-										</td>
-										<td>
-											<span className={`app-tag ${bill.status === 'SETTLED' ? 'app-tag-settled' : 'app-tag-open'}`}>{bill.status === 'SETTLED' ? t('table.settledShort') : t('table.unsettledShort')}</span>
-										</td>
-									</tr>
-								))}
-							</tbody>
-						</table>
-						{currentBills.length === 0 ? <p className="px-2 py-3 text-center text-[12px] text-app-muted">{t('home.noBills')}</p> : null}
-					</div>
+					<HomeBillList bills={currentBills} members={currentTrip?.members || []} onBillClick={handleBillClick} dateLocale={dateLocale} />
 				</div>
 			</section>
 

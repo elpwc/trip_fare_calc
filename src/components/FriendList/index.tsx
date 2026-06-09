@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import FriendIcon, { getBackgroundColor, getDisplayText } from '@/src/components/FriendIcon';
+import FriendIcon from '@/src/components/FriendIcon';
 import { Friend } from '@/src/types';
 import { usePreferences } from '@/src/utils/preferences-provider';
 
@@ -50,17 +50,13 @@ const FriendList: React.FC<FriendListProps> = ({
             }}
             onClick={() => onFriendClick(friend)}
           >
-            <div
-              className={`relative ${getBackgroundColor(friend.name)} rounded-full flex items-center justify-center text-white font-bold shadow-md`}
-              style={{ width: size, height: size }}
-            >
-              {getDisplayText(friend.name)}
-              {friend.isSelf && (
-                <div className="absolute -bottom-1 -right-1 bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-md">
-                  {t('common.self')}
-                </div>
-              )}
-            </div>
+            <FriendIcon
+              name={friend.name}
+              size="lg"
+              isSelf={friend.isSelf}
+              className="hover:-translate-x-px hover:-translate-y-px"
+              style={{ width: size, height: size, fontSize: Math.max(10, Math.round(size * 0.24)) }}
+            />
             <span className="text-xs mt-1 text-center max-w-16 truncate">{friend.name}</span>
           </div>
         );
