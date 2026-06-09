@@ -1,12 +1,19 @@
-const CACHE_NAME = 'tripfarecalc-shell-v1';
+const CACHE_NAME = 'tripfarecalc-shell-v2';
+
+function getBasePathFromSwLocation() {
+	const pathname = self.location.pathname.replace(/\/sw\.js$/, '');
+	return pathname || '/';
+}
 
 function getPrecacheUrls() {
-	const root = new URL('./', self.location);
+	const origin = self.location.origin;
+	const basePath = getBasePathFromSwLocation();
+	const entryUrl = `${origin}${basePath}`;
 	return [
-		root.href,
-		new URL('manifest.webmanifest', self.location).href,
-		new URL('icons/icon192.png', self.location).href,
-		new URL('icons/icon512.png', self.location).href,
+		entryUrl,
+		`${origin}${basePath}/manifest.webmanifest`,
+		`${origin}${basePath}/icons/icon192.png`,
+		`${origin}${basePath}/icons/icon512.png`,
 	];
 }
 

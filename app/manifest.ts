@@ -1,15 +1,15 @@
 import type { MetadataRoute } from 'next';
-import { BASE_PATH } from '@/src/config/base-path';
+import { APP_ENTRY, PWA_SCOPE, withBasePath } from '@/src/config/paths';
 import { zhCN } from '@/src/utils/i18n/locales/zh-CN';
 
 export default function manifest(): MetadataRoute.Manifest {
 	return {
-		id: `${BASE_PATH}/`,
+		id: APP_ENTRY,
 		name: zhCN['app.name'],
 		short_name: '算钱',
 		description: zhCN['app.description'],
-		start_url: `${BASE_PATH}/`,
-		scope: `${BASE_PATH}/`,
+		start_url: APP_ENTRY,
+		scope: PWA_SCOPE,
 		display: 'standalone',
 		display_override: ['standalone', 'browser'],
 		orientation: 'portrait',
@@ -18,25 +18,25 @@ export default function manifest(): MetadataRoute.Manifest {
 		categories: ['finance', 'utilities'],
 		icons: [
 			{
-				src: `${BASE_PATH}/icons/icon192.png`,
+				src: withBasePath('/icons/icon192.png'),
 				sizes: '192x192',
 				type: 'image/png',
 				purpose: 'any',
 			},
 			{
-				src: `${BASE_PATH}/icons/icon512.png`,
+				src: withBasePath('/icons/icon512.png'),
 				sizes: '512x512',
 				type: 'image/png',
 				purpose: 'any',
 			},
 			{
-				src: `${BASE_PATH}/icons/icon512.png`,
+				src: withBasePath('/icons/icon512.png'),
 				sizes: '512x512',
 				type: 'image/png',
 				purpose: 'maskable',
 			},
 			{
-				src: `${BASE_PATH}/icons/icon.png`,
+				src: withBasePath('/icons/icon.png'),
 				sizes: '180x180',
 				type: 'image/png',
 			},
