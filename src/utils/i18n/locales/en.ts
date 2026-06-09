@@ -285,7 +285,7 @@ export const en = {
 	'share.backHome': 'Back to Home',
 
 	'user.settingsLabel': 'Settings',
-	'user.profileTitle': 'Profile',
+	'user.profileTitle': 'Settings',
 	'user.loadingProfile': 'Loading profile…',
 	'user.guestTitle': 'Trip Settlement',
 	'user.guestHint': 'Please sign in or register to save and share bills',

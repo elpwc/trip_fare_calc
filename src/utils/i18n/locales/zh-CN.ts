@@ -285,7 +285,7 @@ export const zhCN = {
 	'share.backHome': '返回首页',
 
 	'user.settingsLabel': 'Settings / 设置',
-	'user.profileTitle': '个人档案',
+	'user.profileTitle': '设置',
 	'user.loadingProfile': '正在读取旅客信息…',
 	'user.guestTitle': '旅行结算',
 	'user.guestHint': '请先登录或注册，才能保存与分享账单',

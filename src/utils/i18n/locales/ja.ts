@@ -285,7 +285,7 @@ export const ja = {
 	'share.backHome': 'ホームに戻る',
 
 	'user.settingsLabel': '設定',
-	'user.profileTitle': 'プロフィール',
+	'user.profileTitle': '設定',
 	'user.loadingProfile': 'プロフィールを読み込み中…',
 	'user.guestTitle': '旅行精算',
 	'user.guestHint': '請求の保存と共有にはログインまたは登録が必要です',

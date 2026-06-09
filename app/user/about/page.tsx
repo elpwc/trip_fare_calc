@@ -5,6 +5,7 @@ import ReceiptPanel from '@/src/components/settings/ReceiptPanel';
 import Perforation from '@/src/components/settings/Perforation';
 import { usePreferences } from '@/src/utils/preferences-provider';
 import type { MessageKey } from '@/src/utils/i18n/messages';
+import icon from '@/app/icon.png';
 
 const GITHUB_REPO = 'https://github.com/elpwc/trip_fare_calc';
 const DEVELOPER_EMAIL = 'elpwc@hotmail.com';
@@ -31,9 +32,12 @@ export default function AboutPage() {
 	return (
 		<SettingsShell title={t('page.about')} subtitle="" stamp="ABOUT" backHref="/user">
 			<ReceiptPanel label="TRIP FARE CALC" serial="v0.1.0">
-				<div className="space-y-3">
-					<p className="settings-display text-[1.75rem] leading-none tracking-tight">{t('app.name')}</p>
-					<p className="text-app-muted whitespace-pre-line text-[14px] leading-relaxed">{t('about.intro')}</p>
+				<div className='flex flex-col justify-center items-center mb-4'>
+					<img src={icon.src} width={200} height={200} />
+					<p className="settings-display text-[1.5rem] leading-none tracking-tight">{t('app.name')}</p>
+				</div>
+				<div className='flex flex-col justify-center items-center'>
+					<p className="text-center text-app-muted whitespace-pre-line text-[14px] leading-relaxed">{t('about.intro')}</p>
 				</div>
 			</ReceiptPanel>
 
@@ -41,20 +45,13 @@ export default function AboutPage() {
 
 			<ReceiptPanel label={t('about.linksSection')} serial="LINK">
 				<div className="space-y-2.5">
-					<a
-						href={GITHUB_REPO}
-						target="_blank"
-						rel="noopener noreferrer"
-						className="about-link-card group"
-					>
+					<a href={GITHUB_REPO} target="_blank" rel="noopener noreferrer" className="about-link-card group">
 						<span className="about-link-icon about-link-icon-github">
 							<GitHubIcon />
 						</span>
 						<span className="min-w-0 flex-1">
 							<span className="app-label block">{t('about.github')}</span>
-							<span className="settings-mono mt-0.5 block truncate text-[13px] font-semibold group-hover:text-[#2a9d8f] dark:group-hover:text-[#5fd3c4]">
-								elpwc/trip_fare_calc
-							</span>
+							<span className="settings-mono mt-0.5 block truncate text-[13px] font-semibold group-hover:text-[#2a9d8f] dark:group-hover:text-[#5fd3c4]">elpwc/trip_fare_calc</span>
 						</span>
 						<span className="settings-mono shrink-0 text-sm text-app-muted opacity-60 group-hover:opacity-100" aria-hidden>
 							↗
@@ -67,9 +64,7 @@ export default function AboutPage() {
 						</span>
 						<span className="min-w-0 flex-1">
 							<span className="app-label block">{t('about.developerEmail')}</span>
-							<span className="settings-mono mt-0.5 block truncate text-[13px] font-semibold group-hover:text-[#2a9d8f] dark:group-hover:text-[#5fd3c4]">
-								{DEVELOPER_EMAIL}
-							</span>
+							<span className="settings-mono mt-0.5 block truncate text-[13px] font-semibold group-hover:text-[#2a9d8f] dark:group-hover:text-[#5fd3c4]">{DEVELOPER_EMAIL}</span>
 						</span>
 						<span className="settings-mono shrink-0 text-sm text-app-muted opacity-60 group-hover:opacity-100" aria-hidden>
 							→

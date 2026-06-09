@@ -29,12 +29,7 @@ function PreferencesSection() {
 				<p className="settings-mono text-app-muted text-[10px] uppercase tracking-[0.28em]">{t('prefs.theme')}</p>
 				<div className="mt-3 flex flex-wrap gap-2">
 					{themeModes.map((mode) => (
-						<button
-							key={mode}
-							type="button"
-							onClick={() => setThemeMode(mode)}
-							className={`settings-chip ${themeMode === mode ? 'settings-chip-active' : ''}`}
-						>
+						<button key={mode} type="button" onClick={() => setThemeMode(mode)} className={`settings-chip ${themeMode === mode ? 'settings-chip-active' : ''}`}>
 							{t(themeLabelKey[mode])}
 						</button>
 					))}
@@ -44,12 +39,7 @@ function PreferencesSection() {
 				<p className="settings-mono text-app-muted text-[10px] uppercase tracking-[0.28em]">{t('prefs.language')}</p>
 				<div className="mt-3 flex flex-wrap gap-2">
 					{localeOptions.map((option) => (
-						<button
-							key={option.value}
-							type="button"
-							onClick={() => setLocale(option.value)}
-							className={`settings-chip ${locale === option.value ? 'settings-chip-active' : ''}`}
-						>
+						<button key={option.value} type="button" onClick={() => setLocale(option.value)} className={`settings-chip ${locale === option.value ? 'settings-chip-active' : ''}`}>
 							{option.label}
 						</button>
 					))}
@@ -241,7 +231,13 @@ export default function UserPage() {
 											<div>
 												<label className="settings-mono text-app-muted mb-2 block text-[10px] uppercase tracking-[0.24em]">{t('user.verificationCode')}</label>
 												<div className="flex gap-2">
-													<input value={code} type="text" onChange={(e) => setCode(e.target.value)} placeholder={t('user.codePlaceholder')} className="settings-input flex-1" />
+													<input
+														value={code}
+														type="text"
+														onChange={(e) => setCode(e.target.value)}
+														placeholder={t('user.codePlaceholder')}
+														className="settings-input flex-1"
+													/>
 													<button type="button" onClick={handleSendCode} className="settings-btn-ghost shrink-0 px-4">
 														{t('user.sendCode')}
 													</button>
@@ -307,33 +303,31 @@ export default function UserPage() {
 									<div className="min-w-0">
 										<p className="settings-display truncate text-2xl">{user.name}</p>
 										<p className="settings-mono text-app-muted mt-2 text-[11px]">{user.email}</p>
-										<button
-											type="button"
-											className="settings-mono mt-3 text-[11px] uppercase tracking-[0.18em] text-[#2a9d8f] underline-offset-4 hover:underline dark:text-[#5fd3c4]"
-											onClick={async () => {
-												const newName = window.prompt(t('user.promptNewName'), user.name);
-												if (newName && newName !== user.name) {
-													try {
-														await updateName(newName);
-														setMessage(t('user.nameUpdated'));
-													} catch (err) {
-														setMessage((err as Error).message);
-													}
-												}
-											}}
-										>
-											{t('user.editName')}
-										</button>
 									</div>
 								</div>
 								<div className="settings-stamp shrink-0 -rotate-6">ON BOARD</div>
 							</div>
-							<div className="settings-barcode mt-5 rounded-sm" aria-hidden />
-							<div className="mt-5 space-y-3 border-t border-dashed border-[#1a1814]/15 pt-5 dark:border-[#f4efe4]/10">
-								<TicketLink
-									index="02"
-									title={t('user.changeEmail')}
-									desc={t('user.currentEmail', { email: user.email })}
+							<div className="flex gap-3">
+								<button
+									type="button"
+									className="settings-mono mt-3 text-[11px] uppercase tracking-[0.18em] text-[#2a9d8f] underline-offset-4 hover:underline dark:text-[#5fd3c4]"
+									onClick={async () => {
+										const newName = window.prompt(t('user.promptNewName'), user.name);
+										if (newName && newName !== user.name) {
+											try {
+												await updateName(newName);
+												setMessage(t('user.nameUpdated'));
+											} catch (err) {
+												setMessage((err as Error).message);
+											}
+										}
+									}}
+								>
+									{t('user.editName')}
+								</button>
+								<button
+									type="button"
+									className="settings-mono mt-3 text-[11px] uppercase tracking-[0.18em] text-[#2a9d8f] underline-offset-4 hover:underline dark:text-[#5fd3c4]"
 									onClick={async () => {
 										const newEmail = window.prompt(t('user.promptNewEmail'), user.email);
 										if (newEmail && newEmail !== user.email) {
@@ -345,11 +339,12 @@ export default function UserPage() {
 											}
 										}
 									}}
-								/>
-								<TicketLink
-									index="03"
-									title={t('user.changePassword')}
-									desc={t('user.changePasswordDesc')}
+								>
+									{t('user.changeEmail')}
+								</button>
+								<button
+									type="button"
+									className="settings-mono mt-3 text-[11px] uppercase tracking-[0.18em] text-[#2a9d8f] underline-offset-4 hover:underline dark:text-[#5fd3c4]"
 									onClick={async () => {
 										const oldPassword = window.prompt(t('user.promptOldPassword'));
 										const newPassword = window.prompt(t('user.promptNewPassword'));
@@ -361,7 +356,9 @@ export default function UserPage() {
 											setMessage((err as Error).message);
 										}
 									}}
-								/>
+								>
+									{t('user.changePassword')}
+								</button>
 							</div>
 						</ReceiptPanel>
 
@@ -399,11 +396,7 @@ export default function UserPage() {
 
 						<Perforation />
 
-						<button
-							type="button"
-							onClick={logout}
-							className="settings-btn-primary mt-2 w-full border-[#1a1814] bg-[#1a1814] dark:border-[#f4efe4] dark:bg-[#f4efe4] dark:text-[#1a1814]"
-						>
+						<button type="button" onClick={logout} className="settings-btn-primary mt-2 w-full border-[#1a1814] bg-[#1a1814] dark:border-[#f4efe4] dark:bg-[#f4efe4] dark:text-[#1a1814]">
 							{t('user.logout')}
 						</button>
 
