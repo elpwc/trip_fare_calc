@@ -375,6 +375,9 @@ export const zhCN = {
 	'auth.error.serverError': '服务器繁忙，请稍后再试',
 	'auth.error.generic': '操作失败，请稍后重试',
 	'auth.error.network': '网络异常，请检查连接后重试',
+	'auth.error.invalidResponse': '服务器返回了异常数据，请稍后重试',
+	'auth.error.notFound': '接口地址不存在，请确认应用部署路径是否正确',
+	'auth.error.badGateway': '无法连接服务器，请稍后再试',
 
 	'about.intro': 'Vibe Coding by UNI\n个人用的旅行结算 App',
 	'about.linksSection': '链接',

@@ -375,6 +375,9 @@ export const ja = {
 	'auth.error.serverError': 'サーバーが混み合っています。しばらくしてからお試しください',
 	'auth.error.generic': '操作に失敗しました。しばらくしてからお試しください',
 	'auth.error.network': 'ネットワークエラーです。接続を確認してください',
+	'auth.error.invalidResponse': 'サーバーから異常な応答が返されました。しばらくしてからお試しください',
+	'auth.error.notFound': 'API が見つかりません。デプロイパスを確認してください',
+	'auth.error.badGateway': 'サーバーに接続できません。しばらくしてからお試しください',
 
 	'about.intro': 'Vibe Coding by UNI\n個人用の旅行精算アプリ',
 	'about.linksSection': 'リンク',

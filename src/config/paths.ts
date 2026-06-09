@@ -1,6 +1,11 @@
 import { BASE_PATH } from '@/src/config/base-path';
 
-export const APP_BASE = process.env.NEXT_PUBLIC_BASE_PATH ?? BASE_PATH;
+function normalizeBasePath(path: string): string {
+	const trimmed = path.trim().replace(/\/+$/, '');
+	return trimmed || BASE_PATH.replace(/\/+$/, '');
+}
+
+export const APP_BASE = normalizeBasePath(process.env.NEXT_PUBLIC_BASE_PATH || BASE_PATH);
 
 /** PWA / 应用入口 URL，不带尾斜杠（与服务器可访问路径一致） */
 export const APP_ENTRY = APP_BASE;

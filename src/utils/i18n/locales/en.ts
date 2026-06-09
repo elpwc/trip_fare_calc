@@ -375,6 +375,9 @@ export const en = {
 	'auth.error.serverError': 'Server is busy — please try again later',
 	'auth.error.generic': 'Something went wrong — please try again',
 	'auth.error.network': 'Network error — please check your connection',
+	'auth.error.invalidResponse': 'The server returned an invalid response — please try again',
+	'auth.error.notFound': 'API endpoint not found — please verify the deployment path',
+	'auth.error.badGateway': 'Unable to reach the server — please try again later',
 
 	'about.intro': 'Vibe Coding by UNI\nA personal travel settlement app',
 	'about.linksSection': 'Links',

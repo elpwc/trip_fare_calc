@@ -1,5 +1,6 @@
 import { AuthRequestError, resolveAuthErrorMessage } from './auth-errors';
 import { apiPath } from '@/src/config/paths';
+import { apiRequest } from '@/src/utils/api-request';
 
 export { AuthRequestError, resolveAuthErrorMessage };
 
@@ -67,23 +68,7 @@ export function getAuthHeaders(): Record<string, string> {
 }
 
 async function request<T>(url: string, options: RequestInit = {}): Promise<T> {
-  const headers: Record<string, string> = {
-    'Content-Type': 'application/json',
-    ...(options.headers as Record<string, string>),
-  };
-
-  const response = await fetch(url, {
-    ...options,
-    headers,
-    cache: 'no-store',
-  });
-
-  const payload = await response.json();
-  if (!response.ok) {
-    throw new AuthRequestError(payload?.error || 'REQUEST_FAILED');
-  }
-
-  return payload as T;
+  return apiRequest<T>(url, options);
 }
 
 export async function registerEmail(email: string) {
