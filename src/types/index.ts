@@ -64,7 +64,9 @@ export type Trip = {
 	startDate?: string;
 	members: TripMember[];
 	bills: Bill[];
-	createdById?: string;
+	isOwner?: boolean;
+	ownerName?: string;
+	ownerUserId?: string;
 };
 
 /**

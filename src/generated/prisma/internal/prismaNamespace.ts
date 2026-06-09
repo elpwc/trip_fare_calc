@@ -393,6 +393,8 @@ export const ModelName = {
   User: 'User',
   Friend: 'Friend',
   Trip: 'Trip',
+  TripShare: 'TripShare',
+  TripAccess: 'TripAccess',
   TripMember: 'TripMember',
   Bill: 'Bill',
   BillOwed: 'BillOwed',
@@ -412,7 +414,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "friend" | "trip" | "tripMember" | "bill" | "billOwed" | "emailVerification"
+    modelProps: "user" | "friend" | "trip" | "tripShare" | "tripAccess" | "tripMember" | "bill" | "billOwed" | "emailVerification"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -611,6 +613,138 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.TripCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.TripCountAggregateOutputType> | number
+        }
+      }
+    }
+    TripShare: {
+      payload: Prisma.$TripSharePayload<ExtArgs>
+      fields: Prisma.TripShareFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TripShareFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripSharePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TripShareFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripSharePayload>
+        }
+        findFirst: {
+          args: Prisma.TripShareFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripSharePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TripShareFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripSharePayload>
+        }
+        findMany: {
+          args: Prisma.TripShareFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripSharePayload>[]
+        }
+        create: {
+          args: Prisma.TripShareCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripSharePayload>
+        }
+        createMany: {
+          args: Prisma.TripShareCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.TripShareDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripSharePayload>
+        }
+        update: {
+          args: Prisma.TripShareUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripSharePayload>
+        }
+        deleteMany: {
+          args: Prisma.TripShareDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TripShareUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.TripShareUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripSharePayload>
+        }
+        aggregate: {
+          args: Prisma.TripShareAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTripShare>
+        }
+        groupBy: {
+          args: Prisma.TripShareGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TripShareGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TripShareCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TripShareCountAggregateOutputType> | number
+        }
+      }
+    }
+    TripAccess: {
+      payload: Prisma.$TripAccessPayload<ExtArgs>
+      fields: Prisma.TripAccessFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TripAccessFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripAccessPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TripAccessFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripAccessPayload>
+        }
+        findFirst: {
+          args: Prisma.TripAccessFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripAccessPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TripAccessFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripAccessPayload>
+        }
+        findMany: {
+          args: Prisma.TripAccessFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripAccessPayload>[]
+        }
+        create: {
+          args: Prisma.TripAccessCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripAccessPayload>
+        }
+        createMany: {
+          args: Prisma.TripAccessCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        delete: {
+          args: Prisma.TripAccessDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripAccessPayload>
+        }
+        update: {
+          args: Prisma.TripAccessUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripAccessPayload>
+        }
+        deleteMany: {
+          args: Prisma.TripAccessDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TripAccessUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        upsert: {
+          args: Prisma.TripAccessUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TripAccessPayload>
+        }
+        aggregate: {
+          args: Prisma.TripAccessAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTripAccess>
+        }
+        groupBy: {
+          args: Prisma.TripAccessGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TripAccessGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TripAccessCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TripAccessCountAggregateOutputType> | number
         }
       }
     }
@@ -958,6 +1092,28 @@ export const TripScalarFieldEnum = {
 export type TripScalarFieldEnum = (typeof TripScalarFieldEnum)[keyof typeof TripScalarFieldEnum]
 
 
+export const TripShareScalarFieldEnum = {
+  id: 'id',
+  tripId: 'tripId',
+  shareToken: 'shareToken',
+  passwordHash: 'passwordHash',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TripShareScalarFieldEnum = (typeof TripShareScalarFieldEnum)[keyof typeof TripShareScalarFieldEnum]
+
+
+export const TripAccessScalarFieldEnum = {
+  id: 'id',
+  tripId: 'tripId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type TripAccessScalarFieldEnum = (typeof TripAccessScalarFieldEnum)[keyof typeof TripAccessScalarFieldEnum]
+
+
 export const TripMemberScalarFieldEnum = {
   id: 'id',
   tripId: 'tripId',
@@ -1059,6 +1215,25 @@ export const TripOrderByRelevanceFieldEnum = {
 } as const
 
 export type TripOrderByRelevanceFieldEnum = (typeof TripOrderByRelevanceFieldEnum)[keyof typeof TripOrderByRelevanceFieldEnum]
+
+
+export const TripShareOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tripId: 'tripId',
+  shareToken: 'shareToken',
+  passwordHash: 'passwordHash'
+} as const
+
+export type TripShareOrderByRelevanceFieldEnum = (typeof TripShareOrderByRelevanceFieldEnum)[keyof typeof TripShareOrderByRelevanceFieldEnum]
+
+
+export const TripAccessOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tripId: 'tripId',
+  userId: 'userId'
+} as const
+
+export type TripAccessOrderByRelevanceFieldEnum = (typeof TripAccessOrderByRelevanceFieldEnum)[keyof typeof TripAccessOrderByRelevanceFieldEnum]
 
 
 export const TripMemberOrderByRelevanceFieldEnum = {
@@ -1240,6 +1415,8 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   friend?: Prisma.FriendOmit
   trip?: Prisma.TripOmit
+  tripShare?: Prisma.TripShareOmit
+  tripAccess?: Prisma.TripAccessOmit
   tripMember?: Prisma.TripMemberOmit
   bill?: Prisma.BillOmit
   billOwed?: Prisma.BillOwedOmit

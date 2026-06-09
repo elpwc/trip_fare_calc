@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyJwtToken } from '@/src/lib/jwt';
+import { getTripAccess } from '@/lib/trip-access';
 
 function getUserId(request: NextRequest): string | null {
   const authHeader = request.headers.get('authorization');
@@ -22,11 +23,8 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const { name, description } = await request.json();
     const { id: tripId } = await params;
 
-    const trip = await prisma.trip.findFirst({
-      where: { id: tripId, userId, isDeleted: false },
-    });
-
-    if (!trip) {
+    const access = await getTripAccess(userId, tripId);
+    if (!access) {
       return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
     }
 
@@ -53,21 +51,27 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     }
 
     const { id: tripId } = await params;
+    const access = await getTripAccess(userId, tripId);
 
-    const trip = await prisma.trip.findFirst({
-      where: { id: tripId, userId, isDeleted: false },
-    });
-
-    if (!trip) {
+    if (!access) {
       return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
     }
 
-    await prisma.trip.update({
-      where: { id: tripId },
-      data: { isDeleted: true },
+    if (access.isOwner) {
+      await prisma.trip.update({
+        where: { id: tripId },
+        data: { isDeleted: true },
+      });
+      return NextResponse.json({ message: 'Trip deleted' });
+    }
+
+    await prisma.tripAccess.delete({
+      where: {
+        tripId_userId: { tripId, userId },
+      },
     });
 
-    return NextResponse.json({ message: 'Trip deleted' });
+    return NextResponse.json({ message: 'Trip removed from list' });
   } catch (error) {
     console.error('Delete trip error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

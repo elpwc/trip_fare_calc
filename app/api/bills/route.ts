@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyJwtToken } from '@/src/lib/jwt';
+import { getTripAccess } from '@/lib/trip-access';
 import type { ExpenseStatus } from '@/src/generated/prisma/enums';
 
 type BillRequestBody = {
@@ -56,18 +57,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required bill fields' }, { status: 400 });
     }
 
-    const trip = await prisma.trip.findFirst({
-      where: { id: tripId, userId, isDeleted: false },
-    });
-    if (!trip) {
+    const access = await getTripAccess(userId, tripId);
+    if (!access) {
       return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
     }
 
-    const payer = await prisma.friend.findFirst({
-      where: { id: payerId, userId, isDeleted: false },
+    const payerMember = await prisma.tripMember.findFirst({
+      where: { tripId, friendId: payerId, isDeleted: false },
     });
-    if (!payer) {
-      return NextResponse.json({ error: 'Payer not found' }, { status: 404 });
+    if (!payerMember) {
+      return NextResponse.json({ error: 'Payer is not a member of this trip' }, { status: 404 });
     }
 
     const bill = await prisma.bill.create({

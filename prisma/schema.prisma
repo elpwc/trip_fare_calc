@@ -19,6 +19,7 @@ model User {
   friends      Friend[]
   trips        Trip[]
   bills        Bill[]
+  tripAccess   TripAccess[]
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
   isDeleted    Boolean              @default(false)
@@ -50,11 +51,36 @@ model Trip {
   description  String?
   members      TripMember[]
   bills        Bill[]
+  share        TripShare?
+  access       TripAccess[]
   createdAt    DateTime             @default(now())
   updatedAt    DateTime             @updatedAt
   isDeleted    Boolean              @default(false)
 
   @@index([userId])
+}
+
+model TripShare {
+  id           String   @id @default(cuid())
+  trip         Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  tripId       String   @unique
+  shareToken   String   @unique @default(cuid())
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model TripAccess {
+  id        String   @id @default(cuid())
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  tripId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@unique([tripId, userId])
+  @@index([userId])
+  @@index([tripId])
 }
 
 model TripMember {

@@ -201,6 +201,8 @@ export type TripWhereInput = {
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   members?: Prisma.TripMemberListRelationFilter
   bills?: Prisma.BillListRelationFilter
+  share?: Prisma.XOR<Prisma.TripShareNullableScalarRelationFilter, Prisma.TripShareWhereInput> | null
+  access?: Prisma.TripAccessListRelationFilter
 }
 
 export type TripOrderByWithRelationInput = {
@@ -214,6 +216,8 @@ export type TripOrderByWithRelationInput = {
   user?: Prisma.UserOrderByWithRelationInput
   members?: Prisma.TripMemberOrderByRelationAggregateInput
   bills?: Prisma.BillOrderByRelationAggregateInput
+  share?: Prisma.TripShareOrderByWithRelationInput
+  access?: Prisma.TripAccessOrderByRelationAggregateInput
   _relevance?: Prisma.TripOrderByRelevanceInput
 }
 
@@ -231,6 +235,8 @@ export type TripWhereUniqueInput = Prisma.AtLeast<{
   user?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
   members?: Prisma.TripMemberListRelationFilter
   bills?: Prisma.BillListRelationFilter
+  share?: Prisma.XOR<Prisma.TripShareNullableScalarRelationFilter, Prisma.TripShareWhereInput> | null
+  access?: Prisma.TripAccessListRelationFilter
 }, "id">
 
 export type TripOrderByWithAggregationInput = {
@@ -269,6 +275,8 @@ export type TripCreateInput = {
   user: Prisma.UserCreateNestedOneWithoutTripsInput
   members?: Prisma.TripMemberCreateNestedManyWithoutTripInput
   bills?: Prisma.BillCreateNestedManyWithoutTripInput
+  share?: Prisma.TripShareCreateNestedOneWithoutTripInput
+  access?: Prisma.TripAccessCreateNestedManyWithoutTripInput
 }
 
 export type TripUncheckedCreateInput = {
@@ -281,6 +289,8 @@ export type TripUncheckedCreateInput = {
   isDeleted?: boolean
   members?: Prisma.TripMemberUncheckedCreateNestedManyWithoutTripInput
   bills?: Prisma.BillUncheckedCreateNestedManyWithoutTripInput
+  share?: Prisma.TripShareUncheckedCreateNestedOneWithoutTripInput
+  access?: Prisma.TripAccessUncheckedCreateNestedManyWithoutTripInput
 }
 
 export type TripUpdateInput = {
@@ -293,6 +303,8 @@ export type TripUpdateInput = {
   user?: Prisma.UserUpdateOneRequiredWithoutTripsNestedInput
   members?: Prisma.TripMemberUpdateManyWithoutTripNestedInput
   bills?: Prisma.BillUpdateManyWithoutTripNestedInput
+  share?: Prisma.TripShareUpdateOneWithoutTripNestedInput
+  access?: Prisma.TripAccessUpdateManyWithoutTripNestedInput
 }
 
 export type TripUncheckedUpdateInput = {
@@ -305,6 +317,8 @@ export type TripUncheckedUpdateInput = {
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   members?: Prisma.TripMemberUncheckedUpdateManyWithoutTripNestedInput
   bills?: Prisma.BillUncheckedUpdateManyWithoutTripNestedInput
+  share?: Prisma.TripShareUncheckedUpdateOneWithoutTripNestedInput
+  access?: Prisma.TripAccessUncheckedUpdateManyWithoutTripNestedInput
 }
 
 export type TripCreateManyInput = {
@@ -434,6 +448,34 @@ export type TripUncheckedUpdateManyWithoutUserNestedInput = {
   deleteMany?: Prisma.TripScalarWhereInput | Prisma.TripScalarWhereInput[]
 }
 
+export type TripCreateNestedOneWithoutShareInput = {
+  create?: Prisma.XOR<Prisma.TripCreateWithoutShareInput, Prisma.TripUncheckedCreateWithoutShareInput>
+  connectOrCreate?: Prisma.TripCreateOrConnectWithoutShareInput
+  connect?: Prisma.TripWhereUniqueInput
+}
+
+export type TripUpdateOneRequiredWithoutShareNestedInput = {
+  create?: Prisma.XOR<Prisma.TripCreateWithoutShareInput, Prisma.TripUncheckedCreateWithoutShareInput>
+  connectOrCreate?: Prisma.TripCreateOrConnectWithoutShareInput
+  upsert?: Prisma.TripUpsertWithoutShareInput
+  connect?: Prisma.TripWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TripUpdateToOneWithWhereWithoutShareInput, Prisma.TripUpdateWithoutShareInput>, Prisma.TripUncheckedUpdateWithoutShareInput>
+}
+
+export type TripCreateNestedOneWithoutAccessInput = {
+  create?: Prisma.XOR<Prisma.TripCreateWithoutAccessInput, Prisma.TripUncheckedCreateWithoutAccessInput>
+  connectOrCreate?: Prisma.TripCreateOrConnectWithoutAccessInput
+  connect?: Prisma.TripWhereUniqueInput
+}
+
+export type TripUpdateOneRequiredWithoutAccessNestedInput = {
+  create?: Prisma.XOR<Prisma.TripCreateWithoutAccessInput, Prisma.TripUncheckedCreateWithoutAccessInput>
+  connectOrCreate?: Prisma.TripCreateOrConnectWithoutAccessInput
+  upsert?: Prisma.TripUpsertWithoutAccessInput
+  connect?: Prisma.TripWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.TripUpdateToOneWithWhereWithoutAccessInput, Prisma.TripUpdateWithoutAccessInput>, Prisma.TripUncheckedUpdateWithoutAccessInput>
+}
+
 export type TripCreateNestedOneWithoutMembersInput = {
   create?: Prisma.XOR<Prisma.TripCreateWithoutMembersInput, Prisma.TripUncheckedCreateWithoutMembersInput>
   connectOrCreate?: Prisma.TripCreateOrConnectWithoutMembersInput
@@ -473,6 +515,8 @@ export type TripCreateWithoutUserInput = {
   isDeleted?: boolean
   members?: Prisma.TripMemberCreateNestedManyWithoutTripInput
   bills?: Prisma.BillCreateNestedManyWithoutTripInput
+  share?: Prisma.TripShareCreateNestedOneWithoutTripInput
+  access?: Prisma.TripAccessCreateNestedManyWithoutTripInput
 }
 
 export type TripUncheckedCreateWithoutUserInput = {
@@ -484,6 +528,8 @@ export type TripUncheckedCreateWithoutUserInput = {
   isDeleted?: boolean
   members?: Prisma.TripMemberUncheckedCreateNestedManyWithoutTripInput
   bills?: Prisma.BillUncheckedCreateNestedManyWithoutTripInput
+  share?: Prisma.TripShareUncheckedCreateNestedOneWithoutTripInput
+  access?: Prisma.TripAccessUncheckedCreateNestedManyWithoutTripInput
 }
 
 export type TripCreateOrConnectWithoutUserInput = {
@@ -525,6 +571,142 @@ export type TripScalarWhereInput = {
   isDeleted?: Prisma.BoolFilter<"Trip"> | boolean
 }
 
+export type TripCreateWithoutShareInput = {
+  id?: string
+  name: string
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDeleted?: boolean
+  user: Prisma.UserCreateNestedOneWithoutTripsInput
+  members?: Prisma.TripMemberCreateNestedManyWithoutTripInput
+  bills?: Prisma.BillCreateNestedManyWithoutTripInput
+  access?: Prisma.TripAccessCreateNestedManyWithoutTripInput
+}
+
+export type TripUncheckedCreateWithoutShareInput = {
+  id?: string
+  userId: string
+  name: string
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDeleted?: boolean
+  members?: Prisma.TripMemberUncheckedCreateNestedManyWithoutTripInput
+  bills?: Prisma.BillUncheckedCreateNestedManyWithoutTripInput
+  access?: Prisma.TripAccessUncheckedCreateNestedManyWithoutTripInput
+}
+
+export type TripCreateOrConnectWithoutShareInput = {
+  where: Prisma.TripWhereUniqueInput
+  create: Prisma.XOR<Prisma.TripCreateWithoutShareInput, Prisma.TripUncheckedCreateWithoutShareInput>
+}
+
+export type TripUpsertWithoutShareInput = {
+  update: Prisma.XOR<Prisma.TripUpdateWithoutShareInput, Prisma.TripUncheckedUpdateWithoutShareInput>
+  create: Prisma.XOR<Prisma.TripCreateWithoutShareInput, Prisma.TripUncheckedCreateWithoutShareInput>
+  where?: Prisma.TripWhereInput
+}
+
+export type TripUpdateToOneWithWhereWithoutShareInput = {
+  where?: Prisma.TripWhereInput
+  data: Prisma.XOR<Prisma.TripUpdateWithoutShareInput, Prisma.TripUncheckedUpdateWithoutShareInput>
+}
+
+export type TripUpdateWithoutShareInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  user?: Prisma.UserUpdateOneRequiredWithoutTripsNestedInput
+  members?: Prisma.TripMemberUpdateManyWithoutTripNestedInput
+  bills?: Prisma.BillUpdateManyWithoutTripNestedInput
+  access?: Prisma.TripAccessUpdateManyWithoutTripNestedInput
+}
+
+export type TripUncheckedUpdateWithoutShareInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  members?: Prisma.TripMemberUncheckedUpdateManyWithoutTripNestedInput
+  bills?: Prisma.BillUncheckedUpdateManyWithoutTripNestedInput
+  access?: Prisma.TripAccessUncheckedUpdateManyWithoutTripNestedInput
+}
+
+export type TripCreateWithoutAccessInput = {
+  id?: string
+  name: string
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDeleted?: boolean
+  user: Prisma.UserCreateNestedOneWithoutTripsInput
+  members?: Prisma.TripMemberCreateNestedManyWithoutTripInput
+  bills?: Prisma.BillCreateNestedManyWithoutTripInput
+  share?: Prisma.TripShareCreateNestedOneWithoutTripInput
+}
+
+export type TripUncheckedCreateWithoutAccessInput = {
+  id?: string
+  userId: string
+  name: string
+  description?: string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDeleted?: boolean
+  members?: Prisma.TripMemberUncheckedCreateNestedManyWithoutTripInput
+  bills?: Prisma.BillUncheckedCreateNestedManyWithoutTripInput
+  share?: Prisma.TripShareUncheckedCreateNestedOneWithoutTripInput
+}
+
+export type TripCreateOrConnectWithoutAccessInput = {
+  where: Prisma.TripWhereUniqueInput
+  create: Prisma.XOR<Prisma.TripCreateWithoutAccessInput, Prisma.TripUncheckedCreateWithoutAccessInput>
+}
+
+export type TripUpsertWithoutAccessInput = {
+  update: Prisma.XOR<Prisma.TripUpdateWithoutAccessInput, Prisma.TripUncheckedUpdateWithoutAccessInput>
+  create: Prisma.XOR<Prisma.TripCreateWithoutAccessInput, Prisma.TripUncheckedCreateWithoutAccessInput>
+  where?: Prisma.TripWhereInput
+}
+
+export type TripUpdateToOneWithWhereWithoutAccessInput = {
+  where?: Prisma.TripWhereInput
+  data: Prisma.XOR<Prisma.TripUpdateWithoutAccessInput, Prisma.TripUncheckedUpdateWithoutAccessInput>
+}
+
+export type TripUpdateWithoutAccessInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  user?: Prisma.UserUpdateOneRequiredWithoutTripsNestedInput
+  members?: Prisma.TripMemberUpdateManyWithoutTripNestedInput
+  bills?: Prisma.BillUpdateManyWithoutTripNestedInput
+  share?: Prisma.TripShareUpdateOneWithoutTripNestedInput
+}
+
+export type TripUncheckedUpdateWithoutAccessInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  userId?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  members?: Prisma.TripMemberUncheckedUpdateManyWithoutTripNestedInput
+  bills?: Prisma.BillUncheckedUpdateManyWithoutTripNestedInput
+  share?: Prisma.TripShareUncheckedUpdateOneWithoutTripNestedInput
+}
+
 export type TripCreateWithoutMembersInput = {
   id?: string
   name: string
@@ -534,6 +716,8 @@ export type TripCreateWithoutMembersInput = {
   isDeleted?: boolean
   user: Prisma.UserCreateNestedOneWithoutTripsInput
   bills?: Prisma.BillCreateNestedManyWithoutTripInput
+  share?: Prisma.TripShareCreateNestedOneWithoutTripInput
+  access?: Prisma.TripAccessCreateNestedManyWithoutTripInput
 }
 
 export type TripUncheckedCreateWithoutMembersInput = {
@@ -545,6 +729,8 @@ export type TripUncheckedCreateWithoutMembersInput = {
   updatedAt?: Date | string
   isDeleted?: boolean
   bills?: Prisma.BillUncheckedCreateNestedManyWithoutTripInput
+  share?: Prisma.TripShareUncheckedCreateNestedOneWithoutTripInput
+  access?: Prisma.TripAccessUncheckedCreateNestedManyWithoutTripInput
 }
 
 export type TripCreateOrConnectWithoutMembersInput = {
@@ -572,6 +758,8 @@ export type TripUpdateWithoutMembersInput = {
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user?: Prisma.UserUpdateOneRequiredWithoutTripsNestedInput
   bills?: Prisma.BillUpdateManyWithoutTripNestedInput
+  share?: Prisma.TripShareUpdateOneWithoutTripNestedInput
+  access?: Prisma.TripAccessUpdateManyWithoutTripNestedInput
 }
 
 export type TripUncheckedUpdateWithoutMembersInput = {
@@ -583,6 +771,8 @@ export type TripUncheckedUpdateWithoutMembersInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   bills?: Prisma.BillUncheckedUpdateManyWithoutTripNestedInput
+  share?: Prisma.TripShareUncheckedUpdateOneWithoutTripNestedInput
+  access?: Prisma.TripAccessUncheckedUpdateManyWithoutTripNestedInput
 }
 
 export type TripCreateWithoutBillsInput = {
@@ -594,6 +784,8 @@ export type TripCreateWithoutBillsInput = {
   isDeleted?: boolean
   user: Prisma.UserCreateNestedOneWithoutTripsInput
   members?: Prisma.TripMemberCreateNestedManyWithoutTripInput
+  share?: Prisma.TripShareCreateNestedOneWithoutTripInput
+  access?: Prisma.TripAccessCreateNestedManyWithoutTripInput
 }
 
 export type TripUncheckedCreateWithoutBillsInput = {
@@ -605,6 +797,8 @@ export type TripUncheckedCreateWithoutBillsInput = {
   updatedAt?: Date | string
   isDeleted?: boolean
   members?: Prisma.TripMemberUncheckedCreateNestedManyWithoutTripInput
+  share?: Prisma.TripShareUncheckedCreateNestedOneWithoutTripInput
+  access?: Prisma.TripAccessUncheckedCreateNestedManyWithoutTripInput
 }
 
 export type TripCreateOrConnectWithoutBillsInput = {
@@ -632,6 +826,8 @@ export type TripUpdateWithoutBillsInput = {
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   user?: Prisma.UserUpdateOneRequiredWithoutTripsNestedInput
   members?: Prisma.TripMemberUpdateManyWithoutTripNestedInput
+  share?: Prisma.TripShareUpdateOneWithoutTripNestedInput
+  access?: Prisma.TripAccessUpdateManyWithoutTripNestedInput
 }
 
 export type TripUncheckedUpdateWithoutBillsInput = {
@@ -643,6 +839,8 @@ export type TripUncheckedUpdateWithoutBillsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   members?: Prisma.TripMemberUncheckedUpdateManyWithoutTripNestedInput
+  share?: Prisma.TripShareUncheckedUpdateOneWithoutTripNestedInput
+  access?: Prisma.TripAccessUncheckedUpdateManyWithoutTripNestedInput
 }
 
 export type TripCreateManyUserInput = {
@@ -663,6 +861,8 @@ export type TripUpdateWithoutUserInput = {
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   members?: Prisma.TripMemberUpdateManyWithoutTripNestedInput
   bills?: Prisma.BillUpdateManyWithoutTripNestedInput
+  share?: Prisma.TripShareUpdateOneWithoutTripNestedInput
+  access?: Prisma.TripAccessUpdateManyWithoutTripNestedInput
 }
 
 export type TripUncheckedUpdateWithoutUserInput = {
@@ -674,6 +874,8 @@ export type TripUncheckedUpdateWithoutUserInput = {
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   members?: Prisma.TripMemberUncheckedUpdateManyWithoutTripNestedInput
   bills?: Prisma.BillUncheckedUpdateManyWithoutTripNestedInput
+  share?: Prisma.TripShareUncheckedUpdateOneWithoutTripNestedInput
+  access?: Prisma.TripAccessUncheckedUpdateManyWithoutTripNestedInput
 }
 
 export type TripUncheckedUpdateManyWithoutUserInput = {
@@ -693,11 +895,13 @@ export type TripUncheckedUpdateManyWithoutUserInput = {
 export type TripCountOutputType = {
   members: number
   bills: number
+  access: number
 }
 
 export type TripCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   members?: boolean | TripCountOutputTypeCountMembersArgs
   bills?: boolean | TripCountOutputTypeCountBillsArgs
+  access?: boolean | TripCountOutputTypeCountAccessArgs
 }
 
 /**
@@ -724,6 +928,13 @@ export type TripCountOutputTypeCountBillsArgs<ExtArgs extends runtime.Types.Exte
   where?: Prisma.BillWhereInput
 }
 
+/**
+ * TripCountOutputType without action
+ */
+export type TripCountOutputTypeCountAccessArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TripAccessWhereInput
+}
+
 
 export type TripSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -736,6 +947,8 @@ export type TripSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   members?: boolean | Prisma.Trip$membersArgs<ExtArgs>
   bills?: boolean | Prisma.Trip$billsArgs<ExtArgs>
+  share?: boolean | Prisma.Trip$shareArgs<ExtArgs>
+  access?: boolean | Prisma.Trip$accessArgs<ExtArgs>
   _count?: boolean | Prisma.TripCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["trip"]>
 
@@ -756,6 +969,8 @@ export type TripInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   user?: boolean | Prisma.UserDefaultArgs<ExtArgs>
   members?: boolean | Prisma.Trip$membersArgs<ExtArgs>
   bills?: boolean | Prisma.Trip$billsArgs<ExtArgs>
+  share?: boolean | Prisma.Trip$shareArgs<ExtArgs>
+  access?: boolean | Prisma.Trip$accessArgs<ExtArgs>
   _count?: boolean | Prisma.TripCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -765,6 +980,8 @@ export type $TripPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     user: Prisma.$UserPayload<ExtArgs>
     members: Prisma.$TripMemberPayload<ExtArgs>[]
     bills: Prisma.$BillPayload<ExtArgs>[]
+    share: Prisma.$TripSharePayload<ExtArgs> | null
+    access: Prisma.$TripAccessPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1117,6 +1334,8 @@ export interface Prisma__TripClient<T, Null = never, ExtArgs extends runtime.Typ
   user<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   members<T extends Prisma.Trip$membersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Trip$membersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TripMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   bills<T extends Prisma.Trip$billsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Trip$billsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BillPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  share<T extends Prisma.Trip$shareArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Trip$shareArgs<ExtArgs>>): Prisma.Prisma__TripShareClient<runtime.Types.Result.GetResult<Prisma.$TripSharePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  access<T extends Prisma.Trip$accessArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Trip$accessArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TripAccessPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1541,6 +1760,49 @@ export type Trip$billsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
   take?: number
   skip?: number
   distinct?: Prisma.BillScalarFieldEnum | Prisma.BillScalarFieldEnum[]
+}
+
+/**
+ * Trip.share
+ */
+export type Trip$shareArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TripShare
+   */
+  select?: Prisma.TripShareSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TripShare
+   */
+  omit?: Prisma.TripShareOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TripShareInclude<ExtArgs> | null
+  where?: Prisma.TripShareWhereInput
+}
+
+/**
+ * Trip.access
+ */
+export type Trip$accessArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TripAccess
+   */
+  select?: Prisma.TripAccessSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TripAccess
+   */
+  omit?: Prisma.TripAccessOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TripAccessInclude<ExtArgs> | null
+  where?: Prisma.TripAccessWhereInput
+  orderBy?: Prisma.TripAccessOrderByWithRelationInput | Prisma.TripAccessOrderByWithRelationInput[]
+  cursor?: Prisma.TripAccessWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TripAccessScalarFieldEnum | Prisma.TripAccessScalarFieldEnum[]
 }
 
 /**

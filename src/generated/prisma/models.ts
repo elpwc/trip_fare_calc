@@ -11,6 +11,8 @@
 export type * from './models/User'
 export type * from './models/Friend'
 export type * from './models/Trip'
+export type * from './models/TripShare'
+export type * from './models/TripAccess'
 export type * from './models/TripMember'
 export type * from './models/Bill'
 export type * from './models/BillOwed'

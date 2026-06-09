@@ -52,6 +52,8 @@ export const ModelName = {
   User: 'User',
   Friend: 'Friend',
   Trip: 'Trip',
+  TripShare: 'TripShare',
+  TripAccess: 'TripAccess',
   TripMember: 'TripMember',
   Bill: 'Bill',
   BillOwed: 'BillOwed',
@@ -113,6 +115,28 @@ export const TripScalarFieldEnum = {
 } as const
 
 export type TripScalarFieldEnum = (typeof TripScalarFieldEnum)[keyof typeof TripScalarFieldEnum]
+
+
+export const TripShareScalarFieldEnum = {
+  id: 'id',
+  tripId: 'tripId',
+  shareToken: 'shareToken',
+  passwordHash: 'passwordHash',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TripShareScalarFieldEnum = (typeof TripShareScalarFieldEnum)[keyof typeof TripShareScalarFieldEnum]
+
+
+export const TripAccessScalarFieldEnum = {
+  id: 'id',
+  tripId: 'tripId',
+  userId: 'userId',
+  createdAt: 'createdAt'
+} as const
+
+export type TripAccessScalarFieldEnum = (typeof TripAccessScalarFieldEnum)[keyof typeof TripAccessScalarFieldEnum]
 
 
 export const TripMemberScalarFieldEnum = {
@@ -216,6 +240,25 @@ export const TripOrderByRelevanceFieldEnum = {
 } as const
 
 export type TripOrderByRelevanceFieldEnum = (typeof TripOrderByRelevanceFieldEnum)[keyof typeof TripOrderByRelevanceFieldEnum]
+
+
+export const TripShareOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tripId: 'tripId',
+  shareToken: 'shareToken',
+  passwordHash: 'passwordHash'
+} as const
+
+export type TripShareOrderByRelevanceFieldEnum = (typeof TripShareOrderByRelevanceFieldEnum)[keyof typeof TripShareOrderByRelevanceFieldEnum]
+
+
+export const TripAccessOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tripId: 'tripId',
+  userId: 'userId'
+} as const
+
+export type TripAccessOrderByRelevanceFieldEnum = (typeof TripAccessOrderByRelevanceFieldEnum)[keyof typeof TripAccessOrderByRelevanceFieldEnum]
 
 
 export const TripMemberOrderByRelevanceFieldEnum = {

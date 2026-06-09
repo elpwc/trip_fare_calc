@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyJwtToken } from '@/src/lib/jwt';
+import { getTripAccess } from '@/lib/trip-access';
 import type { ExpenseStatus } from '@/src/generated/prisma/enums';
 
 type BillUpdateRequestBody = {
@@ -28,6 +29,37 @@ function getUserId(request: NextRequest): string | null {
   return decoded?.userId || null;
 }
 
+async function canAccessBill(userId: string, billId: string) {
+  const bill = await prisma.bill.findFirst({
+    where: { id: billId, isDeleted: false },
+    include: {
+      owedFriends: true,
+      trip: {
+        include: {
+          members: {
+            include: {
+              friend: {
+                select: { id: true, name: true, description: true, participationCount: true, isSelf: true },
+              },
+            },
+          },
+        },
+      },
+    },
+  });
+
+  if (!bill || !bill.tripId) {
+    return null;
+  }
+
+  const access = await getTripAccess(userId, bill.tripId);
+  if (!access) {
+    return null;
+  }
+
+  return bill;
+}
+
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   try {
@@ -36,24 +68,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const bill = await prisma.bill.findFirst({
-      where: { id, userId, isDeleted: false },
-      include: {
-        owedFriends: true,
-        trip: {
-          include: {
-            members: {
-              include: {
-                friend: {
-                  select: { id: true, name: true, description: true, participationCount: true, isSelf: true },
-                },
-              },
-            },
-          },
-        },
-      },
-    });
-
+    const bill = await canAccessBill(userId, id);
     if (!bill) {
       return NextResponse.json({ error: 'Bill not found' }, { status: 404 });
     }
@@ -90,7 +105,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: 'Missing required bill fields' }, { status: 400 });
     }
 
-    const bill = await prisma.bill.findFirst({ where: { id, userId, isDeleted: false } });
+    const bill = await canAccessBill(userId, id);
     if (!bill) {
       return NextResponse.json({ error: 'Bill not found' }, { status: 404 });
     }

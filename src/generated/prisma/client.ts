@@ -60,6 +60,16 @@ export type Friend = Prisma.FriendModel
  */
 export type Trip = Prisma.TripModel
 /**
+ * Model TripShare
+ * 
+ */
+export type TripShare = Prisma.TripShareModel
+/**
+ * Model TripAccess
+ * 
+ */
+export type TripAccess = Prisma.TripAccessModel
+/**
  * Model TripMember
  * 
  */

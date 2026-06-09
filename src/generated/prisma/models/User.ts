@@ -201,6 +201,7 @@ export type UserWhereInput = {
   friends?: Prisma.FriendListRelationFilter
   trips?: Prisma.TripListRelationFilter
   bills?: Prisma.BillListRelationFilter
+  tripAccess?: Prisma.TripAccessListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -214,6 +215,7 @@ export type UserOrderByWithRelationInput = {
   friends?: Prisma.FriendOrderByRelationAggregateInput
   trips?: Prisma.TripOrderByRelationAggregateInput
   bills?: Prisma.BillOrderByRelationAggregateInput
+  tripAccess?: Prisma.TripAccessOrderByRelationAggregateInput
   _relevance?: Prisma.UserOrderByRelevanceInput
 }
 
@@ -231,6 +233,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   friends?: Prisma.FriendListRelationFilter
   trips?: Prisma.TripListRelationFilter
   bills?: Prisma.BillListRelationFilter
+  tripAccess?: Prisma.TripAccessListRelationFilter
 }, "id" | "email">
 
 export type UserOrderByWithAggregationInput = {
@@ -270,6 +273,7 @@ export type UserCreateInput = {
   friends?: Prisma.FriendCreateNestedManyWithoutUserInput
   trips?: Prisma.TripCreateNestedManyWithoutUserInput
   bills?: Prisma.BillCreateNestedManyWithoutUserInput
+  tripAccess?: Prisma.TripAccessCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -283,6 +287,7 @@ export type UserUncheckedCreateInput = {
   friends?: Prisma.FriendUncheckedCreateNestedManyWithoutUserInput
   trips?: Prisma.TripUncheckedCreateNestedManyWithoutUserInput
   bills?: Prisma.BillUncheckedCreateNestedManyWithoutUserInput
+  tripAccess?: Prisma.TripAccessUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -296,6 +301,7 @@ export type UserUpdateInput = {
   friends?: Prisma.FriendUpdateManyWithoutUserNestedInput
   trips?: Prisma.TripUpdateManyWithoutUserNestedInput
   bills?: Prisma.BillUpdateManyWithoutUserNestedInput
+  tripAccess?: Prisma.TripAccessUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -309,6 +315,7 @@ export type UserUncheckedUpdateInput = {
   friends?: Prisma.FriendUncheckedUpdateManyWithoutUserNestedInput
   trips?: Prisma.TripUncheckedUpdateManyWithoutUserNestedInput
   bills?: Prisma.BillUncheckedUpdateManyWithoutUserNestedInput
+  tripAccess?: Prisma.TripAccessUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -422,6 +429,20 @@ export type UserUpdateOneRequiredWithoutTripsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTripsInput, Prisma.UserUpdateWithoutTripsInput>, Prisma.UserUncheckedUpdateWithoutTripsInput>
 }
 
+export type UserCreateNestedOneWithoutTripAccessInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTripAccessInput, Prisma.UserUncheckedCreateWithoutTripAccessInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTripAccessInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutTripAccessNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutTripAccessInput, Prisma.UserUncheckedCreateWithoutTripAccessInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutTripAccessInput
+  upsert?: Prisma.UserUpsertWithoutTripAccessInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTripAccessInput, Prisma.UserUpdateWithoutTripAccessInput>, Prisma.UserUncheckedUpdateWithoutTripAccessInput>
+}
+
 export type UserCreateNestedOneWithoutBillsInput = {
   create?: Prisma.XOR<Prisma.UserCreateWithoutBillsInput, Prisma.UserUncheckedCreateWithoutBillsInput>
   connectOrCreate?: Prisma.UserCreateOrConnectWithoutBillsInput
@@ -446,6 +467,7 @@ export type UserCreateWithoutFriendsInput = {
   isDeleted?: boolean
   trips?: Prisma.TripCreateNestedManyWithoutUserInput
   bills?: Prisma.BillCreateNestedManyWithoutUserInput
+  tripAccess?: Prisma.TripAccessCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutFriendsInput = {
@@ -458,6 +480,7 @@ export type UserUncheckedCreateWithoutFriendsInput = {
   isDeleted?: boolean
   trips?: Prisma.TripUncheckedCreateNestedManyWithoutUserInput
   bills?: Prisma.BillUncheckedCreateNestedManyWithoutUserInput
+  tripAccess?: Prisma.TripAccessUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutFriendsInput = {
@@ -486,6 +509,7 @@ export type UserUpdateWithoutFriendsInput = {
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trips?: Prisma.TripUpdateManyWithoutUserNestedInput
   bills?: Prisma.BillUpdateManyWithoutUserNestedInput
+  tripAccess?: Prisma.TripAccessUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutFriendsInput = {
@@ -498,6 +522,7 @@ export type UserUncheckedUpdateWithoutFriendsInput = {
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   trips?: Prisma.TripUncheckedUpdateManyWithoutUserNestedInput
   bills?: Prisma.BillUncheckedUpdateManyWithoutUserNestedInput
+  tripAccess?: Prisma.TripAccessUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTripsInput = {
@@ -510,6 +535,7 @@ export type UserCreateWithoutTripsInput = {
   isDeleted?: boolean
   friends?: Prisma.FriendCreateNestedManyWithoutUserInput
   bills?: Prisma.BillCreateNestedManyWithoutUserInput
+  tripAccess?: Prisma.TripAccessCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTripsInput = {
@@ -522,6 +548,7 @@ export type UserUncheckedCreateWithoutTripsInput = {
   isDeleted?: boolean
   friends?: Prisma.FriendUncheckedCreateNestedManyWithoutUserInput
   bills?: Prisma.BillUncheckedCreateNestedManyWithoutUserInput
+  tripAccess?: Prisma.TripAccessUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTripsInput = {
@@ -550,6 +577,7 @@ export type UserUpdateWithoutTripsInput = {
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   friends?: Prisma.FriendUpdateManyWithoutUserNestedInput
   bills?: Prisma.BillUpdateManyWithoutUserNestedInput
+  tripAccess?: Prisma.TripAccessUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTripsInput = {
@@ -561,6 +589,75 @@ export type UserUncheckedUpdateWithoutTripsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   friends?: Prisma.FriendUncheckedUpdateManyWithoutUserNestedInput
+  bills?: Prisma.BillUncheckedUpdateManyWithoutUserNestedInput
+  tripAccess?: Prisma.TripAccessUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutTripAccessInput = {
+  id?: string
+  email: string
+  password: string
+  name: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDeleted?: boolean
+  friends?: Prisma.FriendCreateNestedManyWithoutUserInput
+  trips?: Prisma.TripCreateNestedManyWithoutUserInput
+  bills?: Prisma.BillCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutTripAccessInput = {
+  id?: string
+  email: string
+  password: string
+  name: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  isDeleted?: boolean
+  friends?: Prisma.FriendUncheckedCreateNestedManyWithoutUserInput
+  trips?: Prisma.TripUncheckedCreateNestedManyWithoutUserInput
+  bills?: Prisma.BillUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutTripAccessInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutTripAccessInput, Prisma.UserUncheckedCreateWithoutTripAccessInput>
+}
+
+export type UserUpsertWithoutTripAccessInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutTripAccessInput, Prisma.UserUncheckedUpdateWithoutTripAccessInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutTripAccessInput, Prisma.UserUncheckedCreateWithoutTripAccessInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutTripAccessInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutTripAccessInput, Prisma.UserUncheckedUpdateWithoutTripAccessInput>
+}
+
+export type UserUpdateWithoutTripAccessInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  friends?: Prisma.FriendUpdateManyWithoutUserNestedInput
+  trips?: Prisma.TripUpdateManyWithoutUserNestedInput
+  bills?: Prisma.BillUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutTripAccessInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  password?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  friends?: Prisma.FriendUncheckedUpdateManyWithoutUserNestedInput
+  trips?: Prisma.TripUncheckedUpdateManyWithoutUserNestedInput
   bills?: Prisma.BillUncheckedUpdateManyWithoutUserNestedInput
 }
 
@@ -574,6 +671,7 @@ export type UserCreateWithoutBillsInput = {
   isDeleted?: boolean
   friends?: Prisma.FriendCreateNestedManyWithoutUserInput
   trips?: Prisma.TripCreateNestedManyWithoutUserInput
+  tripAccess?: Prisma.TripAccessCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutBillsInput = {
@@ -586,6 +684,7 @@ export type UserUncheckedCreateWithoutBillsInput = {
   isDeleted?: boolean
   friends?: Prisma.FriendUncheckedCreateNestedManyWithoutUserInput
   trips?: Prisma.TripUncheckedCreateNestedManyWithoutUserInput
+  tripAccess?: Prisma.TripAccessUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutBillsInput = {
@@ -614,6 +713,7 @@ export type UserUpdateWithoutBillsInput = {
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   friends?: Prisma.FriendUpdateManyWithoutUserNestedInput
   trips?: Prisma.TripUpdateManyWithoutUserNestedInput
+  tripAccess?: Prisma.TripAccessUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutBillsInput = {
@@ -626,6 +726,7 @@ export type UserUncheckedUpdateWithoutBillsInput = {
   isDeleted?: Prisma.BoolFieldUpdateOperationsInput | boolean
   friends?: Prisma.FriendUncheckedUpdateManyWithoutUserNestedInput
   trips?: Prisma.TripUncheckedUpdateManyWithoutUserNestedInput
+  tripAccess?: Prisma.TripAccessUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -637,12 +738,14 @@ export type UserCountOutputType = {
   friends: number
   trips: number
   bills: number
+  tripAccess: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   friends?: boolean | UserCountOutputTypeCountFriendsArgs
   trips?: boolean | UserCountOutputTypeCountTripsArgs
   bills?: boolean | UserCountOutputTypeCountBillsArgs
+  tripAccess?: boolean | UserCountOutputTypeCountTripAccessArgs
 }
 
 /**
@@ -676,6 +779,13 @@ export type UserCountOutputTypeCountBillsArgs<ExtArgs extends runtime.Types.Exte
   where?: Prisma.BillWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountTripAccessArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TripAccessWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -688,6 +798,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   friends?: boolean | Prisma.User$friendsArgs<ExtArgs>
   trips?: boolean | Prisma.User$tripsArgs<ExtArgs>
   bills?: boolean | Prisma.User$billsArgs<ExtArgs>
+  tripAccess?: boolean | Prisma.User$tripAccessArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -708,6 +819,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   friends?: boolean | Prisma.User$friendsArgs<ExtArgs>
   trips?: boolean | Prisma.User$tripsArgs<ExtArgs>
   bills?: boolean | Prisma.User$billsArgs<ExtArgs>
+  tripAccess?: boolean | Prisma.User$tripAccessArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 
@@ -717,6 +829,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     friends: Prisma.$FriendPayload<ExtArgs>[]
     trips: Prisma.$TripPayload<ExtArgs>[]
     bills: Prisma.$BillPayload<ExtArgs>[]
+    tripAccess: Prisma.$TripAccessPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1069,6 +1182,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   friends<T extends Prisma.User$friendsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$friendsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$FriendPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   trips<T extends Prisma.User$tripsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$tripsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TripPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   bills<T extends Prisma.User$billsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$billsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$BillPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  tripAccess<T extends Prisma.User$tripAccessArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$tripAccessArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TripAccessPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1517,6 +1631,30 @@ export type User$billsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs
   take?: number
   skip?: number
   distinct?: Prisma.BillScalarFieldEnum | Prisma.BillScalarFieldEnum[]
+}
+
+/**
+ * User.tripAccess
+ */
+export type User$tripAccessArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TripAccess
+   */
+  select?: Prisma.TripAccessSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TripAccess
+   */
+  omit?: Prisma.TripAccessOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TripAccessInclude<ExtArgs> | null
+  where?: Prisma.TripAccessWhereInput
+  orderBy?: Prisma.TripAccessOrderByWithRelationInput | Prisma.TripAccessOrderByWithRelationInput[]
+  cursor?: Prisma.TripAccessWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TripAccessScalarFieldEnum | Prisma.TripAccessScalarFieldEnum[]
 }
 
 /**

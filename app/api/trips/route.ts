@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyJwtToken } from '@/src/lib/jwt';
+import { fetchTripWithDetails, formatTripResponse } from '@/lib/trip-access';
 
 function getUserId(request: NextRequest): string | null {
   const authHeader = request.headers.get('authorization');
@@ -19,48 +20,31 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const trips = await prisma.trip.findMany({
-      where: { userId, isDeleted: false },
-      include: {
-        members: {
-          include: {
-            friend: {
-              select: { id: true, name: true, description: true, participationCount: true, isSelf: true },
-            },
-          },
-        },
-        bills: {
-          select: {
-            id: true,
-            payerId: true,
-            amount: true,
-            currency: true,
-            latitude: true,
-            longitude: true,
-            owedFriends: true,
-            name: true,
-            category: true,
-            status: true,
-            paymentMethod: true,
-            description: true,
-            createdAt: true,
-            userId: true,
-          },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
+    const [ownedTrips, sharedAccess] = await Promise.all([
+      prisma.trip.findMany({
+        where: { userId, isDeleted: false },
+        select: { id: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+      prisma.tripAccess.findMany({
+        where: { userId, trip: { isDeleted: false } },
+        select: { tripId: true, createdAt: true },
+        orderBy: { createdAt: 'desc' },
+      }),
+    ]);
 
-    const tripsWithDetails = trips.map(trip => ({
-      ...trip,
-      members: trip.members.map(tm => tm.friend),
-      bills: trip.bills.map((bill) => ({
-        ...bill,
-        createdById: bill.userId,
-      })),
-    }));
+    const ownedIds = ownedTrips.map((t) => t.id);
+    const sharedIds = sharedAccess.map((a) => a.tripId).filter((id) => !ownedIds.includes(id));
+    const allIds = [...ownedIds, ...sharedIds];
 
-    return NextResponse.json(tripsWithDetails);
+    const trips = await Promise.all(
+      allIds.map(async (tripId) => {
+        const trip = await fetchTripWithDetails(tripId);
+        return trip ? formatTripResponse(trip, userId) : null;
+      }),
+    );
+
+    return NextResponse.json(trips.filter(Boolean));
   } catch (error) {
     console.error('Get trips error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
@@ -86,27 +70,14 @@ export async function POST(request: NextRequest) {
         name,
         description: description || '',
       },
-      include: {
-        members: {
-          include: {
-            friend: {
-              select: { id: true, name: true, description: true, participationCount: true, isSelf: true },
-            },
-          },
-        },
-        bills: {
-          select: { id: true, payerId: true, amount: true, owedFriends: true, name: true, category: true, status: true },
-        },
-      },
     });
 
-    const tripWithDetails = {
-      ...trip,
-      members: trip.members.map(tm => tm.friend),
-      bills: trip.bills,
-    };
+    const tripWithDetails = await fetchTripWithDetails(trip.id);
+    if (!tripWithDetails) {
+      return NextResponse.json({ error: 'Failed to create trip' }, { status: 500 });
+    }
 
-    return NextResponse.json(tripWithDetails);
+    return NextResponse.json(formatTripResponse(tripWithDetails, userId));
   } catch (error) {
     console.error('Create trip error:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });

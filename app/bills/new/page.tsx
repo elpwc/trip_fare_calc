@@ -1,12 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
 import { Modal } from '@/src/components/Modal';
 import FriendIcon from '@/src/components/FriendIcon';
 import { getAuthHeaders } from '@/src/utils/auth';
-import { CURRENCIES, Currency, CURRENCY_DEFINITIONS, getCurrencyName } from '@/src/utils/currencies';
+import { Currency, CURRENCY_DEFINITIONS } from '@/src/utils/currencies';
 import { FlagSVG } from '@/src/components/FlagSVG';
 import { Member } from '@/src/types';
 
@@ -39,6 +38,14 @@ const STATUSES = [
 const PAYMENT_METHODS = ['现金', '支付宝', '微信', '银行转账', 'PayPay', '信用卡', 'PayPal', 'ApplePay', '其他'];
 
 export default function NewBillPage({ billId }: { billId?: string } = {}) {
+	return (
+		<Suspense fallback={<div className="min-h-screen bg-slate-50 px-4 py-12 text-center dark:bg-slate-950">加载中...</div>}>
+			<NewBillPageContent billId={billId} />
+		</Suspense>
+	);
+}
+
+function NewBillPageContent({ billId }: { billId?: string } = {}) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const tripId = searchParams.get('tripId');
@@ -57,13 +64,30 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 	const [longitude, setLongitude] = useState<number | null>(null);
 	const [locationError, setLocationError] = useState<string | null>(null);
 
-	const [friends, setFriends] = useState<Friend[]>([]);
 	const [tripMembers, setTripMembers] = useState<Friend[]>([]);
+	const [isLoaded, setIsLoaded] = useState(!billId);
+	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	const [isPaymentMethodModalOpen, setIsPaymentMethodModalOpen] = useState(false);
 	const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
-	const [isLoaded, setIsLoaded] = useState(!Boolean(billId));
-	const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+	const acquireLocation = () => {
+		if (!navigator.geolocation) {
+			setLocationError('浏览器不支持定位');
+			return;
+		}
+		navigator.geolocation.getCurrentPosition(
+			(position) => {
+				setLatitude(position.coords.latitude);
+				setLongitude(position.coords.longitude);
+				setLocationError(null);
+			},
+			(error) => {
+				setLocationError(`定位失败：${error.message}`);
+			},
+			{ enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
+		);
+	};
 
 	useEffect(() => {
 		if (!tripId) return;
@@ -117,7 +141,7 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 			});
 			if (response.ok) {
 				const trips = await response.json();
-				const currentTrip = trips.find((t: any) => t.id === tripId);
+				const currentTrip = trips.find((t: { id: string }) => t.id === tripId);
 				if (currentTrip) {
 					setTripMembers(currentTrip.members || []);
 				}
@@ -127,27 +151,6 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 		}
 	};
 
-	const acquireLocation = () => {
-		if (!navigator.geolocation) {
-			setLocationError('浏览器不支持地理定位');
-			return;
-		}
-		setLocationError('正在获取定位...');
-		navigator.geolocation.getCurrentPosition(
-			(position) => {
-				setLatitude(position.coords.latitude);
-				setLongitude(position.coords.longitude);
-				setLocationError(null);
-			},
-			(error) => {
-				setLatitude(null);
-				setLongitude(null);
-				setLocationError(`定位失败：${error.message}`);
-			},
-			{ enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
-		);
-	};
-
 	const handleSelectAllFriends = () => {
 		setOwedFriendIds(tripMembers.map((f) => f.id));
 	};
@@ -155,22 +158,6 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 	const handleToggleFriend = (friendId: string) => {
 		setOwedFriendIds((prev) => (prev.includes(friendId) ? prev.filter((id) => id !== friendId) : [...prev, friendId]));
 	};
-
-	if (!isLoaded) {
-		return (
-			<div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
-				<div className="max-w-2xl mx-auto px-4 py-12 text-center text-slate-600 dark:text-slate-300">加载中...</div>
-			</div>
-		);
-	}
-
-	if (errorMessage) {
-		return (
-			<div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
-				<div className="max-w-2xl mx-auto px-4 py-12 text-center text-red-600 dark:text-red-400">{errorMessage}</div>
-			</div>
-		);
-	}
 
 	const handleCreateBill = async () => {
 		const selectedTripId = effectiveTripId || tripId;
@@ -219,10 +206,25 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 		}
 	};
 
+	if (!isLoaded) {
+		return (
+			<div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
+				<div className="max-w-2xl mx-auto px-4 py-12 text-center text-slate-600 dark:text-slate-300">加载中...</div>
+			</div>
+		);
+	}
+
+	if (errorMessage) {
+		return (
+			<div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
+				<div className="max-w-2xl mx-auto px-4 py-12 text-center text-red-600 dark:text-red-400">{errorMessage}</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
 			<div className="max-w-2xl mx-auto px-4 py-8 pb-24">
-				{/* Header */}
 				<div className="mb-8 flex items-center justify-between">
 					<button onClick={() => router.back()} className="flex text-[18px] font-semibold text-blue-600 hover:text-blue-500">
 						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
@@ -231,11 +233,10 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 						返回
 					</button>
 					<h1 className="text-3xl font-bold">{billId ? '编辑账单' : '新建账单'}</h1>
-					<div className="w-12" />
+					<div className="w-16" />
 				</div>
 
-				<div className="space-y-6 pb-32">
-					{/* Row 1: Amount + Payment Method + Currency */}
+				<div className="space-y-6">
 					<div className="flex">
 						<input
 							type="number"
@@ -258,7 +259,6 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 						</button>
 					</div>
 
-					{/* Row 2: Category Grid (3x3) */}
 					<div>
 						<div className="grid grid-cols-5 gap-0 border-2 border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
 							{CATEGORIES.map((cat, idx) => (
@@ -275,7 +275,6 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 						</div>
 					</div>
 
-					{/* Row 3: Bill Name */}
 					<div>
 						<input
 							type="text"
@@ -286,13 +285,10 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 						/>
 					</div>
 
-					{/* Row 4: Payer Selection */}
 					<div className="border-4 border-slate-300 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-900 p-4">
 						<div className="mb-4 flex items-center justify-between">
 							<span className="text-base font-semibold">付钱人</span>
 						</div>
-
-						{/* All Friends for Payer Selection */}
 						<div className="flex flex-wrap gap-2 justify-center">
 							{tripMembers.map((friend) => (
 								<button
@@ -309,7 +305,6 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 						</div>
 					</div>
 
-					{/* Row 5: Owed Friends Selection */}
 					<div className="border-4 border-slate-300 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-900 p-4">
 						<div className="mb-4 flex items-center justify-between">
 							<span className="text-base font-semibold">欠钱人</span>
@@ -317,8 +312,6 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 								全部
 							</button>
 						</div>
-
-						{/* All Friends */}
 						<div className="flex flex-wrap gap-2 justify-center">
 							{tripMembers.map((friend) => (
 								<button
@@ -335,7 +328,6 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 						</div>
 					</div>
 
-					{/* Row 6: Description */}
 					<div>
 						<textarea
 							value={description}
@@ -346,7 +338,6 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 						/>
 					</div>
 
-					{/* Row 7: Status Selection */}
 					<div>
 						<div className="flex gap-2 justify-between">
 							{STATUSES.map((stat) => (
@@ -365,7 +356,6 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 						</div>
 					</div>
 
-					{/* Row 8: Location Info */}
 					<div className="border-4 border-slate-300 dark:border-slate-700 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 p-4">
 						<div className="flex items-center justify-between mb-3">
 							<p className="font-bold text-lg">📍 定位信息</p>
@@ -387,7 +377,6 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 						)}
 					</div>
 
-					{/* Action Buttons */}
 					<div className="flex gap-3 pt-4">
 						<button
 							onClick={() => router.back()}
@@ -405,7 +394,6 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 				</div>
 			</div>
 
-			{/* Payment Method Modal */}
 			<Modal isOpen={isPaymentMethodModalOpen} onClose={() => setIsPaymentMethodModalOpen(false)} title="支付方法" showOkButton={false} showCancelButton cancelText="关闭">
 				<div className="grid grid-cols-2 gap-3">
 					{PAYMENT_METHODS.map((method) => (
@@ -427,7 +415,6 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 				</div>
 			</Modal>
 
-			{/* Currency Modal */}
 			<Modal isOpen={isCurrencyModalOpen} onClose={() => setIsCurrencyModalOpen(false)} title="币种" showOkButton={false} showCancelButton cancelText="关闭">
 				<div className="grid grid-cols-2 gap-3">
 					{Object.entries(CURRENCY_DEFINITIONS).map(([key, curr]: [string, Currency]) => (

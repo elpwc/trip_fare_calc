@@ -28,6 +28,12 @@ export default function HomePage() {
 	const [mapTileLayer, setMapTileLayer] = useState<'osm' | 'satellite'>('osm');
 	const [isEditTripModalOpen, setIsEditTripModalOpen] = useState(false);
 	const [editTripName, setEditTripName] = useState('');
+	const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+	const [sharePassword, setSharePassword] = useState('');
+	const [shareUrl, setShareUrl] = useState('');
+	const [shareMessage, setShareMessage] = useState('');
+	const [isSharing, setIsSharing] = useState(false);
+	const [isDeleteTripModalOpen, setIsDeleteTripModalOpen] = useState(false);
 
 	useEffect(() => {
 		fetchTrips();
@@ -197,6 +203,101 @@ export default function HomePage() {
 		}
 	};
 
+	const fetchShareInfo = async (tripId: string) => {
+		try {
+			const response = await fetch(`/api/trips/${tripId}/share`, {
+				headers: getAuthHeaders(),
+			});
+			if (!response.ok) {
+				setShareUrl('');
+				return;
+			}
+
+			const data = await response.json();
+			if (data.shareToken) {
+				setShareUrl(`${window.location.origin}/share?token=${data.shareToken}`);
+			} else {
+				setShareUrl('');
+			}
+		} catch (error) {
+			console.error('Failed to fetch share info:', error);
+		}
+	};
+
+	const openShareModal = () => {
+		if (!currentTrip?.isOwner) return;
+		setSharePassword('');
+		setShareMessage('');
+		fetchShareInfo(currentTrip.id);
+		setIsShareModalOpen(true);
+	};
+
+	const handleCreateShare = async () => {
+		if (!currentTrip) return;
+		if (!sharePassword.trim()) {
+			setShareMessage('请输入分享密码');
+			return;
+		}
+
+		setIsSharing(true);
+		setShareMessage('');
+
+		try {
+			const response = await fetch(`/api/trips/${currentTrip.id}/share`, {
+				method: 'POST',
+				headers: {
+					...getAuthHeaders(),
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ password: sharePassword.trim() }),
+			});
+
+			const data = await response.json();
+			if (response.ok) {
+				setShareUrl(`${window.location.origin}/share?token=${data.shareToken}`);
+				setShareMessage('分享链接已生成，可发送给旅伴');
+			} else {
+				setShareMessage(data.error || '生成分享链接失败');
+			}
+		} catch (error) {
+			console.error('Failed to create share link:', error);
+			setShareMessage('生成分享链接失败');
+		} finally {
+			setIsSharing(false);
+		}
+	};
+
+	const handleCopyShareLink = async () => {
+		if (!shareUrl) return;
+		try {
+			await navigator.clipboard.writeText(shareUrl);
+			setShareMessage('分享链接已复制');
+		} catch (error) {
+			console.error('Copy failed:', error);
+			setShareMessage('复制失败，请手动复制链接');
+		}
+	};
+
+	const handleDeleteTrip = async () => {
+		if (!currentTrip) return;
+
+		try {
+			const response = await fetch(`/api/trips/${currentTrip.id}`, {
+				method: 'DELETE',
+				headers: getAuthHeaders(),
+			});
+
+			if (response.ok) {
+				setIsDeleteTripModalOpen(false);
+				const remainingTrips = trips.filter((trip) => trip.id !== currentTrip.id);
+				setTrips(remainingTrips);
+				setSelectedTripId(remainingTrips[0]?.id || null);
+			}
+		} catch (error) {
+			console.error('Failed to delete trip:', error);
+		}
+	};
+
 	const formatDate = (dateString: string) => {
 		return new Date(dateString).toLocaleDateString('zh-CN');
 	};
@@ -312,7 +413,12 @@ export default function HomePage() {
 					</button>
 				</header>
 
-				<section className="mt-3">
+				<section className="mt-3 flex flex-wrap items-center gap-2">
+					{currentTrip && !currentTrip.isOwner ? (
+						<span className="inline-flex items-center rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
+							来自 {currentTrip.ownerName} 的分享
+						</span>
+					) : null}
 					<button
 						type="button"
 						onClick={() => {
@@ -321,16 +427,14 @@ export default function HomePage() {
 						}}
 						className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 					>
-						<span></span>
 						编辑旅行名称
 					</button>
 					<button
 						type="button"
-						onClick={() => {}}
+						onClick={() => setIsDeleteTripModalOpen(true)}
 						className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
 					>
-						<span></span>
-						删除旅行
+						{currentTrip?.isOwner === false ? '从列表移除旅行' : '删除旅行'}
 					</button>
 				</section>
 
@@ -425,7 +529,6 @@ export default function HomePage() {
 													{bill.category}
 												</p>
 												<p>{bill.name}</p>
-												
 											</td>
 
 											<td className="px-3 py-1">
@@ -475,6 +578,18 @@ export default function HomePage() {
 				>
 					结算
 				</button>
+				{currentTrip?.isOwner ? (
+					<button
+						type="button"
+						onClick={openShareModal}
+						className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-sky-600 text-white shadow-2xl shadow-sky-600/40 transition hover:bg-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-300/60"
+						aria-label="分享旅行"
+					>
+						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+							<path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5" />
+						</svg>
+					</button>
+				) : null}
 				<button
 					type="button"
 					onClick={() => router.push(`/bills/new?tripId=${selectedTripId}`)}
@@ -610,6 +725,61 @@ export default function HomePage() {
 						/>
 					</div>
 				</div>
+			</Modal>
+
+			<Modal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} title="分享旅行" showOkButton={false} showCancelButton cancelText="关闭">
+				<div className="space-y-4">
+					<p className="text-sm text-slate-600 dark:text-slate-400">设置分享密码后，将链接发送给旅伴，对方输入密码即可加入并共同编辑。</p>
+					<div>
+						<label className="block text-sm font-medium mb-2">分享密码</label>
+						<input
+							type="text"
+							value={sharePassword}
+							onChange={(e) => setSharePassword(e.target.value)}
+							placeholder="设置一个便于记忆的密码"
+							className="w-full px-3 py-2 border rounded dark:bg-slate-800 dark:border-slate-700"
+						/>
+					</div>
+					<button
+						type="button"
+						onClick={handleCreateShare}
+						disabled={isSharing}
+						className="w-full rounded-2xl bg-sky-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-sky-500 disabled:opacity-60"
+					>
+						{isSharing ? '生成中...' : shareUrl ? '更新分享密码' : '生成分享链接'}
+					</button>
+					{shareUrl ? (
+						<div className="space-y-2">
+							<label className="block text-sm font-medium">分享链接</label>
+							<div className="flex gap-2">
+								<input type="text" readOnly value={shareUrl} className="flex-1 min-w-0 px-3 py-2 border rounded text-xs dark:bg-slate-800 dark:border-slate-700" />
+								<button
+									type="button"
+									onClick={handleCopyShareLink}
+									className="rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
+								>
+									复制
+								</button>
+							</div>
+						</div>
+					) : null}
+					{shareMessage ? <p className="text-sm text-sky-600 dark:text-sky-400">{shareMessage}</p> : null}
+				</div>
+			</Modal>
+
+			<Modal
+				isOpen={isDeleteTripModalOpen}
+				onClose={() => setIsDeleteTripModalOpen(false)}
+				title={currentTrip?.isOwner === false ? '从列表移除旅行' : '删除旅行'}
+				onOk={handleDeleteTrip}
+				okText={currentTrip?.isOwner === false ? '确认移除' : '确认删除'}
+				showOkButton
+				showCancelButton
+				cancelText="取消"
+			>
+				<p className="text-sm text-slate-600 dark:text-slate-400">
+					{currentTrip?.isOwner === false ? '移除后该旅行将从你的列表中消失，但不会影响其他参与者。' : '删除后该旅行及其所有账单将被隐藏，分享链接也会失效。'}
+				</p>
 			</Modal>
 		</div>
 	);

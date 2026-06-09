@@ -1,13 +1,17 @@
 'use client';
 
 import { FormEvent, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useAuth } from '@/src/utils/auth-provider';
+import { Modal } from '@/src/components/Modal';
+import { getAuthHeaders } from '@/src/utils/auth';
 import receipt_up_img from '@/src/assets/img/receipt_up.png';
 import receipt_down_img from '@/src/assets/img/receipt_down.png';
 
 const languageOptions = ['简体中文', 'English', '日本語', '한국어'];
 
 export default function UserPage() {
+	const router = useRouter();
 	const { user, loading, error, login, register, logout, changePassword, updateName, updateEmail, registerEmail } = useAuth();
 	const [authMode, setAuthMode] = useState<'login' | 'register' | null>(null);
 	const [email, setEmail] = useState('');
@@ -17,6 +21,11 @@ export default function UserPage() {
 	const [code, setCode] = useState('');
 	const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'system'>('system');
 	const [message, setMessage] = useState('');
+	const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
+	const [joinLink, setJoinLink] = useState('');
+	const [joinPassword, setJoinPassword] = useState('');
+	const [joinMessage, setJoinMessage] = useState('');
+	const [isJoining, setIsJoining] = useState(false);
 
 	const handleLogin = async (event: FormEvent) => {
 		event.preventDefault();
@@ -58,6 +67,59 @@ export default function UserPage() {
 			setMessage('验证码已发送，请查收邮箱。');
 		} catch (err) {
 			setMessage((err as Error).message);
+		}
+	};
+
+	const extractShareToken = (input: string) => {
+		const trimmed = input.trim();
+		if (!trimmed) return '';
+		try {
+			const url = new URL(trimmed);
+			return url.searchParams.get('token') || '';
+		} catch {
+			return trimmed;
+		}
+	};
+
+	const handleJoinTrip = async () => {
+		const token = extractShareToken(joinLink);
+		if (!token) {
+			setJoinMessage('请输入有效的分享链接或 token');
+			return;
+		}
+		if (!joinPassword.trim()) {
+			setJoinMessage('请输入分享密码');
+			return;
+		}
+
+		setIsJoining(true);
+		setJoinMessage('');
+
+		try {
+			const response = await fetch('/api/share', {
+				method: 'POST',
+				headers: {
+					...getAuthHeaders(),
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ token, password: joinPassword.trim() }),
+			});
+
+			const data = await response.json();
+			if (!response.ok) {
+				setJoinMessage(data.error || '加入失败');
+				return;
+			}
+
+			setIsJoinModalOpen(false);
+			setJoinLink('');
+			setJoinPassword('');
+			setMessage('已成功加入旅行');
+			router.push(`/?tripId=${data.tripId}`);
+		} catch (err) {
+			setJoinMessage('加入失败，请稍后重试');
+		} finally {
+			setIsJoining(false);
 		}
 	};
 
@@ -224,6 +286,23 @@ export default function UserPage() {
 							<button
 								type="button"
 								className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left transition hover:bg-slate-50 dark:hover:bg-slate-900"
+								onClick={() => {
+									setJoinMessage('');
+									setIsJoinModalOpen(true);
+								}}
+							>
+								<div>
+									<p className="text-base font-medium text-slate-900 dark:text-slate-100">从链接和密码加入</p>
+									<p className="mt-1 text-sm text-slate-500 dark:text-slate-400">输入旅伴分享的链接和密码，加入共同编辑的旅行</p>
+								</div>
+								<span className="text-slate-400">›</span>
+							</button>
+
+							<div className="border-t border-slate-200 dark:border-slate-800" />
+
+							<button
+								type="button"
+								className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left transition hover:bg-slate-50 dark:hover:bg-slate-900"
 								onClick={async () => {
 									const newEmail = window.prompt('请输入新的邮箱地址', user.email);
 									if (newEmail && newEmail !== user.email) {
@@ -341,6 +420,43 @@ export default function UserPage() {
 								退出登录
 							</button>
 						</div>
+
+						{message ? <p className="mt-4 text-center text-sm text-emerald-600 dark:text-emerald-400">{message}</p> : null}
+
+						<Modal
+							isOpen={isJoinModalOpen}
+							onClose={() => setIsJoinModalOpen(false)}
+							title="从链接和密码加入"
+							onOk={handleJoinTrip}
+							okText={isJoining ? '加入中...' : '加入旅行'}
+							showOkButton
+							showCancelButton
+							cancelText="取消"
+						>
+							<div className="space-y-4">
+								<div>
+									<label className="block text-sm font-medium mb-2">分享链接</label>
+									<input
+										type="text"
+										value={joinLink}
+										onChange={(event) => setJoinLink(event.target.value)}
+										placeholder="粘贴完整链接，或仅粘贴 token"
+										className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-900"
+									/>
+								</div>
+								<div>
+									<label className="block text-sm font-medium mb-2">分享密码</label>
+									<input
+										type="text"
+										value={joinPassword}
+										onChange={(event) => setJoinPassword(event.target.value)}
+										placeholder="请输入分享密码"
+										className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-900"
+									/>
+								</div>
+								{joinMessage ? <p className="text-sm text-rose-500">{joinMessage}</p> : null}
+							</div>
+						</Modal>
 					</>
 				)}
 			</div>

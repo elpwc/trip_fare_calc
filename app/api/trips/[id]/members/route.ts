@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyJwtToken } from '@/src/lib/jwt';
+import { getTripAccess } from '@/lib/trip-access';
 
 function getUserId(request: NextRequest): string | null {
   const authHeader = request.headers.get('authorization');
@@ -26,16 +27,11 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'Friend ID is required' }, { status: 400 });
     }
 
-    // Verify trip belongs to user
-    const trip = await prisma.trip.findFirst({
-      where: { id: tripId, userId, isDeleted: false },
-    });
-
-    if (!trip) {
+    const access = await getTripAccess(userId, tripId);
+    if (!access) {
       return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
     }
 
-    // Verify friend belongs to user
     const friend = await prisma.friend.findFirst({
       where: { id: friendId, userId, isDeleted: false },
     });
@@ -44,7 +40,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       return NextResponse.json({ error: 'Friend not found' }, { status: 404 });
     }
 
-    // Check if already a member
     const existingMember = await prisma.tripMember.findUnique({
       where: {
         tripId_friendId: {
@@ -65,7 +60,6 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
       },
     });
 
-    // Update participation count
     await prisma.friend.update({
       where: { id: friendId },
       data: {
@@ -96,12 +90,8 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       return NextResponse.json({ error: 'Friend ID is required' }, { status: 400 });
     }
 
-    // Verify trip belongs to user
-    const trip = await prisma.trip.findFirst({
-      where: { id: tripId, userId, isDeleted: false },
-    });
-
-    if (!trip) {
+    const access = await getTripAccess(userId, tripId);
+    if (!access) {
       return NextResponse.json({ error: 'Trip not found' }, { status: 404 });
     }
 
@@ -127,7 +117,6 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
       },
     });
 
-    // Update participation count
     await prisma.friend.update({
       where: { id: friendId },
       data: {
