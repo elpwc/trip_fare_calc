@@ -6,6 +6,8 @@ import AppShell from '@/src/components/layout/AppShell';
 import { getAuthHeaders } from '@/src/utils/auth';
 import { formatAmount } from '@/src/utils/currencies';
 import { Trip, FlowItem } from '@/src/types';
+import { usePreferences } from '@/src/utils/preferences-provider';
+import type { MessageKey } from '@/src/utils/i18n/messages';
 
 type SettledRecord = FlowItem & {
 	settledAt: string;
@@ -20,6 +22,8 @@ type ExchangeInfo = {
 	source: string;
 };
 
+const SAME_CURRENCY_SOURCE = '__same_currency__';
+
 function getStorageKey(tripId: string) {
 	return `settle-history-${tripId}`;
 }
@@ -29,9 +33,14 @@ function createUniqueId() {
 	return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-function getConversionRateText(currency: string, rates: Record<string, number>, resultCurrency: string) {
+function getConversionRateText(
+	currency: string,
+	rates: Record<string, number>,
+	resultCurrency: string,
+	t: (key: MessageKey, params?: Record<string, string | number>) => string,
+) {
 	const rate = rates[currency];
-	if (!rate) return `${currency}→${resultCurrency} 待获取`;
+	if (!rate) return t('settle.ratePending', { from: currency, to: resultCurrency });
 	return `1${currency}=${(1 / rate).toFixed(3)}${resultCurrency}`;
 }
 
@@ -52,9 +61,19 @@ function saveSettledRecords(tripId: string, records: SettledRecord[]) {
 
 const SETTLE_CURRENCY_KEY = 'tripFareCalc:settleCurrency';
 
+function SettlePageLoading() {
+	const { t } = usePreferences();
+	return (
+		<AppShell tight>
+			<div className="app-empty mt-8">{t('common.loading')}</div>
+		</AppShell>
+	);
+}
+
 function SettlePageContent() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
+	const { t, locale } = usePreferences();
 	const tripId = searchParams.get('tripId');
 
 	const [trip, setTrip] = useState<Trip | null>(null);
@@ -80,7 +99,7 @@ function SettlePageContent() {
 			try {
 				const response = await fetch('/api/trips', { headers: getAuthHeaders(), cache: 'no-store' });
 				const data = await response.json();
-				if (!response.ok) throw new Error(data?.error || '获取旅行失败');
+				if (!response.ok) throw new Error(data?.error || t('settle.fetchTripFailed'));
 				const currentTrip = (data as Trip[]).find((item) => item.id === tripId) || null;
 				setTrip(currentTrip);
 				if (currentTrip) setSavedRecords(loadSavedSettlements(currentTrip.id));
@@ -92,7 +111,7 @@ function SettlePageContent() {
 		}
 
 		loadTrip();
-	}, [tripId, router]);
+	}, [tripId, router, t]);
 
 	useEffect(() => {
 		if (!trip) return;
@@ -100,7 +119,7 @@ function SettlePageContent() {
 		const currencies = Array.from(new Set(trip.bills.map((bill) => bill.currency).filter((code) => code !== selectedCurrency)));
 
 		if (currencies.length === 0) {
-			setExchangeInfo({ base: selectedCurrency, date: new Date().toISOString().split('T')[0], rates: {}, source: '同币种' });
+			setExchangeInfo({ base: selectedCurrency, date: new Date().toISOString().split('T')[0], rates: {}, source: SAME_CURRENCY_SOURCE });
 			setExchangeError('');
 			return;
 		}
@@ -112,7 +131,7 @@ function SettlePageContent() {
 				const quotes = currencies.join(',');
 				const response = await fetch(`https://api.frankfurter.dev/v2/rates?base=${encodeURIComponent(selectedCurrency)}&quotes=${encodeURIComponent(quotes)}`);
 				const result = await response.json();
-				if (!response.ok || !result) throw new Error('汇率接口异常');
+				if (!response.ok || !result) throw new Error(t('settle.ratesApiError'));
 
 				const rates: Record<string, number> = {};
 				if (Array.isArray(result)) {
@@ -124,7 +143,7 @@ function SettlePageContent() {
 				setExchangeInfo({ base: selectedCurrency, date, rates, source: 'frankfurter.dev' });
 			} catch (error) {
 				console.error(error);
-				setExchangeError('汇率获取失败');
+				setExchangeError(t('settle.ratesFailed'));
 				setExchangeInfo(null);
 			} finally {
 				setExchangeLoading(false);
@@ -132,7 +151,7 @@ function SettlePageContent() {
 		}
 
 		loadRates();
-	}, [trip, selectedCurrency, rateRefreshKey]);
+	}, [trip, selectedCurrency, rateRefreshKey, t]);
 
 	const liveFlows = useMemo(() => {
 		if (!trip || !exchangeInfo) return [];
@@ -202,9 +221,9 @@ function SettlePageContent() {
 		const exchangeNotes =
 			exchangeInfo && Object.keys(exchangeInfo.rates).length > 0
 				? Object.keys(exchangeInfo.rates)
-						.map((currency) => getConversionRateText(currency, exchangeInfo.rates, selectedCurrency))
+						.map((currency) => getConversionRateText(currency, exchangeInfo.rates, selectedCurrency, t))
 						.join('；')
-				: '无汇率';
+				: t('settle.noRates');
 
 		const record: SettledRecord = {
 			...item,
@@ -219,10 +238,13 @@ function SettlePageContent() {
 		saveSettledRecords(trip.id, next);
 	};
 
+	const exchangeSourceLabel =
+		exchangeInfo?.source === SAME_CURRENCY_SOURCE ? t('settle.sameCurrency') : exchangeInfo?.source ?? '';
+
 	if (isLoading || !trip) {
 		return (
 			<AppShell tight>
-				<div className="app-empty mt-8">正在加载结算…</div>
+				<div className="app-empty mt-8">{t('settle.loading')}</div>
 			</AppShell>
 		);
 	}
@@ -231,11 +253,11 @@ function SettlePageContent() {
 		<AppShell tight>
 			<header className="mb-2 flex flex-wrap items-start justify-between gap-2">
 				<div>
-					<button type="button" onClick={() => router.push(`/?tripId=${tripId}`)} className="app-label mb-1 hover:text-[#e85d4c]">
-						← 返回账单
+					<button type="button" onClick={() => router.push(`/?tripId=${tripId}`)} className="app-label mb-1 hover:text-app-danger">
+						{t('settle.backToBills')}
 					</button>
 					<h1 className="settings-display text-xl leading-tight">{trip.name}</h1>
-					<p className="app-label mt-1">结算小票 · {selectedCurrency}</p>
+					<p className="app-label mt-1">{t('settle.receipt', { currency: selectedCurrency })}</p>
 				</div>
 				<div className="flex flex-wrap items-center gap-1">
 					<select
@@ -256,38 +278,38 @@ function SettlePageContent() {
 						))}
 					</select>
 					<button type="button" disabled={exchangeLoading} onClick={() => setRateRefreshKey((c) => c + 1)} className="app-toolbar-chip">
-						{exchangeLoading ? '汇率…' : '刷新汇率'}
+						{exchangeLoading ? t('settle.ratesLoading') : t('settle.refreshRates')}
 					</button>
 				</div>
 			</header>
 
 			<div className="app-summary-strip mb-2">
 				<span>
-					未结 <strong>{formatAmount(totalOpenAmount, selectedCurrency)}</strong>
+					{t('settle.openTotal')} <strong>{formatAmount(totalOpenAmount, selectedCurrency)}</strong>
 				</span>
 				<span>
-					已结 <strong>{formatAmount(totalSettledAmount, selectedCurrency)}</strong>
+					{t('settle.settledTotal')} <strong>{formatAmount(totalSettledAmount, selectedCurrency)}</strong>
 				</span>
 				<span className="app-label">
-					待处理 {liveFlows.length} · 已结清 {savedRecords.length}
+					{t('settle.pendingCount', { open: liveFlows.length, closed: savedRecords.length })}
 				</span>
 			</div>
 
-			{exchangeError ? <p className="mb-2 text-[11px] text-[#e85d4c]">{exchangeError}</p> : null}
+			{exchangeError ? <p className="mb-2 text-[11px] text-app-danger">{exchangeError}</p> : null}
 
 			<section className="app-panel overflow-hidden">
 				<div className="app-panel-head">
-					<span className="app-label">算钱结果</span>
-					<span className="settings-mono text-[10px] text-[#6b6458]">不含已结清</span>
+					<span className="app-label">{t('settle.results')}</span>
+					<span className="settings-mono text-[10px] text-app-muted">{t('settle.excludeSettled')}</span>
 				</div>
 				<table className="app-data-table">
 					<thead>
 						<tr>
-							<th>付</th>
-							<th>→</th>
-							<th>收</th>
-							<th>金额</th>
-							<th>原币</th>
+							<th>{t('table.payer')}</th>
+							<th>{t('common.arrow')}</th>
+							<th>{t('table.payee')}</th>
+							<th>{t('table.amount')}</th>
+							<th>{t('table.originalCurrency')}</th>
 							<th></th>
 						</tr>
 					</thead>
@@ -296,21 +318,21 @@ function SettlePageContent() {
 							liveFlows.map((item) => (
 								<tr key={item.id}>
 									<td className="font-semibold">{item.fromName}</td>
-									<td className="text-[#6b6458]">→</td>
+									<td className="text-app-muted">{t('common.arrow')}</td>
 									<td className="font-semibold">{item.toName}</td>
 									<td className="app-amount text-sm">{formatAmount(item.amount, selectedCurrency)}</td>
-									<td className="text-[10px] leading-tight text-[#6b6458]">{item.originalTotals.map((o) => `${o.currency}${o.amount.toFixed(1)}`).join(' ')}</td>
+									<td className="text-[10px] leading-tight text-app-muted">{item.originalTotals.map((o) => `${o.currency}${o.amount.toFixed(1)}`).join(' ')}</td>
 									<td>
 										<button type="button" onClick={() => handleSettleItem(item)} className="app-btn-compact app-btn-compact-primary">
-											结清
+											{t('settle.settleAction')}
 										</button>
 									</td>
 								</tr>
 							))
 						) : (
 							<tr>
-								<td colSpan={6} className="py-3 text-center text-[12px] text-[#6b6458]">
-									暂无可结算往来
+								<td colSpan={6} className="py-3 text-center text-[12px] text-app-muted">
+									{t('settle.noFlows')}
 								</td>
 							</tr>
 						)}
@@ -320,17 +342,19 @@ function SettlePageContent() {
 
 			<section className="app-panel mt-2 overflow-hidden">
 				<div className="app-panel-head">
-					<span className="app-label">已结清</span>
-					<span className="settings-mono text-[10px] text-[#6b6458]">{savedRecords.length} 条</span>
+					<span className="app-label">{t('settle.settledSection')}</span>
+					<span className="settings-mono text-[10px] text-app-muted">
+						{savedRecords.length} {t('common.recordsUnit')}
+					</span>
 				</div>
 				<table className="app-data-table">
 					<thead>
 						<tr>
-							<th>付</th>
-							<th>→</th>
-							<th>收</th>
-							<th>金额</th>
-							<th>时间</th>
+							<th>{t('table.payer')}</th>
+							<th>{t('common.arrow')}</th>
+							<th>{t('table.payee')}</th>
+							<th>{t('table.amount')}</th>
+							<th>{t('table.time')}</th>
 						</tr>
 					</thead>
 					<tbody>
@@ -338,18 +362,18 @@ function SettlePageContent() {
 							savedRecords.map((record) => (
 								<tr key={record.id}>
 									<td>{record.fromName}</td>
-									<td>→</td>
+									<td>{t('common.arrow')}</td>
 									<td>{record.toName}</td>
 									<td className="app-amount">{formatAmount(record.amount, record.resultCurrency)}</td>
-									<td className="settings-mono text-[10px] text-[#6b6458]">
-										{new Date(record.settledAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+									<td className="settings-mono text-[10px] text-app-muted">
+										{new Date(record.settledAt).toLocaleDateString(locale, { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
 									</td>
 								</tr>
 							))
 						) : (
 							<tr>
-								<td colSpan={5} className="py-3 text-center text-[12px] text-[#6b6458]">
-									暂无结清记录
+								<td colSpan={5} className="py-3 text-center text-[12px] text-app-muted">
+									{t('settle.noSettledRecords')}
 								</td>
 							</tr>
 						)}
@@ -358,13 +382,13 @@ function SettlePageContent() {
 			</section>
 
 			{exchangeInfo ? (
-				<div className="mt-2 settings-mono text-[10px] leading-relaxed text-[#6b6458]">
-					汇率 {exchangeInfo.source} · {exchangeInfo.date}
+				<div className="mt-2 settings-mono text-[10px] leading-relaxed text-app-muted">
+					{t('settle.ratesMeta', { source: exchangeSourceLabel, date: exchangeInfo.date })}
 					{Object.keys(exchangeInfo.rates).length > 0
 						? ` · ${Object.keys(exchangeInfo.rates)
-								.map((c) => getConversionRateText(c, exchangeInfo.rates, selectedCurrency))
+								.map((c) => getConversionRateText(c, exchangeInfo.rates, selectedCurrency, t))
 								.join(' · ')}`
-						: ' · 账单币种一致'}
+						: t('settle.ratesSameCurrency')}
 				</div>
 			) : null}
 
@@ -375,13 +399,7 @@ function SettlePageContent() {
 
 export default function SettlePage() {
 	return (
-		<Suspense
-			fallback={
-				<AppShell tight>
-					<div className="app-empty mt-8">加载中...</div>
-				</AppShell>
-			}
-		>
+		<Suspense fallback={<SettlePageLoading />}>
 			<SettlePageContent />
 		</Suspense>
 	);

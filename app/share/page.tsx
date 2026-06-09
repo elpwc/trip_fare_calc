@@ -8,6 +8,7 @@ import { Modal } from '@/src/components/Modal';
 import FriendIcon from '@/src/components/FriendIcon';
 import { getAuthHeaders } from '@/src/utils/auth';
 import { useAuth } from '@/src/utils/auth-provider';
+import { usePreferences } from '@/src/utils/preferences-provider';
 import { Bill, Trip, TripMember } from '@/src/types';
 import { CURRENCY_DEFINITIONS } from '@/src/utils/currencies';
 
@@ -16,11 +17,21 @@ type SharedTrip = Trip & {
 	alreadyJoined?: boolean;
 };
 
+function SharePageLoading() {
+	const { t } = usePreferences();
+	return (
+		<AppShell tight>
+			<div className="app-empty mt-8">{t('common.loading')}</div>
+		</AppShell>
+	);
+}
+
 function SharePageContent() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const token = searchParams.get('token');
 	const { user } = useAuth();
+	const { t, locale } = usePreferences();
 
 	const [password, setPassword] = useState('');
 	const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(true);
@@ -31,10 +42,10 @@ function SharePageContent() {
 
 	useEffect(() => {
 		if (!token) {
-			setPasswordError('无效的分享链接');
+			setPasswordError(t('share.invalidLink'));
 			setIsPasswordModalOpen(false);
 		}
-	}, [token]);
+	}, [token, t]);
 
 	const loadSharedTrip = async (inputPassword: string) => {
 		if (!token) return null;
@@ -45,7 +56,7 @@ function SharePageContent() {
 
 		const data = await response.json();
 		if (!response.ok) {
-			throw new Error(data.error || '密码错误或链接无效');
+			throw new Error(data.error || t('share.passwordError'));
 		}
 
 		return data as SharedTrip;
@@ -53,7 +64,7 @@ function SharePageContent() {
 
 	const handleVerifyPassword = async () => {
 		if (!password.trim()) {
-			setPasswordError('请输入分享密码');
+			setPasswordError(t('share.enterPassword'));
 			return;
 		}
 
@@ -95,14 +106,14 @@ function SharePageContent() {
 
 			const data = await response.json();
 			if (!response.ok) {
-				setJoinMessage(data.error || '加入失败');
+				setJoinMessage(data.error || t('share.joinFailed'));
 				return;
 			}
 
 			router.push(`/?tripId=${data.tripId}`);
 		} catch (error) {
 			console.error('Failed to join trip:', error);
-			setJoinMessage('加入失败，请稍后重试');
+			setJoinMessage(t('share.joinRetry'));
 		} finally {
 			setIsLoading(false);
 		}
@@ -112,9 +123,9 @@ function SharePageContent() {
 		return (
 			<AppShell tight>
 				<div className="app-empty mt-8">
-					<p>无效的分享链接</p>
+					<p>{t('share.invalidLink')}</p>
 					<Link href="/" className="mt-3 inline-block text-[#2a9d8f] underline">
-						返回首页
+						{t('share.backHome')}
 					</Link>
 				</div>
 			</AppShell>
@@ -124,10 +135,10 @@ function SharePageContent() {
 	return (
 		<AppShell tight>
 			{trip && !user ? (
-				<div className="mb-2 border-2 border-[#e85d4c] bg-[#e85d4c]/10 px-2 py-1.5 text-center text-[11px] font-semibold text-[#e85d4c]">
-					注册登录后可以参与编辑
+				<div className="text-app-danger mb-2 border-2 border-[#e85d4c] bg-[#e85d4c]/10 px-2 py-1.5 text-center text-[11px] font-semibold">
+					{t('share.loginBanner')}
 					<Link href="/user" className="ml-2 underline">
-						去登录
+						{t('share.goLogin')}
 					</Link>
 				</div>
 			) : null}
@@ -135,11 +146,11 @@ function SharePageContent() {
 			{trip ? (
 				<>
 					<header className="app-panel mb-2 p-2">
-						<p className="app-label">分享的旅行</p>
+						<p className="app-label">{t('share.sharedTrip')}</p>
 						<h1 className="settings-display text-xl leading-tight">{trip.name}</h1>
-						<p className="settings-mono mt-1 text-[9px] text-[#6b6458]">
-							{new Date(trip.createdAt).toLocaleDateString('zh-CN')}
-							{trip.ownerName ? ` · 创建者 ${trip.ownerName}` : ''}
+						<p className="settings-mono text-app-muted mt-1 text-[9px]">
+							{new Date(trip.createdAt).toLocaleDateString(locale)}
+							{trip.ownerName ? ` · ${t('share.createdBy', { name: trip.ownerName })}` : ''}
 						</p>
 					</header>
 
@@ -154,16 +165,16 @@ function SharePageContent() {
 
 					<section className="app-panel overflow-hidden">
 						<div className="app-panel-head">
-							<span className="app-label">账单列表</span>
-							<span className="settings-mono text-[9px] text-[#6b6458]">{trip.bills.length} 笔</span>
+							<span className="app-label">{t('share.billList')}</span>
+							<span className="settings-mono text-app-muted text-[9px]">{t('share.billsCount', { count: trip.bills.length })}</span>
 						</div>
 						<table className="app-data-table">
 							<thead>
 								<tr>
-									<th>付</th>
-									<th>金额</th>
-									<th>项目</th>
-									<th>态</th>
+									<th>{t('table.payer')}</th>
+									<th>{t('table.amount')}</th>
+									<th>{t('table.item')}</th>
+									<th>{t('table.status')}</th>
 								</tr>
 							</thead>
 							<tbody>
@@ -185,43 +196,45 @@ function SharePageContent() {
 											<p className="mt-0.5 max-w-32 truncate text-[10px]">{bill.name}</p>
 										</td>
 										<td>
-											<span className={`app-tag ${bill.status === 'SETTLED' ? 'app-tag-settled' : 'app-tag-open'}`}>{bill.status === 'SETTLED' ? '清' : '未'}</span>
+											<span className={`app-tag ${bill.status === 'SETTLED' ? 'app-tag-settled' : 'app-tag-open'}`}>
+												{bill.status === 'SETTLED' ? t('table.settledShort') : t('table.unsettledShort')}
+											</span>
 										</td>
 									</tr>
 								))}
 							</tbody>
 						</table>
-						{trip.bills.length === 0 ? <p className="px-2 py-3 text-center text-[11px] text-[#6b6458]">暂无账单</p> : null}
+						{trip.bills.length === 0 ? <p className="text-app-muted px-2 py-3 text-center text-[11px]">{t('home.noBills')}</p> : null}
 					</section>
 
 					{user && !trip.alreadyJoined ? (
 						<div className="mt-3">
 							<button type="button" onClick={handleJoinTrip} disabled={isLoading} className="settings-btn-primary w-full disabled:opacity-60">
-								{isLoading ? '加入中...' : '加入旅行'}
+								{isLoading ? t('share.joining') : t('share.join')}
 							</button>
-							{joinMessage ? <p className="mt-2 text-center text-[11px] text-[#e85d4c]">{joinMessage}</p> : null}
+							{joinMessage ? <p className="text-app-danger mt-2 text-center text-[11px]">{joinMessage}</p> : null}
 						</div>
 					) : null}
 				</>
 			) : (
-				<div className="app-empty mt-8">输入密码后即可查看分享的旅行</div>
+				<div className="app-empty mt-8">{t('share.readonlyHint')}</div>
 			)}
 
 			<Modal
 				isOpen={isPasswordModalOpen}
 				onClose={() => router.push('/')}
-				title="输入分享密码"
+				title={t('share.passwordModalTitle')}
 				onOk={handleVerifyPassword}
-				okText={isLoading ? '验证中...' : '查看旅行'}
+				okText={isLoading ? t('share.verifying') : t('share.verify')}
 				showOkButton
 				showCancelButton
-				cancelText="取消"
+				cancelText={t('common.cancel')}
 			>
 				<div className="modal-stack">
-					<p className="modal-hint">请输入分享者提供的密码以查看或加入此旅行。</p>
+					<p className="modal-hint">{t('share.passwordHint')}</p>
 					<div className="modal-field">
-						<label className="app-label">分享密码</label>
-						<input type="text" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="分享密码" className="settings-input py-2 text-sm" />
+						<label className="app-label">{t('share.passwordPlaceholder')}</label>
+						<input type="text" value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t('share.passwordPlaceholder')} className="settings-input py-2 text-sm" />
 					</div>
 					{passwordError ? <p className="modal-message modal-message-error">{passwordError}</p> : null}
 				</div>
@@ -232,7 +245,7 @@ function SharePageContent() {
 
 export default function SharePage() {
 	return (
-		<Suspense fallback={<AppShell tight><div className="app-empty mt-8">加载中...</div></AppShell>}>
+		<Suspense fallback={<SharePageLoading />}>
 			<SharePageContent />
 		</Suspense>
 	);

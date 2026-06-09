@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import { usePreferences } from '@/src/utils/preferences-provider';
 
 type FriendIconProps = {
 	name: string;
@@ -84,6 +85,7 @@ function getSizeClasses(size: 'sm' | 'md' | 'lg' | 'xl'): { container: string; b
  * 支持不同的大小和"本人"标识
  */
 export const FriendIcon: React.FC<FriendIconProps> = ({ name, size = 'md', isSelf = false, className = '' }) => {
+	const { t } = usePreferences();
 	const sizeClasses = getSizeClasses(size);
 	const bgColor = getBackgroundColor(name);
 	const displayText = getDisplayText(name);
@@ -97,7 +99,7 @@ export const FriendIcon: React.FC<FriendIconProps> = ({ name, size = 'md', isSel
 				<div
 					className={`absolute ${sizeClasses.badge} bg-orange-500 text-white rounded-full flex items-center justify-center font-bold shadow-md`}
 				>
-					<span className={`${sizeClasses.badgeText}`}>我</span>
+					<span className={`${sizeClasses.badgeText}`}>{t('common.self')}</span>
 				</div>
 			)}
 		</div>

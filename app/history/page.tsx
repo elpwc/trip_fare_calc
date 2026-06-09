@@ -5,19 +5,22 @@ import { useRouter } from 'next/navigation';
 import AppShell from '@/src/components/layout/AppShell';
 import TripHistoryCard from '@/src/components/TripHistoryCard';
 import { getAuthHeaders } from '@/src/utils/auth';
+import { usePreferences } from '@/src/utils/preferences-provider';
+import type { MessageKey } from '@/src/utils/i18n/messages';
 import { Trip } from '@/src/types';
 
 const filterOptions = [
-  { value: 'all', label: '全部' },
-  { value: '7d', label: '7天' },
-  { value: '30d', label: '30天' },
-  { value: 'year', label: '今年' },
+  { value: 'all', labelKey: 'history.filter.all' },
+  { value: '7d', labelKey: 'history.filter.7d' },
+  { value: '30d', labelKey: 'history.filter.30d' },
+  { value: 'year', labelKey: 'history.filter.year' },
 ] as const;
 
 type FilterOption = (typeof filterOptions)[number]['value'];
 
 export default function HistoryPage() {
   const router = useRouter();
+  const { t } = usePreferences();
   const [trips, setTrips] = useState<Trip[]>([]);
   const [searchText, setSearchText] = useState('');
   const [filterPeriod, setFilterPeriod] = useState<FilterOption>('all');
@@ -71,10 +74,10 @@ export default function HistoryPage() {
     <AppShell tight>
       <header className="mb-2 flex flex-wrap items-end justify-between gap-2">
         <div>
-          <p className="app-label">History</p>
-          <h1 className="settings-display text-2xl leading-none">旅行历史</h1>
+          <p className="app-label">{t('page.history')}</p>
+          <h1 className="settings-display text-2xl leading-none">{t('history.title')}</h1>
         </div>
-        <span className="settings-mono text-[10px] text-[#6b6458]">共 {filteredTrips.length} 条</span>
+        <span className="settings-mono text-app-muted text-[10px]">{t('history.count', { count: filteredTrips.length })}</span>
       </header>
 
       <div className="mb-2 flex flex-wrap gap-1">
@@ -85,7 +88,7 @@ export default function HistoryPage() {
             onClick={() => setFilterPeriod(option.value)}
             className={`app-toolbar-chip ${filterPeriod === option.value ? 'app-toolbar-chip-active' : ''}`}
           >
-            {option.label}
+            {t(option.labelKey as MessageKey)}
           </button>
         ))}
       </div>
@@ -95,19 +98,19 @@ export default function HistoryPage() {
           type="text"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
-          placeholder="名称 / 参与者"
+          placeholder={t('history.searchPlaceholder')}
           className="settings-input py-2 text-xs"
         />
         <button type="button" onClick={() => setSearchText('')} className="app-toolbar-chip shrink-0 px-2">
-          清除
+          {t('common.clear')}
         </button>
       </div>
 
       <div className="space-y-1.5">
         {isLoading ? (
-          <div className="app-empty">加载中...</div>
+          <div className="app-empty">{t('history.loading')}</div>
         ) : filteredTrips.length === 0 ? (
-          <div className="app-empty">未找到匹配的历史旅行</div>
+          <div className="app-empty">{t('history.empty')}</div>
         ) : (
           filteredTrips.map((trip) => <TripHistoryCard key={trip.id} trip={trip} onClick={() => router.push(`/?tripId=${trip.id}`)} />)
         )}

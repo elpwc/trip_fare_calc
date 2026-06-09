@@ -9,6 +9,8 @@ import { getAuthHeaders } from '@/src/utils/auth';
 import { Currency, CURRENCY_DEFINITIONS } from '@/src/utils/currencies';
 import { FlagSVG } from '@/src/components/FlagSVG';
 import { Member } from '@/src/types';
+import { usePreferences } from '@/src/utils/preferences-provider';
+import type { MessageKey } from '@/src/utils/i18n/messages';
 
 type Friend = Member;
 
@@ -18,42 +20,60 @@ type BillOwed = {
 
 const LAST_BILL_CURRENCY_KEY = 'tripFareCalc:lastBillCurrency';
 
-const CATEGORIES = [
-	{ key: '吃饭', label: '吃饭', tone: 'meal' },
-	{ key: '住宿', label: '住宿', tone: 'hotel' },
-	{ key: '门票', label: '门票', tone: 'ticket' },
-	{ key: 'KTV', label: 'KTV', tone: 'ktv' },
-	{ key: '购物', label: '购物', tone: 'shop' },
-	{ key: '租车', label: '租车', tone: 'car' },
-	{ key: '高速费', label: '高速费', tone: 'toll' },
-	{ key: '加油费', label: '加油费', tone: 'gas' },
-	{ key: '停车费', label: '停车费', tone: 'park' },
-	{ key: '打车', label: '打车', tone: 'taxi' },
-	{ key: '公交', label: '公交', tone: 'bus' },
-	{ key: '火车', label: '火车', tone: 'train' },
-	{ key: '机票', label: '机票', tone: 'flight' },
-	{ key: '交通', label: '交通', tone: 'traffic' },
-	{ key: '其他', label: '其他', tone: 'none' },
+const CATEGORIES: { key: string; tone: string; i18nKey: MessageKey }[] = [
+	{ key: '吃饭', tone: 'meal', i18nKey: 'bills.category.meal' },
+	{ key: '住宿', tone: 'hotel', i18nKey: 'bills.category.hotel' },
+	{ key: '门票', tone: 'ticket', i18nKey: 'bills.category.ticket' },
+	{ key: 'KTV', tone: 'ktv', i18nKey: 'bills.category.ktv' },
+	{ key: '购物', tone: 'shop', i18nKey: 'bills.category.shop' },
+	{ key: '租车', tone: 'car', i18nKey: 'bills.category.car' },
+	{ key: '高速费', tone: 'toll', i18nKey: 'bills.category.toll' },
+	{ key: '加油费', tone: 'gas', i18nKey: 'bills.category.gas' },
+	{ key: '停车费', tone: 'park', i18nKey: 'bills.category.park' },
+	{ key: '打车', tone: 'taxi', i18nKey: 'bills.category.taxi' },
+	{ key: '公交', tone: 'bus', i18nKey: 'bills.category.bus' },
+	{ key: '火车', tone: 'train', i18nKey: 'bills.category.train' },
+	{ key: '机票', tone: 'flight', i18nKey: 'bills.category.flight' },
+	{ key: '交通', tone: 'traffic', i18nKey: 'bills.category.traffic' },
+	{ key: '其他', tone: 'none', i18nKey: 'bills.category.other' },
 ];
 
-const STATUSES = [
-	{ value: 'UNPAID', label: '未付款' },
-	{ value: 'UNRETURNED', label: '未偿还' },
-	{ value: 'PARTIALLY_RETURNED', label: '部分偿还' },
-	{ value: 'SETTLED', label: '已结清' },
+const STATUSES: { value: string; i18nKey: MessageKey }[] = [
+	{ value: 'UNPAID', i18nKey: 'bills.status.unpaid' },
+	{ value: 'UNRETURNED', i18nKey: 'bills.status.unreturned' },
+	{ value: 'PARTIALLY_RETURNED', i18nKey: 'bills.status.partial' },
+	{ value: 'SETTLED', i18nKey: 'bills.status.settled' },
 ];
 
-const PAYMENT_METHODS = ['任意', '现金', '支付宝', '微信', '银行转账', 'PayPay', '信用卡', 'PayPal', 'ApplePay', '其他'];
+const PAYMENT_METHODS: { value: string; i18nKey: MessageKey }[] = [
+	{ value: '任意', i18nKey: 'bills.payment.any' },
+	{ value: '现金', i18nKey: 'bills.payment.cash' },
+	{ value: '支付宝', i18nKey: 'bills.payment.alipay' },
+	{ value: '微信', i18nKey: 'bills.payment.wechat' },
+	{ value: '银行转账', i18nKey: 'bills.payment.bank' },
+	{ value: 'PayPay', i18nKey: 'bills.payment.paypay' },
+	{ value: '信用卡', i18nKey: 'bills.payment.card' },
+	{ value: 'PayPal', i18nKey: 'bills.payment.paypal' },
+	{ value: 'ApplePay', i18nKey: 'bills.payment.applepay' },
+	{ value: '其他', i18nKey: 'bills.payment.other' },
+];
+
+function getPaymentI18nKey(value: string): MessageKey {
+	return PAYMENT_METHODS.find((method) => method.value === value)?.i18nKey ?? 'bills.payment.other';
+}
+
+function BillPageLoading() {
+	const { t } = usePreferences();
+	return (
+		<AppShell tight>
+			<div className="app-empty mt-8">{t('common.loading')}</div>
+		</AppShell>
+	);
+}
 
 export default function NewBillPage({ billId }: { billId?: string } = {}) {
 	return (
-		<Suspense
-			fallback={
-				<AppShell tight>
-					<div className="app-empty mt-8">加载中...</div>
-				</AppShell>
-			}
-		>
+		<Suspense fallback={<BillPageLoading />}>
 			<NewBillPageContent billId={billId} />
 		</Suspense>
 	);
@@ -62,6 +82,7 @@ export default function NewBillPage({ billId }: { billId?: string } = {}) {
 function NewBillPageContent({ billId }: { billId?: string } = {}) {
 	const router = useRouter();
 	const searchParams = useSearchParams();
+	const { t } = usePreferences();
 	const tripId = searchParams.get('tripId');
 	const [effectiveTripId, setEffectiveTripId] = useState<string | null>(tripId);
 
@@ -91,7 +112,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 
 	const acquireLocation = () => {
 		if (!navigator.geolocation) {
-			setLocationError('浏览器不支持定位');
+			setLocationError(t('bills.locationUnsupported'));
 			return;
 		}
 		navigator.geolocation.getCurrentPosition(
@@ -101,7 +122,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 				setLocationError(null);
 			},
 			(error) => {
-				setLocationError(`定位失败：${error.message}`);
+				setLocationError(t('bills.locationFailed', { message: error.message }));
 			},
 			{ enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
 		);
@@ -127,7 +148,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 
 			if (!response.ok) {
 				const errorData = await response.json();
-				setErrorMessage(errorData?.error || '获取账单失败');
+				setErrorMessage(errorData?.error || t('bills.fetchFailed'));
 				return;
 			}
 
@@ -148,7 +169,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 			setIsLoaded(true);
 		} catch (error) {
 			console.error('Failed to fetch bill:', error);
-			setErrorMessage('获取账单失败');
+			setErrorMessage(t('bills.fetchFailed'));
 		}
 	};
 
@@ -179,8 +200,8 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 
 	const handleCreateBill = async () => {
 		const selectedTripId = effectiveTripId || tripId;
-		if (!selectedTripId || !amount || !payerId ) {
-			alert('请填写必需信息');
+		if (!selectedTripId || !amount || !payerId) {
+			alert(t('bills.requiredFields'));
 			return;
 		}
 
@@ -216,18 +237,19 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 				router.push(`/?tripId=${selectedTripId}`);
 			} else {
 				const errorData = await response.json();
-				alert(`${billId ? '更新' : '创建'}账单失败: ${errorData.error || '未知错误'}`);
+				const failMsg = billId ? t('bills.updateFailed') : t('bills.createFailed');
+				alert(`${failMsg}: ${errorData.error || t('bills.unknownError')}`);
 			}
 		} catch (error) {
 			console.error('Failed to submit bill:', error);
-			alert(`${billId ? '更新' : '创建'}账单失败`);
+			alert(billId ? t('bills.updateFailed') : t('bills.createFailed'));
 		}
 	};
 
 	if (!isLoaded) {
 		return (
 			<AppShell tight>
-				<div className="app-empty mt-8">加载中...</div>
+				<div className="app-empty mt-8">{t('common.loading')}</div>
 			</AppShell>
 		);
 	}
@@ -235,7 +257,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 	if (errorMessage) {
 		return (
 			<AppShell tight>
-				<div className="app-empty mt-8 text-[#e85d4c]">{errorMessage}</div>
+				<div className="app-empty mt-8 text-app-danger">{errorMessage}</div>
 			</AppShell>
 		);
 	}
@@ -243,10 +265,10 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 	return (
 		<AppShell tight>
 			<header className="mb-2 flex items-center justify-between gap-2">
-				<button type="button" onClick={() => router.back()} className="app-label hover:text-[#e85d4c]">
-					← 返回
+				<button type="button" onClick={() => router.back()} className="app-label hover:text-app-danger">
+					← {t('common.back')}
 				</button>
-				<h1 className="settings-display text-xl">{billId ? '编辑账单' : '新建账单'}</h1>
+				<h1 className="settings-display text-xl">{billId ? t('bills.editTitle') : t('bills.newTitle')}</h1>
 				<span className="settings-stamp scale-75">BILL</span>
 			</header>
 
@@ -256,13 +278,13 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 						type="number"
 						value={amount}
 						onChange={(e) => setAmount(e.target.value)}
-						placeholder="金额"
+						placeholder={t('bills.amount')}
 						className="settings-input min-w-0 flex-1 border-0 py-3 text-3xl font-bold shadow-none focus:shadow-none"
 					/>
 					<button type="button" onClick={() => setIsPaymentMethodModalOpen(true)} className="app-toolbar-chip shrink-0 self-stretch border-y-0 border-r-0 px-2">
-						{paymentMethod === '任意' ? '支付方式' : paymentMethod}
+						{paymentMethod === '任意' ? t('bills.paymentMethod') : t(getPaymentI18nKey(paymentMethod))}
 					</button>
-					<button type="button" onClick={() => setIsCurrencyModalOpen(true)} className="app-currency-btn" aria-label="选择币种">
+					<button type="button" onClick={() => setIsCurrencyModalOpen(true)} className="app-currency-btn" aria-label={t('bills.selectCurrency')}>
 						<span className="app-currency-btn-symbol">{CURRENCY_DEFINITIONS[currency]?.symbol || '¥'}</span>
 						<span className="app-currency-btn-code">{currency}</span>
 					</button>
@@ -277,17 +299,17 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 								onClick={() => setCategory(cat.key)}
 								className={`app-cat-btn app-cat-${cat.tone} ${category === cat.key ? 'app-cat-btn-active' : ''} ${idx % 5 !== 4 ? 'border-r border-[#1a1814]/10' : ''}`}
 							>
-								{cat.label}
+								{t(cat.i18nKey)}
 							</button>
 						))}
 					</div>
 				</div>
 
-				<input type="text" value={billName} onChange={(e) => setBillName(e.target.value)} placeholder="账单名称（可空）" className="settings-input py-2 text-sm" />
+				<input type="text" value={billName} onChange={(e) => setBillName(e.target.value)} placeholder={t('bills.namePlaceholder')} className="settings-input py-2 text-sm" />
 
 				<div className="app-panel p-2">
 					<div className="mb-1 flex items-center justify-between">
-						<span className="app-label">付钱人</span>
+						<span className="app-label">{t('bills.payer')}</span>
 					</div>
 					<div className="flex flex-wrap justify-center gap-1">
 						{tripMembers.map((friend) => (
@@ -306,9 +328,9 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 
 				<div className="app-panel p-2">
 					<div className="mb-1 flex items-center justify-between">
-						<span className="app-label">欠钱人</span>
+						<span className="app-label">{t('bills.owed')}</span>
 						<button type="button" onClick={handleSelectAllFriends} className="app-btn-compact">
-							全部
+							{t('bills.selectAll')}
 						</button>
 					</div>
 					<div className="flex flex-wrap justify-center gap-1">
@@ -326,63 +348,63 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 					</div>
 				</div>
 
-				<textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="备注（可选）" rows={2} className="settings-input resize-none py-2 text-sm" />
+				<textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t('bills.notePlaceholder')} rows={2} className="settings-input resize-none py-2 text-sm" />
 
 				<div className="grid grid-cols-4 gap-1">
 					{STATUSES.map((stat) => (
 						<button key={stat.value} type="button" onClick={() => setStatus(stat.value)} className={`app-toolbar-chip py-1.5 ${status === stat.value ? 'app-toolbar-chip-active' : ''}`}>
-							{stat.label}
+							{t(stat.i18nKey)}
 						</button>
 					))}
 				</div>
 
 				<div className="app-panel p-2">
 					<div className="mb-1 flex items-center justify-between">
-						<span className="app-label">定位</span>
+						<span className="app-label">{t('bills.location')}</span>
 						<button type="button" onClick={acquireLocation} className="app-btn-compact app-btn-compact-primary">
-							重取
+							{t('bills.reacquireLocation')}
 						</button>
 					</div>
 					{locationError ? (
-						<p className="text-[11px] text-[#e85d4c]">{locationError}</p>
+						<p className="text-[11px] text-app-danger">{locationError}</p>
 					) : latitude != null && longitude != null ? (
 						<p className="settings-mono text-[10px] text-[#2a9d8f]">
 							{latitude.toFixed(5)}, {longitude.toFixed(5)}
 						</p>
 					) : (
-						<p className="text-[11px] text-[#6b6458]">正在获取…</p>
+						<p className="text-[11px] text-app-muted">{t('bills.locating')}</p>
 					)}
 				</div>
 
 				<div className="flex gap-2 pt-1">
 					<button type="button" onClick={() => router.back()} className="settings-btn-ghost flex-1 py-3 text-sm">
-						取消
+						{t('common.cancel')}
 					</button>
 					<button type="button" onClick={handleCreateBill} className="settings-btn-primary flex-1 py-3 text-sm">
-						{billId ? '保存' : '创建'}
+						{billId ? t('common.save') : t('common.create')}
 					</button>
 				</div>
 			</div>
 
-			<Modal isOpen={isPaymentMethodModalOpen} onClose={() => setIsPaymentMethodModalOpen(false)} title="支付方法" showOkButton={false} showCancelButton cancelText="关闭">
+			<Modal isOpen={isPaymentMethodModalOpen} onClose={() => setIsPaymentMethodModalOpen(false)} title={t('bills.modal.paymentMethod')} showOkButton={false} showCancelButton cancelText={t('common.close')}>
 				<div className="modal-option-grid">
 					{PAYMENT_METHODS.map((method) => (
 						<button
-							key={method}
+							key={method.value}
 							type="button"
 							onClick={() => {
-								setPaymentMethod(method);
+								setPaymentMethod(method.value);
 								setIsPaymentMethodModalOpen(false);
 							}}
-							className={`modal-option ${paymentMethod === method ? 'modal-option-active' : ''}`}
+							className={`modal-option ${paymentMethod === method.value ? 'modal-option-active' : ''}`}
 						>
-							{method}
+							{t(method.i18nKey)}
 						</button>
 					))}
 				</div>
 			</Modal>
 
-			<Modal isOpen={isCurrencyModalOpen} onClose={() => setIsCurrencyModalOpen(false)} title="币种" showOkButton={false} showCancelButton cancelText="关闭">
+			<Modal isOpen={isCurrencyModalOpen} onClose={() => setIsCurrencyModalOpen(false)} title={t('bills.modal.currency')} showOkButton={false} showCancelButton cancelText={t('common.close')}>
 				<div className="modal-option-grid">
 					{Object.entries(CURRENCY_DEFINITIONS).map(([key, curr]: [string, Currency]) => (
 						<button

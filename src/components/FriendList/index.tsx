@@ -3,6 +3,7 @@
 import React from 'react';
 import FriendIcon, { getBackgroundColor, getDisplayText } from '@/src/components/FriendIcon';
 import { Friend } from '@/src/types';
+import { usePreferences } from '@/src/utils/preferences-provider';
 
 type FriendListProps = {
   friends: Friend[];
@@ -13,6 +14,8 @@ const FriendList: React.FC<FriendListProps> = ({
   friends,
   onFriendClick,
 }) => {
+  const { t } = usePreferences();
+
   const getFriendPosition = (index: number, total: number) => {
     if (total === 0) return { x: 0, y: 0 };
     const angle = (index / total) * 2 * Math.PI;
@@ -54,7 +57,7 @@ const FriendList: React.FC<FriendListProps> = ({
               {getDisplayText(friend.name)}
               {friend.isSelf && (
                 <div className="absolute -bottom-1 -right-1 bg-orange-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-bold shadow-md">
-                  我
+                  {t('common.self')}
                 </div>
               )}
             </div>
@@ -63,10 +66,9 @@ const FriendList: React.FC<FriendListProps> = ({
         );
       })}
       {friends.length === 0 && (
-        <div className="text-center text-slate-500">
+        <div className="text-center text-app-muted">
           <div className="text-4xl mb-4">👥</div>
-          <div className="text-lg font-medium">还没有好友</div>
-          <div className="mt-2 text-sm">点击右下角的加号按钮添加第一位好友</div>
+          <div className="text-lg font-medium">{t('friends.emptyList')}</div>
         </div>
       )}
     </div>

@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ReactNode } from 'react';
+import { usePreferences } from '@/src/utils/preferences-provider';
 
 type SettingsShellProps = {
 	title: string;
@@ -12,6 +13,8 @@ type SettingsShellProps = {
 };
 
 export default function SettingsShell({ title, subtitle, stamp, backHref = '/user', children }: SettingsShellProps) {
+	const { t } = usePreferences();
+
 	return (
 		<div className="settings-paper min-h-screen text-[#1a1814] dark:text-[#f4efe4]">
 			<div className="settings-paper-grid pointer-events-none fixed inset-0 opacity-70 dark:opacity-30" aria-hidden />
@@ -20,13 +23,13 @@ export default function SettingsShell({ title, subtitle, stamp, backHref = '/use
 					<div>
 						<Link
 							href={backHref}
-							className="settings-mono mb-3 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-[#6b6458] transition hover:text-[#e85d4c] dark:text-[#a89f8f] dark:hover:text-[#ff7a68]"
+							className="settings-mono mb-3 inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.28em] text-app-muted transition hover:text-app-danger"
 						>
 							<span aria-hidden>←</span>
-							返回
+							{t('common.back')}
 						</Link>
 						<h1 className="settings-display text-[2rem] leading-none tracking-tight">{title}</h1>
-						{subtitle ? <p className="settings-mono mt-3 max-w-md text-[12px] leading-relaxed text-[#6b6458] dark:text-[#a89f8f]">{subtitle}</p> : null}
+						{subtitle ? <p className="settings-mono mt-3 max-w-md text-[12px] leading-relaxed text-app-muted">{subtitle}</p> : null}
 					</div>
 					{stamp ? (
 						<div className="settings-stamp shrink-0 rotate-6" aria-hidden>

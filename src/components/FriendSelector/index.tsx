@@ -3,6 +3,7 @@
 import React from 'react';
 import { Member } from '@/src/types';
 import FriendIcon from '@/src/components/FriendIcon';
+import { usePreferences } from '@/src/utils/preferences-provider';
 
 type Friend = Member;
 
@@ -17,6 +18,8 @@ const FriendSelector: React.FC<FriendSelectorProps> = ({
   selectedFriends,
   onToggleFriend,
 }) => {
+  const { t } = usePreferences();
+
   const getFriendPosition = (index: number, total: number) => {
     if (total === 0) return { x: 0, y: 0 };
     const angle = (index / total) * 2 * Math.PI;
@@ -65,7 +68,7 @@ const FriendSelector: React.FC<FriendSelectorProps> = ({
       {friends.length === 0 ? (
         <div className="modal-hint text-center">
           <div className="mb-1 text-xl">👥</div>
-          <div>暂无好友</div>
+          <div>{t('selector.noFriends')}</div>
         </div>
       ) : null}
     </div>

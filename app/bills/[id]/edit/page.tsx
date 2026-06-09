@@ -1,17 +1,20 @@
 'use client';
 
 import { useParams } from 'next/navigation';
+import AppShell from '@/src/components/layout/AppShell';
+import { usePreferences } from '@/src/utils/preferences-provider';
 import NewBillPage from '../../new/page';
 
 export default function EditBillPage() {
+	const { t } = usePreferences();
 	const params = useParams();
 	const billId = Array.isArray(params?.id) ? params.id[0] : params?.id;
 
 	if (!billId) {
 		return (
-			<div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
-				<div className="max-w-2xl mx-auto px-4 py-12 text-center text-red-600 dark:text-red-400">无效的账单ID</div>
-			</div>
+			<AppShell tight>
+				<div className="app-empty mt-8 text-app-danger">{t('settle.invalidBillId')}</div>
+			</AppShell>
 		);
 	}
 

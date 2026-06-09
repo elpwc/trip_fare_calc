@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -12,17 +14,23 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.text-app-muted {
+  @apply text-[#6b6458] dark:text-[#a89f8f];
+}
+
+.text-app-danger {
+  @apply text-[#e85d4c] dark:text-[#ff7a68];
 }
 
 /* ── Settings / Receipt aesthetic ── */
@@ -175,7 +183,7 @@ body {
   opacity: 0.85;
 }
 
-@media (prefers-color-scheme: dark) {
+html.dark {
   .settings-paper {
     background: #121110;
     color: #f4efe4;
@@ -299,8 +307,7 @@ body {
 
 /* ── App-wide receipt UI (compact / screenshot-friendly) ── */
 .app-paper {
-  background: #f4efe4;
-  color: #1a1814;
+  @apply bg-[#f4efe4] text-[#1a1814] dark:bg-[#121110] dark:text-[#f4efe4];
 }
 
 .app-paper-grid {
@@ -310,18 +317,27 @@ body {
   background-size: 22px 22px;
 }
 
+html.dark .app-paper-grid {
+  background-image:
+    linear-gradient(rgba(244, 239, 228, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(244, 239, 228, 0.04) 1px, transparent 1px);
+}
+
 .app-label {
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 9px;
   letter-spacing: 0.28em;
   text-transform: uppercase;
-  color: #6b6458;
+  @apply text-[#6b6458] dark:text-[#a89f8f];
 }
 
 .app-panel {
-  border: 2px solid #1a1814;
-  background: #fffdf8;
+  @apply border-2 border-[#1a1814] bg-[#fffdf8] dark:border-[#f4efe4] dark:bg-[#1c1a18];
   box-shadow: 4px 4px 0 rgba(26, 24, 20, 0.1);
+}
+
+html.dark .app-panel {
+  box-shadow: 4px 4px 0 rgba(244, 239, 228, 0.06);
 }
 
 .app-panel-head {
@@ -329,13 +345,12 @@ body {
   align-items: center;
   justify-content: space-between;
   gap: 0.5rem;
-  border-bottom: 1px dashed rgba(26, 24, 20, 0.2);
   padding: 0.35rem 0.5rem;
+  @apply border-b border-dashed border-[#1a1814]/20 dark:border-[#f4efe4]/20;
 }
 
 .app-toolbar-chip {
-  border: 1px solid #1a1814;
-  background: #fffdf8;
+  @apply border border-[#1a1814] bg-[#fffdf8] dark:border-[#f4efe4] dark:bg-[#1c1a18] dark:text-[#f4efe4];
   padding: 0.2rem 0.45rem;
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 10px;
@@ -344,12 +359,12 @@ body {
 }
 
 .app-toolbar-chip:hover {
+  @apply dark:bg-[#5fd3c4]/10;
   background: rgba(42, 157, 143, 0.12);
 }
 
 .app-toolbar-chip-active {
-  background: #1a1814;
-  color: #f4efe4;
+  @apply bg-[#1a1814] text-[#f4efe4] dark:bg-[#f4efe4] dark:text-[#1a1814];
 }
 
 .app-data-table {
@@ -653,7 +668,7 @@ body {
   box-shadow: 2px 2px 0 #2a9d8f;
 }
 
-@media (prefers-color-scheme: dark) {
+html.dark {
   .app-label {
     color: #a89f8f;
   }
