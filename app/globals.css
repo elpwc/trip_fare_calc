@@ -35,8 +35,7 @@ body {
 
 /* ── Settings / Receipt aesthetic ── */
 .settings-paper {
-  background: #f4efe4;
-  color: #1a1814;
+  @apply bg-[#f4efe4] text-[#1a1814] dark:bg-[#121110] dark:text-[#f4efe4];
 }
 
 .settings-paper-grid {
@@ -44,6 +43,12 @@ body {
     linear-gradient(rgba(26, 24, 20, 0.035) 1px, transparent 1px),
     linear-gradient(90deg, rgba(26, 24, 20, 0.035) 1px, transparent 1px);
   background-size: 22px 22px;
+}
+
+html.dark .settings-paper-grid {
+  background-image:
+    linear-gradient(rgba(244, 239, 228, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(244, 239, 228, 0.04) 1px, transparent 1px);
 }
 
 .settings-display {
@@ -56,8 +61,9 @@ body {
 }
 
 .settings-stamp {
-  border: 3px double #e85d4c;
-  color: #e85d4c;
+  @apply border-[#e85d4c] text-[#e85d4c] dark:border-[#ff7a68] dark:text-[#ff7a68];
+  border-width: 3px;
+  border-style: double;
   padding: 0.45rem 0.65rem;
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 10px;
@@ -68,10 +74,12 @@ body {
 }
 
 .settings-receipt {
-  position: relative;
-  background: #fffdf8;
-  border: 2px solid #1a1814;
+  @apply relative border-2 border-[#1a1814] bg-[#fffdf8] dark:border-[#f4efe4] dark:bg-[#1c1a18];
   box-shadow: 6px 6px 0 rgba(26, 24, 20, 0.12);
+}
+
+html.dark .settings-receipt {
+  box-shadow: 6px 6px 0 rgba(244, 239, 228, 0.06);
 }
 
 .settings-receipt-teeth {
@@ -84,20 +92,35 @@ body {
   background-color: transparent;
 }
 
+html.dark .settings-receipt-teeth {
+  background:
+    linear-gradient(135deg, #1c1a18 33.33%, transparent 33.33%) -8px 0,
+    linear-gradient(225deg, #1c1a18 33.33%, transparent 33.33%) -8px 0;
+  background-size: 16px 10px;
+}
+
 .settings-ticket {
-  border: 2px solid #1a1814;
+  @apply border-2 border-[#1a1814] dark:border-[#f4efe4];
   background: linear-gradient(90deg, rgba(42, 157, 143, 0.08) 0%, rgba(42, 157, 143, 0.08) 12px, #fffdf8 12px);
   box-shadow: 3px 3px 0 rgba(26, 24, 20, 0.08);
 }
 
+html.dark .settings-ticket {
+  background: linear-gradient(90deg, rgba(95, 211, 196, 0.1) 0%, rgba(95, 211, 196, 0.1) 12px, #1c1a18 12px);
+  box-shadow: 3px 3px 0 rgba(244, 239, 228, 0.05);
+}
+
 .settings-ticket-hole {
+  @apply border-2 border-[#1a1814] bg-[#f4efe4] dark:border-[#f4efe4] dark:bg-[#121110];
   width: 10px;
   height: 10px;
   margin-top: 0.35rem;
   border-radius: 999px;
-  border: 2px solid #1a1814;
-  background: #f4efe4;
   box-shadow: inset 0 0 0 2px #fffdf8;
+}
+
+html.dark .settings-ticket-hole {
+  box-shadow: inset 0 0 0 2px #1a1818;
 }
 
 .settings-perforation {
@@ -106,24 +129,23 @@ body {
   opacity: 0.25;
 }
 
+html.dark .settings-perforation {
+  background-image: repeating-linear-gradient(90deg, #f4efe4 0 6px, transparent 6px 12px);
+}
+
 .settings-input {
-  width: 100%;
-  border: 2px solid #1a1814;
-  background: #fffdf8;
+  @apply w-full border-2 border-[#1a1814] bg-[#fffdf8] text-[#1a1814] outline-none dark:border-[#f4efe4] dark:bg-[#121110] dark:text-[#f4efe4];
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
-  outline: none;
   transition: box-shadow 0.15s ease;
 }
 
 .settings-input:focus {
-  box-shadow: 4px 4px 0 #2a9d8f;
+  @apply shadow-[4px_4px_0_#2a9d8f] dark:shadow-[4px_4px_0_#5fd3c4];
 }
 
 .settings-btn-primary {
-  border: 2px solid #1a1814;
-  background: #e85d4c;
-  color: #fffdf8;
+  @apply border-2 border-[#1a1814] bg-[#e85d4c] text-[#fffdf8] dark:border-[#f4efe4] dark:shadow-[4px_4px_0_#f4efe4];
   padding: 0.75rem 1.25rem;
   font-size: 0.875rem;
   font-weight: 700;
@@ -137,15 +159,17 @@ body {
   box-shadow: 5px 5px 0 #1a1814;
 }
 
+html.dark .settings-btn-primary:hover {
+  box-shadow: 5px 5px 0 #f4efe4;
+}
+
 .settings-btn-primary:active {
   transform: translate(2px, 2px);
   box-shadow: 2px 2px 0 #1a1814;
 }
 
 .settings-btn-ghost {
-  border: 2px solid #1a1814;
-  background: transparent;
-  color: #1a1814;
+  @apply border-2 border-[#1a1814] bg-transparent text-[#1a1814] dark:border-[#f4efe4] dark:text-[#f4efe4];
   padding: 0.75rem 1.25rem;
   font-size: 0.875rem;
   font-weight: 700;
@@ -153,11 +177,11 @@ body {
 }
 
 .settings-btn-ghost:hover {
-  background: rgba(26, 24, 20, 0.06);
+  @apply bg-[#1a1814]/6 dark:bg-[#f4efe4]/8;
 }
 
 .settings-chip {
-  border: 2px solid #1a1814;
+  @apply border-2 border-[#1a1814] dark:border-[#f4efe4];
   padding: 0.45rem 0.85rem;
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 11px;
@@ -166,21 +190,21 @@ body {
 }
 
 .settings-chip-active {
-  background: #1a1814;
-  color: #f4efe4;
-  box-shadow: 3px 3px 0 #2a9d8f;
+  @apply bg-[#1a1814] text-[#f4efe4] shadow-[3px_3px_0_#2a9d8f] dark:bg-[#f4efe4] dark:text-[#1a1814] dark:shadow-[3px_3px_0_#5fd3c4];
 }
 
 .settings-faq-item {
-  border: 2px solid #1a1814;
-  background: #fffdf8;
+  @apply border-2 border-[#1a1814] bg-[#fffdf8] dark:border-[#f4efe4] dark:bg-[#1c1a18];
 }
 
 .settings-barcode {
   height: 44px;
-  background:
-    repeating-linear-gradient(90deg, #1a1814 0 2px, transparent 2px 5px, #1a1814 5px 6px, transparent 6px 10px);
   opacity: 0.85;
+  background: repeating-linear-gradient(90deg, #1a1814 0 2px, transparent 2px 5px, #1a1814 5px 6px, transparent 6px 10px);
+}
+
+html.dark .settings-barcode {
+  background: repeating-linear-gradient(90deg, #f4efe4 0 2px, transparent 2px 5px, #f4efe4 5px 6px, transparent 6px 10px);
 }
 
 html.dark {
@@ -382,16 +406,14 @@ html.dark .app-panel {
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: #6b6458;
-  border-bottom: 2px solid #1a1814;
-  background: rgba(26, 24, 20, 0.04);
   white-space: nowrap;
+  @apply border-b-2 border-[#1a1814] bg-[#1a1814]/4 text-[#6b6458] dark:border-[#f4efe4] dark:bg-[#121110] dark:text-[#a89f8f];
 }
 
 .app-data-table td {
   padding: 5px 7px;
   vertical-align: top;
-  border-bottom: 1px dashed rgba(26, 24, 20, 0.14);
+  @apply border-b border-dashed border-[#1a1814]/14 dark:border-[#f4efe4]/12;
 }
 
 .app-data-table tbody tr {
@@ -400,17 +422,17 @@ html.dark .app-panel {
 }
 
 .app-data-table tbody tr:hover {
-  background: rgba(42, 157, 143, 0.08);
+  @apply bg-[#2a9d8f]/8 dark:bg-[#f4efe4]/5;
 }
 
 .app-tag {
   display: inline-block;
-  border: 1px solid #1a1814;
   padding: 0 0.35rem;
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 9px;
   letter-spacing: 0.1em;
   text-transform: uppercase;
+  @apply border border-[#1a1814] dark:border-[#f4efe4];
 }
 
 .app-tag-settled {
@@ -436,14 +458,14 @@ html.dark .app-panel {
 }
 
 .app-trip-select {
-  width: 100%;
-  min-height: 3.25rem;
-  border: 2px solid #1a1814;
-  background: #fffdf8;
+  @apply w-full min-h-[3.25rem] border-2 border-[#1a1814] bg-[#fffdf8] text-left dark:border-[#f4efe4] dark:bg-[#1c1a18] dark:text-[#f4efe4];
   padding: 0.45rem 0.6rem;
-  text-align: left;
   box-shadow: 3px 3px 0 rgba(26, 24, 20, 0.08);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+html.dark .app-trip-select {
+  box-shadow: 3px 3px 0 rgba(244, 239, 228, 0.06);
 }
 
 .app-trip-select:hover {
@@ -452,8 +474,7 @@ html.dark .app-panel {
 }
 
 .app-dropdown {
-  border: 2px solid #1a1814;
-  background: #fffdf8;
+  @apply border-2 border-[#1a1814] bg-[#fffdf8] dark:border-[#f4efe4] dark:bg-[#1c1a18];
   box-shadow: 4px 4px 0 rgba(26, 24, 20, 0.12);
 }
 
@@ -462,11 +483,11 @@ html.dark .app-panel {
   padding: 0.45rem 0.55rem;
   text-align: left;
   font-size: 12px;
-  border-bottom: 1px dashed rgba(26, 24, 20, 0.12);
+  @apply border-b border-dashed border-[#1a1814]/12 dark:border-[#f4efe4]/12;
 }
 
 .app-dropdown-item:hover {
-  background: rgba(42, 157, 143, 0.1);
+  @apply bg-[#2a9d8f]/10 dark:bg-[#5fd3c4]/10;
 }
 
 .app-fab-bar {
@@ -480,10 +501,13 @@ html.dark .app-panel {
 }
 
 .app-fab {
-  border: 2px solid #1a1814;
-  font-weight: 700;
+  @apply border-2 border-[#1a1814] font-bold dark:border-[#f4efe4];
   box-shadow: 3px 3px 0 #1a1814;
   transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+html.dark .app-fab {
+  box-shadow: 3px 3px 0 #f4efe4;
 }
 
 .app-fab:hover {
@@ -491,9 +515,12 @@ html.dark .app-panel {
   box-shadow: 4px 4px 0 #1a1814;
 }
 
+html.dark .app-fab:hover {
+  box-shadow: 4px 4px 0 #f4efe4;
+}
+
 .app-fab-settle {
-  background: #1a1814;
-  color: #f4efe4;
+  @apply bg-[#1a1814] text-[#f4efe4] dark:bg-[#f4efe4] dark:text-[#1a1814];
   padding: 0.55rem 0.85rem;
   font-size: 13px;
 }
@@ -519,23 +546,19 @@ html.dark .app-panel {
 }
 
 .app-empty {
-  border: 2px dashed rgba(26, 24, 20, 0.25);
-  background: rgba(255, 253, 248, 0.7);
+  @apply border-2 border-dashed border-[#1a1814]/25 bg-[#fffdf8]/70 text-[12px] text-[#6b6458] dark:border-[#f4efe4]/25 dark:bg-[#1c1a18] dark:text-[#a89f8f];
   padding: 1.25rem 0.75rem;
   text-align: center;
-  font-size: 12px;
-  color: #6b6458;
 }
 
 .app-summary-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.65rem 1rem;
-  border: 2px solid #1a1814;
-  background: #fffdf8;
+  @apply flex flex-wrap gap-x-4 gap-y-[0.65rem] border-2 border-[#1a1814] bg-[#fffdf8] text-[12px] dark:border-[#f4efe4] dark:bg-[#1c1a18] dark:text-[#f4efe4];
   padding: 0.45rem 0.6rem;
-  font-size: 12px;
   box-shadow: 3px 3px 0 rgba(26, 24, 20, 0.08);
+}
+
+html.dark .app-summary-strip {
+  box-shadow: 3px 3px 0 rgba(244, 239, 228, 0.06);
 }
 
 .app-summary-strip strong {
@@ -544,48 +567,53 @@ html.dark .app-panel {
 }
 
 .app-header-add {
-  flex-shrink: 0;
-  align-self: stretch;
-  display: inline-flex;
-  min-height: 3.25rem;
-  min-width: 3.25rem;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #1a1814;
-  background: #2a9d8f;
-  color: #fffdf8;
-  font-size: 1.5rem;
-  font-weight: 700;
-  line-height: 1;
+  @apply inline-flex min-h-[3.25rem] min-w-[3.25rem] shrink-0 items-center justify-center self-stretch border-2 border-[#1a1814] bg-[#2a9d8f] text-[1.5rem] font-bold leading-none text-[#fffdf8] dark:border-[#f4efe4] dark:bg-[#5fd3c4] dark:text-[#1a1814];
   box-shadow: 3px 3px 0 rgba(26, 24, 20, 0.08);
   transition: transform 0.12s ease, box-shadow 0.12s ease;
 }
 
-.app-header-add:hover {
-  transform: translate(-1px, -1px);
-  box-shadow: 4px 4px 0 rgba(26, 24, 20, 0.1);
+html.dark .app-header-add {
+  box-shadow: 3px 3px 0 rgba(244, 239, 228, 0.06);
 }
 
 .app-currency-btn {
-  flex-shrink: 0;
-  align-self: stretch;
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.1rem;
-  min-width: 3.75rem;
-  border-left: 2px solid #1a1814;
-  background: #2a9d8f;
-  color: #fffdf8;
-  padding: 0 0.75rem;
-  font-weight: 700;
+  @apply flex min-w-[3.75rem] shrink-0 flex-col items-center justify-center gap-[0.1rem] self-stretch border-l-2 border-[#1a1814] bg-[#2a9d8f] px-3 font-bold text-[#fffdf8] dark:border-[#f4efe4] dark:bg-[#5fd3c4] dark:text-[#1a1814];
   transition: background 0.12s ease;
 }
 
 .app-currency-btn:hover {
-  background: #248f82;
+  @apply bg-[#248f82] dark:bg-[#4bc4b5];
 }
+
+.app-cat-btn {
+  @apply border border-transparent bg-[#f4efe4] text-[11px] font-semibold text-[#6b6458] dark:bg-[#1a1818] dark:text-[#a89f8f];
+  padding: 0.4rem 0.25rem;
+  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.app-cat-btn:hover {
+  @apply border-[#1a1814]/15 dark:border-[#f4efe4]/15;
+}
+
+.app-cat-btn-active {
+  @apply border-[#1a1814] shadow-[inset_0_0_0_1px_rgba(26,24,20,0.08)] dark:border-[#f4efe4];
+}
+
+.app-cat-meal.app-cat-btn-active { @apply bg-[#fde8d8] text-[#9a3412] dark:bg-orange-500/20 dark:text-orange-300; }
+.app-cat-hotel.app-cat-btn-active { @apply bg-[#ede9fe] text-[#5b21b6] dark:bg-violet-500/20 dark:text-violet-300; }
+.app-cat-car.app-cat-btn-active { @apply bg-[#cffafe] text-[#0e7490] dark:bg-cyan-500/15 dark:text-cyan-300; }
+.app-cat-ticket.app-cat-btn-active { @apply bg-[#fce7f3] text-[#9d174d] dark:bg-pink-500/20 dark:text-pink-300; }
+.app-cat-toll.app-cat-btn-active { @apply bg-[#fef9c3] text-[#854d0e] dark:bg-yellow-500/15 dark:text-yellow-300; }
+.app-cat-ktv.app-cat-btn-active { @apply bg-[#ffe4e6] text-[#be123c] dark:bg-rose-500/20 dark:text-rose-300; }
+.app-cat-train.app-cat-btn-active { @apply bg-[#e0e7ff] text-[#3730a3] dark:bg-indigo-500/20 dark:text-indigo-300; }
+.app-cat-flight.app-cat-btn-active { @apply bg-[#e0f2fe] text-[#0369a1] dark:bg-sky-500/15 dark:text-sky-300; }
+.app-cat-shop.app-cat-btn-active { @apply bg-[#ecfccb] text-[#3f6212] dark:bg-lime-500/15 dark:text-lime-300; }
+.app-cat-gas.app-cat-btn-active,
+.app-cat-park.app-cat-btn-active,
+.app-cat-taxi.app-cat-btn-active,
+.app-cat-bus.app-cat-btn-active,
+.app-cat-traffic.app-cat-btn-active,
+.app-cat-none.app-cat-btn-active { @apply bg-[#e2e8f0] text-[#475569] dark:bg-slate-500/20 dark:text-slate-300; }
 
 .app-currency-btn-symbol {
   font-size: 1.35rem;
@@ -599,39 +627,29 @@ html.dark .app-panel {
   opacity: 0.9;
 }
 
-.app-cat-btn {
-  border: 1px solid transparent;
-  background: #f4efe4;
-  padding: 0.4rem 0.25rem;
-  font-size: 11px;
-  font-weight: 600;
-  color: #6b6458;
-  transition: background 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+.app-header-add:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 rgba(26, 24, 20, 0.1);
 }
 
-.app-cat-btn:hover {
-  border-color: rgba(26, 24, 20, 0.15);
+html.dark .app-header-add:hover {
+  box-shadow: 4px 4px 0 rgba(244, 239, 228, 0.08);
 }
 
-.app-cat-btn-active {
-  border-color: #1a1814;
-  box-shadow: inset 0 0 0 1px rgba(26, 24, 20, 0.08);
+.app-btn-compact-primary {
+  @apply bg-[#2a9d8f] text-[#fffdf8];
 }
 
-.app-cat-meal.app-cat-btn-active { background: #fde8d8; color: #9a3412; }
-.app-cat-hotel.app-cat-btn-active { background: #ede9fe; color: #5b21b6; }
-.app-cat-car.app-cat-btn-active { background: #cffafe; color: #0e7490; }
-.app-cat-ticket.app-cat-btn-active { background: #fce7f3; color: #9d174d; }
-.app-cat-toll.app-cat-btn-active { background: #fef9c3; color: #854d0e; }
-.app-cat-ktv.app-cat-btn-active { background: #ffe4e6; color: #be123c; }
-.app-cat-train.app-cat-btn-active { background: #e0e7ff; color: #3730a3; }
-.app-cat-flight.app-cat-btn-active { background: #e0f2fe; color: #0369a1; }
-.app-cat-shop.app-cat-btn-active { background: #ecfccb; color: #3f6212; }
-.app-cat-none.app-cat-btn-active { background: #e2e8f0; color: #475569; }
+.app-btn-compact-danger {
+  @apply bg-[#e85d4c] text-[#fffdf8];
+}
+
+.text-app-accent {
+  @apply text-[#2a9d8f] dark:text-[#5fd3c4];
+}
 
 .app-btn-compact {
-  border: 1px solid #1a1814;
-  background: #fffdf8;
+  @apply border border-[#1a1814] bg-[#fffdf8] dark:border-[#f4efe4] dark:bg-[#121110] dark:text-[#f4efe4];
   padding: 0.15rem 0.45rem;
   font-family: var(--font-geist-mono), ui-monospace, monospace;
   font-size: 9px;
@@ -639,136 +657,15 @@ html.dark .app-panel {
   text-transform: uppercase;
 }
 
-.app-btn-compact-primary {
-  background: #2a9d8f;
-  color: #fffdf8;
-}
-
-.app-btn-compact-danger {
-  background: #e85d4c;
-  color: #fffdf8;
-}
-
 .app-nav {
-  border-top: 2px solid #1a1814;
-  background: #fffdf8;
+  @apply border-t-2 border-[#1a1814] bg-[#fffdf8] dark:border-[#f4efe4] dark:bg-[#1c1a18];
   box-shadow: 0 -3px 0 rgba(26, 24, 20, 0.06);
 }
 
 .app-nav-link {
-  border: 1px solid transparent;
-  color: #6b6458;
-  transition: all 0.12s ease;
+  @apply border border-transparent text-[#6b6458] transition-all duration-100 dark:text-[#a89f8f];
 }
 
 .app-nav-link-active {
-  border-color: #1a1814;
-  background: #1a1814;
-  color: #f4efe4;
-  box-shadow: 2px 2px 0 #2a9d8f;
-}
-
-html.dark {
-  .app-label {
-    color: #a89f8f;
-  }
-
-  .app-toolbar-chip {
-    border-color: #f4efe4;
-    background: #1c1a18;
-    color: #f4efe4;
-  }
-
-  .app-toolbar-chip-active {
-    background: #f4efe4;
-    color: #1a1814;
-  }
-
-  .app-tag {
-    border-color: #f4efe4;
-  }
-
-  .app-trip-select,
-  .app-dropdown,
-  .app-panel,
-  .app-summary-strip,
-  .app-empty {
-    border-color: #f4efe4;
-    background: #1c1a18;
-    color: #f4efe4;
-  }
-
-  .app-trip-select {
-    box-shadow: 3px 3px 0 rgba(244, 239, 228, 0.06);
-  }
-
-  .app-dropdown-item {
-    border-bottom-color: rgba(244, 239, 228, 0.12);
-  }
-
-  .app-dropdown-item:hover {
-    background: rgba(95, 211, 196, 0.1);
-  }
-
-  .app-fab {
-    border-color: #f4efe4;
-    box-shadow: 3px 3px 0 #f4efe4;
-  }
-
-  .app-fab-settle {
-    background: #f4efe4;
-    color: #1a1814;
-  }
-
-  .app-btn-compact {
-    border-color: #f4efe4;
-    background: #121110;
-    color: #f4efe4;
-  }
-
-  .app-nav {
-    border-top-color: #f4efe4;
-    background: #1c1a18;
-  }
-
-  .app-nav-link {
-    color: #a89f8f;
-  }
-
-  .app-currency-btn {
-    border-left-color: #f4efe4;
-    background: #5fd3c4;
-    color: #1a1814;
-  }
-
-  .app-currency-btn:hover {
-    background: #4bc4b5;
-  }
-
-  .app-cat-btn {
-    background: #1a1818;
-    color: #a89f8f;
-  }
-
-  .app-cat-btn-active {
-    border-color: #f4efe4;
-  }
-
-  .app-cat-meal.app-cat-btn-active { background: rgba(251, 146, 60, 0.2); color: #fdba74; }
-  .app-cat-hotel.app-cat-btn-active { background: rgba(167, 139, 250, 0.2); color: #c4b5fd; }
-  .app-cat-car.app-cat-btn-active { background: rgba(34, 211, 238, 0.15); color: #67e8f9; }
-  .app-cat-ticket.app-cat-btn-active { background: rgba(244, 114, 182, 0.2); color: #f9a8d4; }
-  .app-cat-toll.app-cat-btn-active { background: rgba(250, 204, 21, 0.15); color: #fde047; }
-  .app-cat-ktv.app-cat-btn-active { background: rgba(251, 113, 133, 0.2); color: #fda4af; }
-  .app-cat-train.app-cat-btn-active { background: rgba(129, 140, 248, 0.2); color: #a5b4fc; }
-  .app-cat-flight.app-cat-btn-active { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; }
-  .app-cat-shop.app-cat-btn-active { background: rgba(163, 230, 53, 0.15); color: #bef264; }
-  .app-cat-none.app-cat-btn-active { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; }
-
-  .app-header-add {
-    border-color: #f4efe4;
-    background: #5fd3c4;
-    color: #1a1814;
-    box-shadow: 3px 3px 0 rgba(244, 239, 228, 0.06);
-  }
+  @apply border-[#1a1814] bg-[#1a1814] text-[#f4efe4] shadow-[2px_2px_0_#2a9d8f] dark:border-[#f4efe4] dark:bg-[#f4efe4] dark:text-[#1a1814] dark:shadow-[2px_2px_0_#5fd3c4];
 }

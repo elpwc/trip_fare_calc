@@ -37,7 +37,11 @@
 .modal-hint {
 	font-size: 0.8125rem;
 	line-height: 1.5;
-	@apply text-[#6b6458] dark:text-[#a89f8f];
+	color: #6b6458;
+}
+
+html.dark .modal-hint {
+	color: #a89f8f;
 }
 
 .modal-message {
@@ -46,11 +50,19 @@
 }
 
 .modal-message-error {
-	@apply text-[#e85d4c] dark:text-[#ff7a68];
+	color: #e85d4c;
+}
+
+html.dark .modal-message-error {
+	color: #ff7a68;
 }
 
 .modal-message-info {
-	@apply text-[#2a9d8f] dark:text-[#5fd3c4];
+	color: #2a9d8f;
+}
+
+html.dark .modal-message-info {
+	color: #5fd3c4;
 }
 
 .modal-option-grid {
@@ -60,12 +72,20 @@
 }
 
 .modal-option {
-	@apply border-2 border-[#1a1814] bg-[#fffdf8] text-[#1a1814] dark:border-[#f4efe4] dark:bg-[#121110] dark:text-[#f4efe4];
+	border: 2px solid #1a1814;
+	background: #fffdf8;
+	color: #1a1814;
 	padding: 0.65rem 0.75rem;
 	font-size: 0.8125rem;
 	font-weight: 600;
 	text-align: center;
 	transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease, color 0.12s ease;
+}
+
+html.dark .modal-option {
+	border-color: #f4efe4;
+	background: #121110;
+	color: #f4efe4;
 }
 
 .modal-option:hover {
@@ -74,7 +94,15 @@
 }
 
 .modal-option-active {
-	@apply bg-[#1a1814] text-[#f4efe4] shadow-[3px_3px_0_#2a9d8f] dark:bg-[#f4efe4] dark:text-[#1a1814] dark:shadow-[3px_3px_0_#5fd3c4];
+	background: #1a1814;
+	color: #f4efe4;
+	box-shadow: 3px 3px 0 #2a9d8f;
+}
+
+html.dark .modal-option-active {
+	background: #f4efe4;
+	color: #1a1814;
+	box-shadow: 3px 3px 0 #5fd3c4;
 }
 
 .modal-option-currency {
@@ -100,8 +128,14 @@
 }
 
 .modal-panel {
-	@apply border-2 border-[#1a1814] bg-[#f4efe4] dark:border-[#f4efe4] dark:bg-[#121110];
+	border: 2px solid #1a1814;
+	background: #f4efe4;
 	padding: 0.75rem;
+}
+
+html.dark .modal-panel {
+	border-color: #f4efe4;
+	background: #121110;
 }
 
 .modal-panel-title {
@@ -111,7 +145,11 @@
 	font-weight: 700;
 	letter-spacing: 0.16em;
 	text-transform: uppercase;
-	@apply text-[#6b6458] dark:text-[#a89f8f];
+	color: #6b6458;
+}
+
+html.dark .modal-panel-title {
+	color: #a89f8f;
 }
 
 .modal-member-row {
@@ -139,17 +177,9 @@
 .modal-trip-list li {
 	font-size: 0.8125rem;
 	line-height: 1.4;
-	@apply text-[#6b6458] dark:text-[#a89f8f];
+	color: #6b6458;
 }
 
-.text-app-muted {
-	@apply text-[#6b6458] dark:text-[#a89f8f];
-}
-
-.text-app-danger {
-	@apply text-[#e85d4c] dark:text-[#ff7a68];
-}
-
-.text-app-accent {
-	@apply text-[#2a9d8f] dark:text-[#5fd3c4];
+html.dark .modal-trip-list li {
+	color: #a89f8f;
 }
