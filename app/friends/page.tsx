@@ -1,6 +1,7 @@
 'use client';
 
 import { Modal } from '@/src/components/Modal';
+import AppShell from '@/src/components/layout/AppShell';
 import { getAuthHeaders } from '@/src/utils/auth';
 import FriendList from '@/src/components/FriendList';
 import React, { useState, useEffect } from 'react';
@@ -190,25 +191,26 @@ const FriendsPage: React.FC = () => {
 	const maxParticipation = Math.max(...friends.map((f) => f.participationCount), 0);
 
 	return (
-		<div className="relative w-full min-h-screen bg-gray-100 flex justify-center px-4 py-2">
-			<div className="w-full">
-				<div>
-					<p className="text-4xl px-2 pt-4">旅伴一览</p>
-					<p className="text-[12px] px-2 py-2 text-gray-500">在这里提前设置好所有旅伴，方便在新建旅行和记账时快速选择</p>
+		<AppShell tight>
+			<header className="mb-2">
+				<p className="app-label">Companions</p>
+				<h1 className="settings-display text-2xl leading-none">旅伴一览</h1>
+				<p className="mt-1 text-[11px] leading-snug text-[#6b6458]">提前录入旅伴，新建旅行和记账时快速选择</p>
+			</header>
+
+			<div className="app-panel h-[calc(100vh-220px)] min-h-72 overflow-hidden">
+				<div className="app-panel-head">
+					<span className="app-label">{friends.length} 人</span>
+					<span className="settings-mono text-[9px] text-[#6b6458]">点击头像编辑</span>
 				</div>
-				<div className="relative w-full max-w-4xl h-[calc(100vh-250px)] rounded-3xl border border-slate-200 bg-white/80 shadow-sm backdrop-blur">
-					<FriendList friends={friends} onFriendClick={handleFriendClick} />
-				</div>
+				<FriendList friends={friends} onFriendClick={handleFriendClick} />
 			</div>
 
-			<button
-				type="button"
-				onClick={() => setIsAddingFriend(true)}
-				className="fixed z-50 bottom-26 right-6 h-16 w-16 items-center justify-center rounded-full bg-emerald-600 text-white shadow-2xl shadow-emerald-600/40 transition hover:bg-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-300/60"
-				aria-label="添加旅伴"
-			>
-				<span className="text-3xl font-bold leading-none">+</span>
-			</button>
+			<div className="app-fab-bar">
+				<button type="button" onClick={() => setIsAddingFriend(true)} className="app-fab app-fab-icon app-fab-add" aria-label="添加旅伴">
+					+
+				</button>
+			</div>
 			{/* Friend Modal */}
 			<Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="" showCloseButton={false} className="max-w-md">
 				{selectedFriend && (
@@ -306,7 +308,7 @@ const FriendsPage: React.FC = () => {
 					</button>
 				</div>
 			</Modal>
-		</div>
+		</AppShell>
 	);
 };
 

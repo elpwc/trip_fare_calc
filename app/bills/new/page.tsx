@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Modal } from '@/src/components/Modal';
+import AppShell from '@/src/components/layout/AppShell';
 import FriendIcon from '@/src/components/FriendIcon';
 import { getAuthHeaders } from '@/src/utils/auth';
 import { Currency, CURRENCY_DEFINITIONS } from '@/src/utils/currencies';
@@ -15,17 +16,19 @@ type BillOwed = {
 	friendId: string;
 };
 
+const LAST_BILL_CURRENCY_KEY = 'tripFareCalc:lastBillCurrency';
+
 const CATEGORIES = [
-	{ key: '吃饭', label: '吃饭', bg: 'bg-orange-500', text: 'text-white' },
-	{ key: '酒店', label: '酒店', bg: 'bg-purple-500', text: 'text-white' },
-	{ key: '租车', label: '租车', bg: 'bg-cyan-500', text: 'text-white' },
-	{ key: '门票', label: '门票', bg: 'bg-pink-500', text: 'text-white' },
-	{ key: '高速费', label: '高速费', bg: 'bg-yellow-500', text: 'text-white' },
-	{ key: 'KTV', label: 'KTV', bg: 'bg-rose-500', text: 'text-white' },
-	{ key: '火车票', label: '火车票', bg: 'bg-indigo-500', text: 'text-white' },
-	{ key: '机票', label: '机票', bg: 'bg-sky-500', text: 'text-white' },
-	{ key: '购物', label: '购物', bg: 'bg-lime-500', text: 'text-white' },
-	{ key: '无', label: '无', bg: 'bg-slate-400', text: 'text-white' },
+	{ key: '吃饭', label: '吃饭', tone: 'meal' },
+	{ key: '酒店', label: '酒店', tone: 'hotel' },
+	{ key: '租车', label: '租车', tone: 'car' },
+	{ key: '门票', label: '门票', tone: 'ticket' },
+	{ key: '高速费', label: '高速费', tone: 'toll' },
+	{ key: 'KTV', label: 'KTV', tone: 'ktv' },
+	{ key: '火车票', label: '火车票', tone: 'train' },
+	{ key: '机票', label: '机票', tone: 'flight' },
+	{ key: '购物', label: '购物', tone: 'shop' },
+	{ key: '无', label: '无', tone: 'none' },
 ];
 
 const STATUSES = [
@@ -39,7 +42,7 @@ const PAYMENT_METHODS = ['现金', '支付宝', '微信', '银行转账', 'PayPa
 
 export default function NewBillPage({ billId }: { billId?: string } = {}) {
 	return (
-		<Suspense fallback={<div className="min-h-screen bg-slate-50 px-4 py-12 text-center dark:bg-slate-950">加载中...</div>}>
+		<Suspense fallback={<AppShell tight><div className="app-empty mt-8">加载中...</div></AppShell>}>
 			<NewBillPageContent billId={billId} />
 		</Suspense>
 	);
@@ -52,7 +55,11 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 	const [effectiveTripId, setEffectiveTripId] = useState<string | null>(tripId);
 
 	const [amount, setAmount] = useState('');
-	const [currency, setCurrency] = useState('CNY');
+	const [currency, setCurrency] = useState(() => {
+		if (typeof window === 'undefined') return 'CNY';
+		const saved = window.localStorage.getItem(LAST_BILL_CURRENCY_KEY);
+		return saved && CURRENCY_DEFINITIONS[saved] ? saved : 'CNY';
+	});
 	const [paymentMethod, setPaymentMethod] = useState('现金');
 	const [category, setCategory] = useState('吃饭');
 	const [billName, setBillName] = useState('');
@@ -208,189 +215,146 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 
 	if (!isLoaded) {
 		return (
-			<div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
-				<div className="max-w-2xl mx-auto px-4 py-12 text-center text-slate-600 dark:text-slate-300">加载中...</div>
-			</div>
+			<AppShell tight>
+				<div className="app-empty mt-8">加载中...</div>
+			</AppShell>
 		);
 	}
 
 	if (errorMessage) {
 		return (
-			<div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
-				<div className="max-w-2xl mx-auto px-4 py-12 text-center text-red-600 dark:text-red-400">{errorMessage}</div>
-			</div>
+			<AppShell tight>
+				<div className="app-empty mt-8 text-[#e85d4c]">{errorMessage}</div>
+			</AppShell>
 		);
 	}
 
 	return (
-		<div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
-			<div className="max-w-2xl mx-auto px-4 py-8 pb-24">
-				<div className="mb-8 flex items-center justify-between">
-					<button onClick={() => router.back()} className="flex text-[18px] font-semibold text-blue-600 hover:text-blue-500">
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
-							<path d="m3.86 8.753 5.482 4.796c.646.566 1.658.106 1.658-.753V3.204a1 1 0 0 0-1.659-.753l-5.48 4.796a1 1 0 0 0 0 1.506z" />
-						</svg>
-						返回
+		<AppShell tight>
+			<header className="mb-2 flex items-center justify-between gap-2">
+				<button type="button" onClick={() => router.back()} className="app-label hover:text-[#e85d4c]">
+					← 返回
+				</button>
+				<h1 className="settings-display text-xl">{billId ? '编辑账单' : '新建账单'}</h1>
+				<span className="settings-stamp scale-75">BILL</span>
+			</header>
+
+			<div className="space-y-2">
+				<div className="app-panel flex overflow-hidden">
+					<input
+						type="number"
+						value={amount}
+						onChange={(e) => setAmount(e.target.value)}
+						placeholder="金额"
+						className="settings-input min-w-0 flex-1 border-0 py-3 text-3xl font-bold shadow-none focus:shadow-none"
+					/>
+					<button type="button" onClick={() => setIsPaymentMethodModalOpen(true)} className="app-toolbar-chip shrink-0 self-stretch border-y-0 border-r-0 px-2">
+						{paymentMethod}
 					</button>
-					<h1 className="text-3xl font-bold">{billId ? '编辑账单' : '新建账单'}</h1>
-					<div className="w-16" />
+					<button type="button" onClick={() => setIsCurrencyModalOpen(true)} className="app-currency-btn" aria-label="选择币种">
+						<span className="app-currency-btn-symbol">{CURRENCY_DEFINITIONS[currency]?.symbol || '¥'}</span>
+						<span className="app-currency-btn-code">{currency}</span>
+					</button>
 				</div>
 
-				<div className="space-y-6">
-					<div className="flex">
-						<input
-							type="number"
-							value={amount}
-							onChange={(e) => setAmount(e.target.value)}
-							placeholder="金额"
-							className="flex-1 min-w-0 text-4xl font-bold px-4 py-4 border-4 border-slate-300 dark:border-slate-700 rounded-l-2xl bg-white dark:bg-slate-900 outline-none focus:border-blue-500 placeholder:text-slate-400"
-						/>
-						<button
-							onClick={() => setIsPaymentMethodModalOpen(true)}
-							className="px-3 py-4 border-y-4 border-r-4 border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-blue-500 font-semibold text-sm whitespace-nowrap"
-						>
-							{paymentMethod}
-						</button>
-						<button
-							onClick={() => setIsCurrencyModalOpen(true)}
-							className="px-3 py-4 border-y-4 border-r-4 border-slate-300 dark:border-slate-700 rounded-r-2xl bg-white dark:bg-slate-900 hover:border-blue-500 font-semibold text-3xl whitespace-nowrap"
-						>
-							{CURRENCY_DEFINITIONS[currency].suffix}
-						</button>
-					</div>
-
-					<div>
-						<div className="grid grid-cols-5 gap-0 border-2 border-slate-200 dark:border-slate-800 rounded-xl overflow-hidden">
-							{CATEGORIES.map((cat, idx) => (
-								<button
-									key={cat.key}
-									onClick={() => setCategory(cat.key)}
-									className={`py-2 px-2 font-semibold transition text-xs ${
-										category === cat.key ? `${cat.bg} ${cat.text} relative z-10` : `${cat.bg} ${cat.text} opacity-40 hover:opacity-100`
-									} ${idx % 5 !== 4 ? 'border-r border-slate-300 dark:border-slate-700' : ''}`}
-								>
-									{cat.label}
-								</button>
-							))}
-						</div>
-					</div>
-
-					<div>
-						<input
-							type="text"
-							value={billName}
-							onChange={(e) => setBillName(e.target.value)}
-							placeholder="账单说明"
-							className="w-full text-lg px-4 py-4 border-4 border-slate-300 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-900 outline-none focus:border-blue-500 placeholder:text-slate-400"
-						/>
-					</div>
-
-					<div className="border-4 border-slate-300 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-900 p-4">
-						<div className="mb-4 flex items-center justify-between">
-							<span className="text-base font-semibold">付钱人</span>
-						</div>
-						<div className="flex flex-wrap gap-2 justify-center">
-							{tripMembers.map((friend) => (
-								<button
-									key={friend.id}
-									onClick={() => setPayerId(friend.id)}
-									className={`flex flex-col min-w-16 items-center gap-1 p-2 rounded-lg transition ${
-										payerId === friend.id ? 'bg-blue-50 dark:bg-blue-900/30 ring-2 ring-blue-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800'
-									}`}
-								>
-									<FriendIcon name={friend.name} size="lg" isSelf={friend.isSelf} />
-									<span className="text-xs font-semibold text-center max-w-14 truncate">{friend.name}</span>
-								</button>
-							))}
-						</div>
-					</div>
-
-					<div className="border-4 border-slate-300 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-900 p-4">
-						<div className="mb-4 flex items-center justify-between">
-							<span className="text-base font-semibold">欠钱人</span>
-							<button onClick={handleSelectAllFriends} className="px-3 py-1 text-xs font-semibold bg-slate-200 dark:bg-slate-800 rounded-full hover:bg-slate-300 dark:hover:bg-slate-700">
-								全部
+				<div className="app-panel overflow-hidden p-1">
+					<div className="grid grid-cols-5 gap-0">
+						{CATEGORIES.map((cat, idx) => (
+							<button
+								key={cat.key}
+								type="button"
+								onClick={() => setCategory(cat.key)}
+								className={`app-cat-btn app-cat-${cat.tone} ${category === cat.key ? 'app-cat-btn-active' : ''} ${idx % 5 !== 4 ? 'border-r border-[#1a1814]/10' : ''}`}
+							>
+								{cat.label}
 							</button>
-						</div>
-						<div className="flex flex-wrap gap-2 justify-center">
-							{tripMembers.map((friend) => (
-								<button
-									key={friend.id}
-									onClick={() => handleToggleFriend(friend.id)}
-									className={`flex flex-col min-w-16 items-center gap-1 p-2 rounded-lg transition ${
-										owedFriendIds.includes(friend.id) ? 'bg-blue-50 dark:bg-blue-900/30 ring-2 ring-blue-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800'
-									}`}
-								>
-									<FriendIcon name={friend.name} size="lg" isSelf={friend.isSelf} />
-									<span className="text-xs font-semibold text-center max-w-14 truncate">{friend.name}</span>
-								</button>
-							))}
-						</div>
+						))}
 					</div>
+				</div>
 
-					<div>
-						<textarea
-							value={description}
-							onChange={(e) => setDescription(e.target.value)}
-							placeholder="添加备注（可选）"
-							rows={3}
-							className="w-full px-4 py-4 border-4 border-slate-300 dark:border-slate-700 rounded-2xl bg-white dark:bg-slate-900 outline-none focus:border-blue-500 placeholder:text-slate-400"
-						/>
+				<input type="text" value={billName} onChange={(e) => setBillName(e.target.value)} placeholder="账单说明" className="settings-input py-2 text-sm" />
+
+				<div className="app-panel p-2">
+					<div className="mb-1 flex items-center justify-between">
+						<span className="app-label">付钱人</span>
 					</div>
-
-					<div>
-						<div className="flex gap-2 justify-between">
-							{STATUSES.map((stat) => (
-								<button
-									key={stat.value}
-									onClick={() => setStatus(stat.value)}
-									className={`flex-1 py-3 px-3 border-3 rounded-lg font-semibold transition text-sm ${
-										status === stat.value
-											? 'border-blue-600 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-											: 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-blue-500'
-									}`}
-								>
-									{stat.label}
-								</button>
-							))}
-						</div>
-					</div>
-
-					<div className="border-4 border-slate-300 dark:border-slate-700 rounded-2xl bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 p-4">
-						<div className="flex items-center justify-between mb-3">
-							<p className="font-bold text-lg">📍 定位信息</p>
-							<button onClick={acquireLocation} className="px-3 py-1 text-xs font-semibold bg-emerald-600 text-white rounded-full hover:bg-emerald-500 transition">
-								重新获取
+					<div className="flex flex-wrap justify-center gap-1">
+						{tripMembers.map((friend) => (
+							<button
+								key={friend.id}
+								type="button"
+								onClick={() => setPayerId(friend.id)}
+								className={`flex min-w-14 flex-col items-center gap-0.5 p-1 ${payerId === friend.id ? 'ring-2 ring-[#2a9d8f]' : ''}`}
+							>
+								<FriendIcon name={friend.name} size="md" isSelf={friend.isSelf} />
+								<span className="max-w-14 truncate text-[9px]">{friend.name}</span>
 							</button>
-						</div>
-						{locationError ? (
-							<p className="text-sm text-rose-600 dark:text-rose-400 font-semibold">{locationError}</p>
-						) : latitude != null && longitude != null ? (
-							<div>
-								<p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">✓ 已定位</p>
-								<p className="text-xs text-emerald-600 dark:text-emerald-400 font-mono mt-1">
-									{latitude.toFixed(6)}, {longitude.toFixed(6)}
-								</p>
-							</div>
-						) : (
-							<p className="text-sm text-slate-600 dark:text-slate-400 font-semibold">正在获取地理位置...</p>
-						)}
+						))}
 					</div>
+				</div>
 
-					<div className="flex gap-3 pt-4">
-						<button
-							onClick={() => router.back()}
-							className="flex-1 py-4 px-4 border-4 border-slate-300 dark:border-slate-700 rounded-2xl font-bold text-base hover:bg-slate-100 dark:hover:bg-slate-800 transition"
-						>
-							取消
-						</button>
-						<button
-							onClick={handleCreateBill}
-							className="flex-1 py-4 px-4 border-4 border-emerald-600 bg-emerald-600 text-white rounded-2xl font-bold text-base hover:bg-emerald-500 hover:border-emerald-500 transition"
-						>
-							{billId ? '保存修改' : '创建账单'}
+				<div className="app-panel p-2">
+					<div className="mb-1 flex items-center justify-between">
+						<span className="app-label">欠钱人</span>
+						<button type="button" onClick={handleSelectAllFriends} className="app-btn-compact">
+							全部
 						</button>
 					</div>
+					<div className="flex flex-wrap justify-center gap-1">
+						{tripMembers.map((friend) => (
+							<button
+								key={friend.id}
+								type="button"
+								onClick={() => handleToggleFriend(friend.id)}
+								className={`flex min-w-14 flex-col items-center gap-0.5 p-1 ${owedFriendIds.includes(friend.id) ? 'ring-2 ring-[#2a9d8f]' : ''}`}
+							>
+								<FriendIcon name={friend.name} size="md" isSelf={friend.isSelf} />
+								<span className="max-w-14 truncate text-[9px]">{friend.name}</span>
+							</button>
+						))}
+					</div>
+				</div>
+
+				<textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="备注（可选）" rows={2} className="settings-input resize-none py-2 text-sm" />
+
+				<div className="grid grid-cols-4 gap-1">
+					{STATUSES.map((stat) => (
+						<button
+							key={stat.value}
+							type="button"
+							onClick={() => setStatus(stat.value)}
+							className={`app-toolbar-chip py-1.5 ${status === stat.value ? 'app-toolbar-chip-active' : ''}`}
+						>
+							{stat.label}
+						</button>
+					))}
+				</div>
+
+				<div className="app-panel p-2">
+					<div className="mb-1 flex items-center justify-between">
+						<span className="app-label">定位</span>
+						<button type="button" onClick={acquireLocation} className="app-btn-compact app-btn-compact-primary">
+							重取
+						</button>
+					</div>
+					{locationError ? (
+						<p className="text-[11px] text-[#e85d4c]">{locationError}</p>
+					) : latitude != null && longitude != null ? (
+						<p className="settings-mono text-[10px] text-[#2a9d8f]">
+							{latitude.toFixed(5)}, {longitude.toFixed(5)}
+						</p>
+					) : (
+						<p className="text-[11px] text-[#6b6458]">正在获取…</p>
+					)}
+				</div>
+
+				<div className="flex gap-2 pt-1">
+					<button type="button" onClick={() => router.back()} className="settings-btn-ghost flex-1 py-3 text-sm">
+						取消
+					</button>
+					<button type="button" onClick={handleCreateBill} className="settings-btn-primary flex-1 py-3 text-sm">
+						{billId ? '保存' : '创建'}
+					</button>
 				</div>
 			</div>
 
@@ -422,6 +386,9 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 							key={curr.code}
 							onClick={() => {
 								setCurrency(curr.code);
+								if (typeof window !== 'undefined') {
+									window.localStorage.setItem(LAST_BILL_CURRENCY_KEY, curr.code);
+								}
 								setIsCurrencyModalOpen(false);
 							}}
 							className={`grid grid-cols-2 gap-2 py-3 px-4 border-3 rounded-lg font-semibold transition ${
@@ -436,6 +403,6 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 					))}
 				</div>
 			</Modal>
-		</div>
+		</AppShell>
 	);
 }

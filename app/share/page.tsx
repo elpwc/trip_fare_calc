@@ -3,6 +3,7 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import AppShell from '@/src/components/layout/AppShell';
 import { Modal } from '@/src/components/Modal';
 import FriendIcon from '@/src/components/FriendIcon';
 import { getAuthHeaders } from '@/src/utils/auth';
@@ -107,23 +108,23 @@ function SharePageContent() {
 		}
 	};
 
-	const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString('zh-CN');
-
 	if (!token) {
 		return (
-			<div className="min-h-screen bg-slate-50 px-4 py-12 text-center text-slate-700 dark:bg-slate-950 dark:text-slate-200">
-				<p>无效的分享链接</p>
-				<Link href="/" className="mt-4 inline-block text-sky-600">
-					返回首页
-				</Link>
-			</div>
+			<AppShell tight>
+				<div className="app-empty mt-8">
+					<p>无效的分享链接</p>
+					<Link href="/" className="mt-3 inline-block text-[#2a9d8f] underline">
+						返回首页
+					</Link>
+				</div>
+			</AppShell>
 		);
 	}
 
 	return (
-		<div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
+		<AppShell tight>
 			{trip && !user ? (
-				<div className="sticky top-0 z-20 border-b border-amber-200 bg-amber-50 px-4 py-3 text-center text-sm font-medium text-amber-800 dark:border-amber-900/50 dark:bg-amber-950/40 dark:text-amber-200">
+				<div className="mb-2 border-2 border-[#e85d4c] bg-[#e85d4c]/10 px-2 py-1.5 text-center text-[11px] font-semibold text-[#e85d4c]">
 					注册登录后可以参与编辑
 					<Link href="/user" className="ml-2 underline">
 						去登录
@@ -132,85 +133,78 @@ function SharePageContent() {
 			) : null}
 
 			{trip ? (
-				<div className="mx-auto max-w-245 px-4 pb-28 pt-5">
-					<header className="rounded-3xl border border-slate-200 bg-white/95 p-5 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-						<p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">分享的旅行</p>
-						<h1 className="mt-2 text-2xl font-semibold">{trip.name}</h1>
-						<p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{formatDate(trip.createdAt)}</p>
-						{trip.ownerName ? <p className="mt-2 text-sm text-violet-600 dark:text-violet-300">创建者：{trip.ownerName}</p> : null}
+				<>
+					<header className="app-panel mb-2 p-2">
+						<p className="app-label">分享的旅行</p>
+						<h1 className="settings-display text-xl leading-tight">{trip.name}</h1>
+						<p className="settings-mono mt-1 text-[9px] text-[#6b6458]">
+							{new Date(trip.createdAt).toLocaleDateString('zh-CN')}
+							{trip.ownerName ? ` · 创建者 ${trip.ownerName}` : ''}
+						</p>
 					</header>
 
-					<section className="mt-4">
-						<p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">参与者</p>
-						<div className="mt-2 flex flex-wrap gap-3">
-							{(trip.members || []).map((member: TripMember) => (
-								<div key={member.id} className="flex min-w-16 flex-col items-center gap-2 text-center">
-									<FriendIcon name={member.name} size="md" isSelf={member.isSelf} />
-									<p className="max-w-18 truncate text-xs text-slate-700 dark:text-slate-300">{member.name}</p>
-								</div>
-							))}
-						</div>
+					<section className="mb-2 flex flex-wrap gap-1">
+						{(trip.members || []).map((member: TripMember) => (
+							<div key={member.id} className="flex min-w-11 flex-col items-center gap-0.5">
+								<FriendIcon name={member.name} size="sm" isSelf={member.isSelf} />
+								<p className="max-w-11 truncate text-[9px]">{member.name}</p>
+							</div>
+						))}
 					</section>
 
-					<section className="mt-4">
-						<p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">账单列表</p>
-						<div className="mt-2 overflow-hidden rounded-xl border border-slate-200 bg-white/95 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-							<table className="min-w-full text-xs">
-								<thead className="border-b border-slate-200 bg-slate-50 text-left text-[10px] uppercase tracking-[0.24em] text-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400">
-									<tr>
-										<th className="px-3 py-3">付钱人</th>
-										<th className="px-3 py-3">金额</th>
-										<th className="px-3 py-3">名称</th>
-										<th className="px-3 py-3">状态</th>
-									</tr>
-								</thead>
-								<tbody>
-									{(trip.bills || []).map((bill: Bill, index: number) => (
-										<tr key={bill.id} className={`border-b border-slate-200 dark:border-slate-800 ${index === trip.bills.length - 1 ? '' : ''}`}>
-											<td className="px-3 py-2">
-												<FriendIcon
-													name={(trip.members || []).find((m) => m.id === bill.payerId)?.name || '?'}
-													size="md"
-													isSelf={(trip.members || []).find((m) => m.id === bill.payerId)?.isSelf}
-												/>
-											</td>
-											<td className="px-3 py-2 font-semibold">
-												{bill.amount}
-												{CURRENCY_DEFINITIONS[bill.currency || 'CNY']?.suffix || '¥'}
-											</td>
-											<td className="px-3 py-2">
-												<p className="font-medium">{bill.name}</p>
-												<p className="text-[11px] text-slate-500">{bill.category}</p>
-											</td>
-											<td className="px-3 py-2">
-												<span className="inline-flex rounded-full bg-amber-100 px-2 py-1 text-[11px] font-semibold text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
-													{bill.status === 'SETTLED' ? '清' : '未'}
-												</span>
-											</td>
-										</tr>
-									))}
-								</tbody>
-							</table>
-							{trip.bills.length === 0 ? <p className="px-4 py-6 text-center text-sm text-slate-500">暂无账单</p> : null}
+					<section className="app-panel overflow-hidden">
+						<div className="app-panel-head">
+							<span className="app-label">账单列表</span>
+							<span className="settings-mono text-[9px] text-[#6b6458]">{trip.bills.length} 笔</span>
 						</div>
+						<table className="app-data-table">
+							<thead>
+								<tr>
+									<th>付</th>
+									<th>金额</th>
+									<th>项目</th>
+									<th>态</th>
+								</tr>
+							</thead>
+							<tbody>
+								{(trip.bills || []).map((bill: Bill) => (
+									<tr key={bill.id}>
+										<td>
+											<FriendIcon
+												name={(trip.members || []).find((m) => m.id === bill.payerId)?.name || '?'}
+												size="sm"
+												isSelf={(trip.members || []).find((m) => m.id === bill.payerId)?.isSelf}
+											/>
+										</td>
+										<td className="app-amount">
+											{bill.amount}
+											{CURRENCY_DEFINITIONS[bill.currency || 'CNY']?.suffix || '¥'}
+										</td>
+										<td>
+											<span className="app-tag">{bill.category}</span>
+											<p className="mt-0.5 max-w-32 truncate text-[10px]">{bill.name}</p>
+										</td>
+										<td>
+											<span className={`app-tag ${bill.status === 'SETTLED' ? 'app-tag-settled' : 'app-tag-open'}`}>{bill.status === 'SETTLED' ? '清' : '未'}</span>
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+						{trip.bills.length === 0 ? <p className="px-2 py-3 text-center text-[11px] text-[#6b6458]">暂无账单</p> : null}
 					</section>
 
 					{user && !trip.alreadyJoined ? (
-						<div className="fixed bottom-26 left-0 right-0 z-20 px-4">
-							<button
-								type="button"
-								onClick={handleJoinTrip}
-								disabled={isLoading}
-								className="mx-auto flex w-full max-w-245 items-center justify-center rounded-full bg-emerald-600 px-6 py-4 text-base font-semibold text-white shadow-2xl transition hover:bg-emerald-500 disabled:opacity-60"
-							>
+						<div className="mt-3">
+							<button type="button" onClick={handleJoinTrip} disabled={isLoading} className="settings-btn-primary w-full disabled:opacity-60">
 								{isLoading ? '加入中...' : '加入旅行'}
 							</button>
-							{joinMessage ? <p className="mt-2 text-center text-sm text-rose-500">{joinMessage}</p> : null}
+							{joinMessage ? <p className="mt-2 text-center text-[11px] text-[#e85d4c]">{joinMessage}</p> : null}
 						</div>
 					) : null}
-				</div>
+				</>
 			) : (
-				<div className="mx-auto max-w-245 px-4 py-12 text-center text-slate-500">输入密码后即可查看分享的旅行</div>
+				<div className="app-empty mt-8">输入密码后即可查看分享的旅行</div>
 			)}
 
 			<Modal
@@ -230,18 +224,18 @@ function SharePageContent() {
 						value={password}
 						onChange={(e) => setPassword(e.target.value)}
 						placeholder="分享密码"
-						className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-900"
+						className="settings-input"
 					/>
 					{passwordError ? <p className="text-sm text-rose-500">{passwordError}</p> : null}
 				</div>
 			</Modal>
-		</div>
+		</AppShell>
 	);
 }
 
 export default function SharePage() {
 	return (
-		<Suspense fallback={<div className="min-h-screen bg-slate-50 px-4 py-12 text-center dark:bg-slate-950">加载中...</div>}>
+		<Suspense fallback={<AppShell tight><div className="app-empty mt-8">加载中...</div></AppShell>}>
 			<SharePageContent />
 		</Suspense>
 	);

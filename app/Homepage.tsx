@@ -3,11 +3,12 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Modal } from '@/src/components/Modal';
+import AppShell from '@/src/components/layout/AppShell';
 import FriendSelector from '@/src/components/FriendSelector';
 import BillMap from '@/src/components/BillMap';
 import FriendIcon from '@/src/components/FriendIcon';
 import { getAuthHeaders } from '@/src/utils/auth';
-import { Friend, TripMember, Trip, Bill } from '@/src/types';
+import { Friend, TripMember, Trip, Bill, BillOwed } from '@/src/types';
 import { CURRENCY_DEFINITIONS } from '@/src/utils/currencies';
 
 export default function HomePage() {
@@ -304,17 +305,12 @@ export default function HomePage() {
 
 	if (trips.length === 0) {
 		return (
-			<div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100 flex items-center justify-center">
-				<div className="text-center">
-					<div className="text-6xl mb-4">✈️</div>
-					<h1 className="text-2xl font-semibold mb-2">还没有旅行</h1>
-					<p className="text-slate-600 mb-6">创建你的第一个旅行，开始记录账单</p>
-					<button
-						onClick={() => setIsNewTripModalOpen(true)}
-						className="inline-flex items-center gap-2 rounded-3xl bg-sky-600 px-6 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-sky-500"
-					>
-						<span className="text-lg">+</span>
-						新建旅行
+			<AppShell>
+				<div className="app-empty mt-8">
+					<p className="settings-display text-xl">还没有旅行</p>
+					<p className="mt-2 text-[12px]">创建第一个旅行，开始记录账单</p>
+					<button type="button" onClick={() => setIsNewTripModalOpen(true)} className="settings-btn-primary mt-4">
+						+ 新建旅行
 					</button>
 				</div>
 
@@ -351,252 +347,168 @@ export default function HomePage() {
 						</div>
 					</div>
 				</Modal>
-			</div>
+			</AppShell>
 		);
 	}
 
 	return (
-		<div className="min-h-screen bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-100">
-			<div className="max-w-245 mx-auto px-4 pb-28 pt-5">
-				<header className="flex flex-wrap items-center justify-between gap-3">
-					<div className="relative min-w-0 flex-1">
-						<button
-							type="button"
-							onClick={() => setIsTripDropdownOpen(!isTripDropdownOpen)}
-							className="w-full rounded-3xl border border-slate-200 bg-white/95 px-4 py-3 text-left shadow-sm transition hover:border-slate-300 dark:border-slate-700 dark:bg-slate-900"
-						>
-							<div className="flex items-center justify-between gap-3">
-								<div className="flex-1 min-w-0">
-									<p className="truncate text-base font-semibold">{currentTrip?.name}</p>
-									{currentTrip && <p className="text-xs text-slate-500 dark:text-slate-400">{formatDate(currentTrip.createdAt)}</p>}
-								</div>
-								<span className="inline-flex h-10 w-10 items-center justify-center rounded-2xl bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-200">
-									{isTripDropdownOpen ? (
-										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-											<path d="m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z" />
-										</svg>
-									) : (
-										<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-											<path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z" />
-										</svg>
-									)}
-								</span>
+		<AppShell tight>
+			<header className="flex items-stretch gap-1.5">
+				<div className="relative min-w-0 flex-1">
+					<button type="button" onClick={() => setIsTripDropdownOpen(!isTripDropdownOpen)} className="app-trip-select">
+						<div className="flex items-center justify-between gap-2">
+							<div className="min-w-0 flex-1">
+								<p className="app-label">当前旅行</p>
+								<p className="truncate text-sm font-semibold leading-tight">{currentTrip?.name}</p>
+								{currentTrip ? <p className="settings-mono text-[10px] text-[#6b6458]">{formatDate(currentTrip.createdAt)}</p> : null}
 							</div>
-						</button>
-
-						{isTripDropdownOpen && (
-							<div className="absolute top-full left-0 right-0 mt-1 bg-white border border-slate-200 rounded-3xl shadow-lg z-10 dark:bg-slate-900 dark:border-slate-700">
-								{trips.map((trip) => (
-									<button
-										key={trip.id}
-										onClick={() => {
-											setSelectedTripId(trip.id);
-											setIsTripDropdownOpen(false);
-										}}
-										className="w-full px-4 py-3 text-left hover:bg-slate-50 dark:hover:bg-slate-800 first:rounded-t-3xl last:rounded-b-3xl"
-									>
-										<p className="truncate text-sm font-semibold">{trip.name}</p>
-										<p className="text-xs text-slate-500 dark:text-slate-400">{formatDate(trip.createdAt)}</p>
-									</button>
-								))}
-							</div>
-						)}
-					</div>
-
-					<button
-						type="button"
-						onClick={() => setIsNewTripModalOpen(true)}
-						className="inline-flex h-12 w-12 items-center justify-center rounded-3xl bg-sky-600 text-white shadow-lg transition hover:bg-sky-500"
-						aria-label="新建旅行"
-					>
-						<span className="text-2xl font-bold leading-none">+</span>
+							<span className="settings-mono text-xs">{isTripDropdownOpen ? '▲' : '▼'}</span>
+						</div>
 					</button>
-				</header>
 
-				<section className="mt-3 flex flex-wrap items-center gap-2">
-					{currentTrip && !currentTrip.isOwner ? (
-						<span className="inline-flex items-center rounded-full bg-violet-100 px-3 py-1 text-xs font-semibold text-violet-700 dark:bg-violet-900/30 dark:text-violet-300">
-							来自 {currentTrip.ownerName} 的分享
-						</span>
-					) : null}
-					<button
-						type="button"
-						onClick={() => {
-							setEditTripName(currentTrip?.name || '');
-							setIsEditTripModalOpen(true);
-						}}
-						className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-					>
-						编辑旅行名称
-					</button>
-					<button
-						type="button"
-						onClick={() => setIsDeleteTripModalOpen(true)}
-						className="inline-flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
-					>
-						{currentTrip?.isOwner === false ? '从列表移除旅行' : '删除旅行'}
-					</button>
-				</section>
-
-				<section className="mt-2">
-					<div className="flex items-center justify-between gap-3">
-						<p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">参与者</p>
-					</div>
-
-					<div className="mt-2 flex gap-3 overflow-x-auto">
-						{(currentTrip?.members || []).map((member) => (
-							<div key={member.id} className="flex min-w-16 flex-col items-center gap-2 text-center">
+					{isTripDropdownOpen ? (
+						<div className="app-dropdown absolute top-full left-0 right-0 z-20 mt-0.5 max-h-48 overflow-y-auto">
+							{trips.map((trip) => (
 								<button
+									key={trip.id}
+									type="button"
 									onClick={() => {
-										setSelectedMember(member);
-										setIsMemberDetailModalOpen(true);
+										setSelectedTripId(trip.id);
+										setIsTripDropdownOpen(false);
 									}}
-									className="cursor-pointer"
+									className="app-dropdown-item"
 								>
-									<FriendIcon name={member.name} size="md" isSelf={member.isSelf} />
+									<p className="truncate text-xs font-semibold">{trip.name}</p>
+									<p className="settings-mono text-[10px] text-[#6b6458]">{formatDate(trip.createdAt)}</p>
 								</button>
-								<p className="max-w-18 truncate text-xs text-slate-700 dark:text-slate-300">{member.name}</p>
-							</div>
-						))}
-
-						<button
-							type="button"
-							onClick={() => setIsAddMemberModalOpen(true)}
-							className="flex h-8 w-8 items-center justify-center rounded-full border border-dashed border-slate-300 bg-white text-lg font-semibold text-slate-600 transition hover:border-slate-400 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200"
-							aria-label="添加成员"
-						>
-							+
-						</button>
-					</div>
-				</section>
-
-				<section className="mt-0 -mx-4">
-					<div className="mt-3 overflow-hidden border border-slate-200 bg-white/95 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-						<div className="h-32 cursor-pointer" onClick={() => setIsMapModalOpen(true)}>
-							<BillMap bills={currentBills} interactive={false} tileLayer="osm" />
+							))}
 						</div>
-					</div>
-				</section>
+					) : null}
+				</div>
 
-				<section className="mt-4">
-					<p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">账单列表</p>
-				</section>
+				<button type="button" onClick={() => setIsNewTripModalOpen(true)} className="app-header-add shrink-0" aria-label="新建旅行">
+					+
+				</button>
+			</header>
 
-				<section className="mt-2 pb-24">
-					<div className="relative overflow-hidden rounded-xl border border-slate-200 bg-white/95 shadow-sm dark:border-slate-700 dark:bg-slate-900">
-						<div className="overflow-x-auto">
-							<table className="min-w-full text-xs">
-								<thead className="border-b border-slate-200 bg-slate-50 text-left text-[10px] uppercase tracking-[0.24em] text-slate-500 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-400">
-									<tr>
-										<th className="px-3 py-3">付钱人</th>
-										<th className="px-3 py-3">金额</th>
-										<th className="px-3 py-3">名称</th>
-										<th className="px-3 py-3">创建人/日期</th>
-										<th className="px-3 py-3">状态</th>
-									</tr>
-								</thead>
-								<tbody>
-									{currentBills.map((bill, index) => (
-										<tr
-											key={bill.id}
-											className={`border-b cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors ${index === currentBills.length - 1 ? '' : 'border-slate-200'} dark:border-slate-800`}
-											onClick={() => handleBillClick(bill)}
-										>
-											<td className="px-3 py-1">
-												<FriendIcon
-													name={(currentTrip?.members || []).find((m) => m.id === bill.payerId)?.name || '?'}
-													size="md"
-													isSelf={(currentTrip?.members || []).find((m) => m.id === bill.payerId)?.isSelf}
-												/>
-											</td>
-											<td className="px-3 py-1 font-semibold text-slate-900 dark:text-slate-100">
-												{bill.amount}
-												{CURRENCY_DEFINITIONS[bill.currency || 'CNY']?.suffix || '¥'}
-												<div className="flex flex-wrap items-center gap-1">
-													{bill.owedFriends.slice(0, 4).map((owed: any) => {
-														const member = (currentTrip?.members || []).find((m) => m.id === owed.friendId);
-														return <FriendIcon key={owed.id} name={member?.name || '?'} size="sm" isSelf={member?.isSelf} />;
-													})}
-													{bill.owedFriends.length > 4 ? (
-														<span className="inline-flex h-6 min-w-6 items-center justify-center rounded-full bg-slate-100 px-1 text-[10px] font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-															+{bill.owedFriends.length - 4}
-														</span>
-													) : null}
-												</div>
-											</td>
-											<td className="px-3 py-1 text-slate-700 dark:text-slate-300">
-												<p className="inline-flex w-max rounded-full bg-slate-100 px-2 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-													{bill.category}
-												</p>
-												<p>{bill.name}</p>
-											</td>
-
-											<td className="px-3 py-1">
-												<div>
-													{bill.createdById && bill.createdById !== currentUserMemberId ? (
-														<p className="text-[10px] text-slate-500 dark:text-slate-400">
-															{(currentTrip?.members || []).find((m) => m.id === bill.createdById)?.name || '我'}
-														</p>
-													) : (
-														<p className="text-[10px] text-slate-500 dark:text-slate-400">-</p>
-													)}
-													<p className="text-[10px] text-slate-500 dark:text-slate-400">
-														{new Date(bill.createdAt).toLocaleDateString('zh-CN', {
-															month: '2-digit',
-															day: '2-digit',
-															hour: '2-digit',
-															minute: '2-digit',
-														})}
-													</p>
-												</div>
-											</td>
-											<td className="px-3 py-1">
-												<span
-													className={`inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${
-														bill.status === 'SETTLED'
-															? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300'
-															: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
-													}`}
-												>
-													{bill.status === 'SETTLED' ? '清' : '未'}
-												</span>
-											</td>
-										</tr>
-									))}
-								</tbody>
-							</table>
-						</div>
-					</div>
-				</section>
+			<div className="mt-1.5 flex flex-wrap items-center gap-1">
+				{currentTrip && !currentTrip.isOwner ? <span className="app-tag app-tag-share">分享·{currentTrip.ownerName}</span> : null}
+				<button type="button" onClick={() => { setEditTripName(currentTrip?.name || ''); setIsEditTripModalOpen(true); }} className="app-toolbar-chip">
+					改名
+				</button>
+				<button type="button" onClick={() => setIsDeleteTripModalOpen(true)} className="app-toolbar-chip">
+					{currentTrip?.isOwner === false ? '移除' : '删除'}
+				</button>
+				<span className="app-label ml-auto">{currentBills.length} 笔</span>
 			</div>
 
-			<div className="fixed bottom-26 right-5 z-50 flex items-center gap-3">
-				<button
-					type="button"
-					onClick={() => router.push(`/settle?tripId=${selectedTripId}`)}
-					className="inline-flex h-16 items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-lg font-semibold text-white shadow-2xl shadow-slate-900/30 transition hover:bg-slate-800 focus:outline-none focus:ring-4 focus:ring-slate-300/60"
-				>
+			<section className="mt-1.5">
+				<div className="flex items-center gap-1.5 overflow-x-auto pb-0.5">
+					{(currentTrip?.members || []).map((member) => (
+						<button
+							key={member.id}
+							type="button"
+							onClick={() => {
+								setSelectedMember(member);
+								setIsMemberDetailModalOpen(true);
+							}}
+							className="flex min-w-11 flex-col items-center gap-0.5"
+						>
+							<FriendIcon name={member.name} size="sm" isSelf={member.isSelf} />
+							<p className="max-w-11 truncate text-[10px]">{member.name}</p>
+						</button>
+					))}
+					<button type="button" onClick={() => setIsAddMemberModalOpen(true)} className="app-toolbar-chip h-6 min-w-6 px-1" aria-label="添加成员">
+						+
+					</button>
+				</div>
+			</section>
+
+			<section className="mt-1.5">
+				<div className="app-panel overflow-hidden">
+					<div className="h-20 cursor-pointer" onClick={() => setIsMapModalOpen(true)}>
+						<BillMap bills={currentBills} interactive={false} tileLayer="osm" />
+					</div>
+				</div>
+			</section>
+
+			<section className="mt-1.5">
+				<div className="app-panel overflow-hidden">
+					<div className="app-panel-head">
+						<span className="app-label">账单列表</span>
+						<span className="settings-mono text-[10px] text-[#6b6458]">点击编辑</span>
+					</div>
+					<div className="overflow-x-auto">
+						<table className="app-data-table">
+							<thead>
+								<tr>
+									<th>付</th>
+									<th>金额/分摊</th>
+									<th>项目</th>
+									<th>时间</th>
+									<th>态</th>
+								</tr>
+							</thead>
+							<tbody>
+								{currentBills.map((bill) => (
+									<tr key={bill.id} onClick={() => handleBillClick(bill)}>
+										<td>
+											<FriendIcon
+												name={(currentTrip?.members || []).find((m) => m.id === bill.payerId)?.name || '?'}
+												size="sm"
+												isSelf={(currentTrip?.members || []).find((m) => m.id === bill.payerId)?.isSelf}
+											/>
+										</td>
+										<td>
+											<p className="app-amount">
+												{bill.amount}
+												{CURRENCY_DEFINITIONS[bill.currency || 'CNY']?.suffix || '¥'}
+											</p>
+											<div className="mt-0.5 flex flex-wrap items-center gap-0.5">
+												{bill.owedFriends.slice(0, 5).map((owed: BillOwed) => {
+													const member = (currentTrip?.members || []).find((m) => m.id === owed.friendId);
+													return <FriendIcon key={owed.id} name={member?.name || '?'} size="sm" isSelf={member?.isSelf} />;
+												})}
+												{bill.owedFriends.length > 5 ? <span className="settings-mono text-[9px]">+{bill.owedFriends.length - 5}</span> : null}
+											</div>
+										</td>
+										<td>
+											<span className="app-tag">{bill.category}</span>
+											<p className="mt-0.5 max-w-28 truncate text-[11px] leading-tight">{bill.name}</p>
+										</td>
+										<td>
+											{bill.createdById && bill.createdById !== currentUserMemberId ? (
+												<p className="text-[10px] leading-tight text-[#6b6458]">{(currentTrip?.members || []).find((m) => m.id === bill.createdById)?.name}</p>
+											) : null}
+											<p className="settings-mono text-[10px] leading-tight text-[#6b6458]">
+												{new Date(bill.createdAt).toLocaleDateString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+											</p>
+										</td>
+										<td>
+											<span className={`app-tag ${bill.status === 'SETTLED' ? 'app-tag-settled' : 'app-tag-open'}`}>{bill.status === 'SETTLED' ? '清' : '未'}</span>
+										</td>
+									</tr>
+								))}
+							</tbody>
+						</table>
+						{currentBills.length === 0 ? <p className="px-2 py-3 text-center text-[12px] text-[#6b6458]">暂无账单</p> : null}
+					</div>
+				</div>
+			</section>
+
+			<div className="app-fab-bar">
+				<button type="button" onClick={() => router.push(`/settle?tripId=${selectedTripId}`)} className="app-fab app-fab-settle">
 					结算
 				</button>
 				{currentTrip?.isOwner ? (
-					<button
-						type="button"
-						onClick={openShareModal}
-						className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-sky-600 text-white shadow-2xl shadow-sky-600/40 transition hover:bg-sky-500 focus:outline-none focus:ring-4 focus:ring-sky-300/60"
-						aria-label="分享旅行"
-					>
-						<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="currentColor" viewBox="0 0 16 16">
+					<button type="button" onClick={openShareModal} className="app-fab app-fab-icon app-fab-share" aria-label="分享旅行">
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
 							<path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5" />
 						</svg>
 					</button>
 				) : null}
-				<button
-					type="button"
-					onClick={() => router.push(`/bills/new?tripId=${selectedTripId}`)}
-					className="inline-flex h-16 w-16 items-center justify-center rounded-full bg-emerald-600 text-white shadow-2xl shadow-emerald-600/40 transition hover:bg-emerald-500 focus:outline-none focus:ring-4 focus:ring-emerald-300/60"
-					aria-label="新建账单"
-				>
-					<span className="text-3xl font-bold leading-none">+</span>
+				<button type="button" onClick={() => router.push(`/bills/new?tripId=${selectedTripId}`)} className="app-fab app-fab-icon app-fab-add" aria-label="新建账单">
+					+
 				</button>
 			</div>
 
@@ -781,6 +693,6 @@ export default function HomePage() {
 					{currentTrip?.isOwner === false ? '移除后该旅行将从你的列表中消失，但不会影响其他参与者。' : '删除后该旅行及其所有账单将被隐藏，分享链接也会失效。'}
 				</p>
 			</Modal>
-		</div>
+		</AppShell>
 	);
 }
