@@ -17,6 +17,7 @@ const FriendsPage: React.FC = () => {
 	const [isAddingFriend, setIsAddingFriend] = useState(false);
 	const [newFriendName, setNewFriendName] = useState('');
 	const [newFriendDescription, setNewFriendDescription] = useState('');
+	const [newFriendIsMe, setNewFriendIsMe] = useState(false);
 
 	useEffect(() => {
 		fetchFriends();
@@ -170,6 +171,7 @@ const FriendsPage: React.FC = () => {
 				body: JSON.stringify({
 					name: newFriendName.trim(),
 					description: newFriendDescription,
+					isSelf: newFriendIsMe,
 				}),
 			});
 			if (response.ok) {
@@ -177,6 +179,7 @@ const FriendsPage: React.FC = () => {
 				setFriends([...friends, { ...newFriend, trips: [] }]);
 				setNewFriendName('');
 				setNewFriendDescription('');
+				setNewFriendIsMe(false);
 				setIsAddingFriend(false);
 			}
 		} catch (error) {
@@ -274,7 +277,7 @@ const FriendsPage: React.FC = () => {
 									onClick={handleSetAsSelf}
 									className={`px-4 py-2 rounded ${selectedFriend.isSelf ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
 								>
-									{selectedFriend.isSelf ? '取消本人' : '设为本人'}
+									{selectedFriend.isSelf ? '这不是我本人' : '这是我本人'}
 								</button>
 								<button onClick={handleDeleteFriend} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
 									删除
@@ -293,6 +296,14 @@ const FriendsPage: React.FC = () => {
 				<div className="space-y-4">
 					<input type="text" placeholder="朋友姓名" value={newFriendName} onChange={(e) => setNewFriendName(e.target.value)} className="w-full px-3 py-2 border rounded" />
 					<input type="text" placeholder="描述（可选）" value={newFriendDescription} onChange={(e) => setNewFriendDescription(e.target.value)} className="w-full px-3 py-2 border rounded" />
+					<button
+						onClick={() => {
+							setNewFriendIsMe(!newFriendIsMe);
+						}}
+						className={`px-4 py-2 rounded ${newFriendIsMe ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+					>
+						{newFriendIsMe ? '这是我本人(已选择)' : '这是我本人'}
+					</button>
 				</div>
 			</Modal>
 		</div>
