@@ -9,6 +9,7 @@ const routeTitleKeys: { pattern: RegExp; key: MessageKey }[] = [
 	{ pattern: /^\/user\/?$/, key: 'page.settings' },
 	{ pattern: /^\/user\/feedback\/?$/, key: 'page.feedback' },
 	{ pattern: /^\/user\/about\/?$/, key: 'page.about' },
+	{ pattern: /^\/user\/guide\/?$/, key: 'page.guide' },
 	{ pattern: /^\/settle\/?$/, key: 'page.settle' },
 	{ pattern: /^\/share\/?$/, key: 'page.share' },
 	{ pattern: /^\/bills\/new\/?$/, key: 'page.newBill' },

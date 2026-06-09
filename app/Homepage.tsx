@@ -14,6 +14,7 @@ import { apiPath, withBasePath } from '@/src/config/paths';
 import { Friend, TripMember, Trip, Bill } from '@/src/types';
 import { usePreferences } from '@/src/utils/preferences-provider';
 import { useRequireAuth } from '@/src/utils/use-require-auth';
+import { ONBOARDING_TRIP_CREATED_EVENT } from '@/src/utils/onboarding/storage';
 import type { Locale } from '@/src/utils/preferences/constants';
 
 const DATE_LOCALE_MAP: Record<Locale, string> = {
@@ -143,6 +144,7 @@ export default function HomePage() {
 				}
 				setSelectedFriendsForTrip([]);
 				await fetchTrips(); // Refresh to get updated members
+				window.dispatchEvent(new Event(ONBOARDING_TRIP_CREATED_EVENT));
 			}
 		} catch (error) {
 			console.error('Failed to create trip:', error);
@@ -324,7 +326,7 @@ export default function HomePage() {
 				<div className="app-empty mt-8">
 					<p className="settings-display text-xl">{t('home.noTripsTitle')}</p>
 					<p className="mt-2 text-[12px]">{t('home.noTripsHint')}</p>
-					<button type="button" onClick={() => guardAuth(() => setIsNewTripModalOpen(true))} className="settings-btn-primary mt-4">
+					<button type="button" onClick={() => guardAuth(() => setIsNewTripModalOpen(true))} className="settings-btn-primary mt-4" data-onboarding-target="new-trip">
 						+ {t('home.newTrip')}
 					</button>
 				</div>
@@ -402,7 +404,7 @@ export default function HomePage() {
 					) : null}
 				</div>
 
-				<button type="button" onClick={() => guardAuth(() => setIsNewTripModalOpen(true))} className="app-header-add shrink-0" aria-label={t('home.newTrip')}>
+				<button type="button" onClick={() => guardAuth(() => setIsNewTripModalOpen(true))} className="app-header-add shrink-0" aria-label={t('home.newTrip')} data-onboarding-target="new-trip">
 					+
 				</button>
 			</header>
@@ -478,7 +480,7 @@ export default function HomePage() {
 			</section>
 
 			<div className="app-fab-bar">
-				<button type="button" onClick={() => guardAuth(() => router.push(`/settle?tripId=${selectedTripId}`))} className="app-fab app-fab-settle">
+				<button type="button" onClick={() => guardAuth(() => router.push(`/settle?tripId=${selectedTripId}`))} className="app-fab app-fab-settle" data-onboarding-target="settle">
 					{t('home.settle')}
 				</button>
 				{currentTrip?.isOwner ? (
@@ -488,7 +490,7 @@ export default function HomePage() {
 						</svg>
 					</button>
 				) : null}
-				<button type="button" onClick={() => guardAuth(() => router.push(`/bills/new?tripId=${selectedTripId}`))} className="app-fab app-fab-icon app-fab-add" aria-label={t('home.newBill')}>
+				<button type="button" onClick={() => guardAuth(() => router.push(`/bills/new?tripId=${selectedTripId}`))} className="app-fab app-fab-icon app-fab-add" aria-label={t('home.newBill')} data-onboarding-target="new-bill">
 					+
 				</button>
 			</div>

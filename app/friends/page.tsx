@@ -182,7 +182,7 @@ const FriendsPage: React.FC = () => {
 			</div>
 
 			<div className="app-fab-bar">
-				<button type="button" onClick={() => guardAuth(() => setIsAddingFriend(true))} className="app-fab app-fab-icon app-fab-add" aria-label={t('friends.addFriend')}>
+				<button type="button" onClick={() => guardAuth(() => setIsAddingFriend(true))} className="app-fab app-fab-icon app-fab-add" aria-label={t('friends.addFriend')} data-onboarding-target="add-friend">
 					+
 				</button>
 			</div>

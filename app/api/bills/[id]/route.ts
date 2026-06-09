@@ -101,7 +101,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     const body = (await request.json()) as BillUpdateRequestBody;
     const { payerId, amount, currency = 'CNY', paymentMethod = 'Cash', name, description, category, status, owedFriendIds, latitude, longitude } = body;
 
-    if (!payerId || !amount || !name || !category || !status) {
+    if (!payerId || !amount || !category || !status) {
       return NextResponse.json({ error: 'Missing required bill fields' }, { status: 400 });
     }
 

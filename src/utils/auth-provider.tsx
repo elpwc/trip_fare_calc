@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import * as auth from './auth';
 import type { AuthUser } from './auth';
+import { startOnboarding } from '@/src/utils/onboarding/storage';
 
 type AuthContextType = {
   user: AuthUser | null;
@@ -72,6 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const result = await auth.register(email, name, password, code);
       setToken(result.token);
       setUser(result.user);
+      startOnboarding(result.user.id);
     } catch (err) {
       throw err;
     } finally {

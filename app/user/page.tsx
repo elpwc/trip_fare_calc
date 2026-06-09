@@ -304,6 +304,7 @@ function UserPageContent() {
 						</div>
 
 						<div className="mt-6 grid gap-3 sm:grid-cols-2">
+							<TicketLink href="/user/guide" index="A0" title={t('user.guideLink')} desc={t('user.guideDesc')} />
 							<TicketLink href="/user/feedback" index="A1" title={t('user.feedbackLink')} desc={t('user.feedbackDesc')} />
 							<TicketLink href="/user/about" index="A2" title={t('user.aboutLink')} desc={t('user.aboutDesc')} />
 						</div>
@@ -411,6 +412,7 @@ function UserPageContent() {
 
 						<ReceiptPanel label="MORE" serial="MENU-03">
 							<div className="grid gap-3 sm:grid-cols-2">
+								<TicketLink href="/user/guide" index="03" title={t('user.guideLink')} desc={t('user.guideDesc')} />
 								<TicketLink href="/user/feedback" index="04" title={t('user.feedbackLink')} desc="" />
 								<TicketLink href="/user/about" index="05" title={t('user.aboutLink')} desc="" />
 							</div>

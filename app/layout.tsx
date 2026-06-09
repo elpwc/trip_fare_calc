@@ -5,6 +5,7 @@ import PwaInstallPrompt from '@/src/components/PwaInstallPrompt';
 import { AuthProvider } from '@/src/utils/auth-provider';
 import { PageTitleSync, PreferencesProvider } from '@/src/utils/preferences-provider';
 import { PwaProvider } from '@/src/utils/pwa/pwa-provider';
+import { OnboardingProvider } from '@/src/components/onboarding/OnboardingProvider';
 import { BASE_PATH } from '@/src/config/base-path';
 import { zhCN } from '@/src/utils/i18n/locales/zh-CN';
 import 'leaflet/dist/leaflet.css';
@@ -65,8 +66,10 @@ export default function RootLayout({
 				<PreferencesProvider>
 					<PwaProvider>
 						<AuthProvider>
-							<PageTitleSync />
-							{children}
+							<OnboardingProvider>
+								<PageTitleSync />
+								{children}
+							</OnboardingProvider>
 						</AuthProvider>
 						<PwaInstallPrompt />
 						<BottomMenu />

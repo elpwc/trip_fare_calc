@@ -5,7 +5,7 @@ import { Modal } from '@/src/components/Modal';
 import { apiPath } from '@/src/config/paths';
 import { getAuthHeaders } from '@/src/utils/auth';
 import { usePreferences } from '@/src/utils/preferences-provider';
-import type { Friend } from '@/src/types';
+import { ONBOARDING_FRIEND_ADDED_EVENT } from '@/src/utils/onboarding/storage';
 
 type AddFriendModalProps = {
 	isOpen: boolean;
@@ -46,6 +46,7 @@ export default function AddFriendModal({ isOpen, onClose, onAdded }: AddFriendMo
 			if (response.ok) {
 				const newFriend = await response.json();
 				onAdded?.({ ...newFriend, trips: newFriend.trips ?? [] });
+				window.dispatchEvent(new Event(ONBOARDING_FRIEND_ADDED_EVENT));
 				onClose();
 			}
 		} catch (error) {

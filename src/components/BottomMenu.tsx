@@ -66,6 +66,7 @@ export default function BottomMenu() {
             <Link
               key={item.id}
               href={item.href}
+              data-onboarding-target={item.id === 'friends' ? 'friends-tab' : item.id === 'bills' ? 'bills-tab' : undefined}
               className={`app-nav-link flex flex-1 flex-col items-center justify-center gap-0.5 px-1 py-1 text-[10px] font-semibold ${active ? 'app-nav-link-active' : ''}`}
             >
               <span className="inline-flex h-9 w-9 items-center justify-center">{item.icon}</span>

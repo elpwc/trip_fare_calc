@@ -225,7 +225,7 @@ html.dark .settings-btn-primary:hover {
 }
 
 .settings-btn-ghost {
-	@apply border-2 border-[#1a1814] bg-transparent text-[#1a1814] dark:border-[#f4efe4] dark:text-[#f4efe4];
+	@apply border-2 border-[#1a1814] bg-[#2a9d8f] text-[#1a1814] dark:border-[#f4efe4] dark:text-[#f4efe4];
 	padding: 0.75rem 1.25rem;
 	font-size: 0.875rem;
 	font-weight: 700;

@@ -354,7 +354,7 @@ export default function HomeBillList({ bills, members, onBillClick, dateLocale }
 											</div>
 										</td>
 										<td>
-											<p className="app-bill-name">{bill.name || '—'}</p>
+											<p className="app-bill-name">{bill.name || t(getBillCategoryLabelKey(bill.category))}</p>
 											<span className="app-bill-cat-muted">{t(getBillCategoryLabelKey(bill.category))}</span>
 										</td>
 										<td>
