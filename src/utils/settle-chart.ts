@@ -180,6 +180,7 @@ export function buildNestedChartData(
 	const nested = new Map<string, Map<string, number>>();
 
 	trip.bills.forEach((bill) => {
+		if (bill.status === 'SETTLED') return;
 		const converted = convertAmount(bill.amount, bill.currency || 'CNY', selectedCurrency, rates);
 		expandBill(bill, converted, ctx.settledFlowPairs).forEach((row) => {
 			const outerKey = rowDimensionKey(row, outerDim);

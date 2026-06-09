@@ -105,6 +105,22 @@ export default function HomePage() {
 
 	const currentBills = useMemo(() => currentTrip?.bills || [], [currentTrip]);
 
+	const mapBills = useMemo(() => {
+		const members = currentTrip?.members || [];
+		return currentBills.map((bill) => {
+			const payer = members.find((member) => member.id === bill.payerId);
+			return {
+				id: bill.id,
+				name: bill.name,
+				amount: bill.amount,
+				latitude: bill.latitude,
+				longitude: bill.longitude,
+				payerName: payer?.name,
+				payerIsSelf: payer?.isSelf,
+			};
+		});
+	}, [currentBills, currentTrip?.members]);
+
 	const handleCreateTrip = async () => {
 		if (!newTripName.trim()) return;
 
@@ -576,7 +592,7 @@ export default function HomePage() {
 						</button>
 					</div>
 					<div className="app-panel h-140 overflow-hidden">
-						<BillMap bills={currentBills} interactive={true} tileLayer={mapTileLayer} />
+						<BillMap bills={mapBills} interactive={true} tileLayer={mapTileLayer} showBillMarkers />
 					</div>
 				</div>
 			</Modal>

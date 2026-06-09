@@ -42,7 +42,6 @@ const CATEGORIES: { key: string; tone: string; i18nKey: MessageKey }[] = [
 const STATUSES: { value: string; i18nKey: MessageKey }[] = [
 	{ value: 'UNPAID', i18nKey: 'bills.status.unpaid' },
 	{ value: 'UNRETURNED', i18nKey: 'bills.status.unreturned' },
-	{ value: 'PARTIALLY_RETURNED', i18nKey: 'bills.status.partial' },
 	{ value: 'SETTLED', i18nKey: 'bills.status.settled' },
 ];
 
@@ -351,7 +350,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 
 				<textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder={t('bills.notePlaceholder')} rows={2} className="settings-input resize-none py-2 text-sm" />
 
-				<div className="grid grid-cols-4 gap-1">
+				<div className="grid grid-cols-3 gap-1">
 					{STATUSES.map((stat) => (
 						<button key={stat.value} type="button" onClick={() => setStatus(stat.value)} className={`app-toolbar-chip py-1.5 ${status === stat.value ? 'app-toolbar-chip-active' : ''}`}>
 							{t(stat.i18nKey)}
