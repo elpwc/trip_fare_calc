@@ -11,7 +11,7 @@ export const CURRENCY_DEFINITIONS: Record<string, Currency> = {
 	CNY: {
 		code: 'CNY',
 		name: '人民币',
-		symbol: '¥',
+		symbol: '元',
 		region: '中国',
 		countryCode: 'CN',
 		suffix: '元',
@@ -43,7 +43,7 @@ export const CURRENCY_DEFINITIONS: Record<string, Currency> = {
 	JPY: {
 		code: 'JPY',
 		name: '日元',
-		symbol: '¥',
+		symbol: '円',
 		region: '日本',
 		countryCode: 'JP',
 		suffix: '円',

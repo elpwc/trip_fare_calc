@@ -53,7 +53,7 @@ export async function POST(request: NextRequest) {
       longitude,
     } = body;
 
-    if (!tripId || !payerId || !amount || !name || !category || !status) {
+    if (!tripId || !payerId || !amount || !category || !status) {
       return NextResponse.json({ error: 'Missing required bill fields' }, { status: 400 });
     }
 

@@ -20,15 +20,20 @@ const LAST_BILL_CURRENCY_KEY = 'tripFareCalc:lastBillCurrency';
 
 const CATEGORIES = [
 	{ key: '吃饭', label: '吃饭', tone: 'meal' },
-	{ key: '酒店', label: '酒店', tone: 'hotel' },
-	{ key: '租车', label: '租车', tone: 'car' },
+	{ key: '住宿', label: '住宿', tone: 'hotel' },
 	{ key: '门票', label: '门票', tone: 'ticket' },
-	{ key: '高速费', label: '高速费', tone: 'toll' },
 	{ key: 'KTV', label: 'KTV', tone: 'ktv' },
-	{ key: '火车票', label: '火车票', tone: 'train' },
-	{ key: '机票', label: '机票', tone: 'flight' },
 	{ key: '购物', label: '购物', tone: 'shop' },
-	{ key: '无', label: '无', tone: 'none' },
+	{ key: '租车', label: '租车', tone: 'car' },
+	{ key: '高速费', label: '高速费', tone: 'toll' },
+	{ key: '加油费', label: '加油费', tone: 'gas' },
+	{ key: '停车费', label: '停车费', tone: 'park' },
+	{ key: '打车', label: '打车', tone: 'taxi' },
+	{ key: '公交', label: '公交', tone: 'bus' },
+	{ key: '火车', label: '火车', tone: 'train' },
+	{ key: '机票', label: '机票', tone: 'flight' },
+	{ key: '交通', label: '交通', tone: 'traffic' },
+	{ key: '其他', label: '其他', tone: 'none' },
 ];
 
 const STATUSES = [
@@ -38,11 +43,17 @@ const STATUSES = [
 	{ value: 'SETTLED', label: '已结清' },
 ];
 
-const PAYMENT_METHODS = ['现金', '支付宝', '微信', '银行转账', 'PayPay', '信用卡', 'PayPal', 'ApplePay', '其他'];
+const PAYMENT_METHODS = ['任意', '现金', '支付宝', '微信', '银行转账', 'PayPay', '信用卡', 'PayPal', 'ApplePay', '其他'];
 
 export default function NewBillPage({ billId }: { billId?: string } = {}) {
 	return (
-		<Suspense fallback={<AppShell tight><div className="app-empty mt-8">加载中...</div></AppShell>}>
+		<Suspense
+			fallback={
+				<AppShell tight>
+					<div className="app-empty mt-8">加载中...</div>
+				</AppShell>
+			}
+		>
 			<NewBillPageContent billId={billId} />
 		</Suspense>
 	);
@@ -60,7 +71,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 		const saved = window.localStorage.getItem(LAST_BILL_CURRENCY_KEY);
 		return saved && CURRENCY_DEFINITIONS[saved] ? saved : 'CNY';
 	});
-	const [paymentMethod, setPaymentMethod] = useState('现金');
+	const [paymentMethod, setPaymentMethod] = useState('任意');
 	const [category, setCategory] = useState('吃饭');
 	const [billName, setBillName] = useState('');
 	const [payerId, setPayerId] = useState<string>('');
@@ -168,7 +179,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 
 	const handleCreateBill = async () => {
 		const selectedTripId = effectiveTripId || tripId;
-		if (!selectedTripId || !amount || !payerId || !billName.trim()) {
+		if (!selectedTripId || !amount || !payerId ) {
 			alert('请填写必需信息');
 			return;
 		}
@@ -249,7 +260,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 						className="settings-input min-w-0 flex-1 border-0 py-3 text-3xl font-bold shadow-none focus:shadow-none"
 					/>
 					<button type="button" onClick={() => setIsPaymentMethodModalOpen(true)} className="app-toolbar-chip shrink-0 self-stretch border-y-0 border-r-0 px-2">
-						{paymentMethod}
+						{paymentMethod === '任意' ? '支付方式' : paymentMethod}
 					</button>
 					<button type="button" onClick={() => setIsCurrencyModalOpen(true)} className="app-currency-btn" aria-label="选择币种">
 						<span className="app-currency-btn-symbol">{CURRENCY_DEFINITIONS[currency]?.symbol || '¥'}</span>
@@ -272,7 +283,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 					</div>
 				</div>
 
-				<input type="text" value={billName} onChange={(e) => setBillName(e.target.value)} placeholder="账单说明" className="settings-input py-2 text-sm" />
+				<input type="text" value={billName} onChange={(e) => setBillName(e.target.value)} placeholder="账单名称（可空）" className="settings-input py-2 text-sm" />
 
 				<div className="app-panel p-2">
 					<div className="mb-1 flex items-center justify-between">
@@ -319,12 +330,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 
 				<div className="grid grid-cols-4 gap-1">
 					{STATUSES.map((stat) => (
-						<button
-							key={stat.value}
-							type="button"
-							onClick={() => setStatus(stat.value)}
-							className={`app-toolbar-chip py-1.5 ${status === stat.value ? 'app-toolbar-chip-active' : ''}`}
-						>
+						<button key={stat.value} type="button" onClick={() => setStatus(stat.value)} className={`app-toolbar-chip py-1.5 ${status === stat.value ? 'app-toolbar-chip-active' : ''}`}>
 							{stat.label}
 						</button>
 					))}
