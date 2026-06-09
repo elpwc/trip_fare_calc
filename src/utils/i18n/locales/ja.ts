@@ -321,4 +321,13 @@ export const ja = {
 
 	'selector.noFriends': '友達がいません',
 	'modal.closeAria': '閉じる',
+
+	'test.friends.desc': 'テスト：名前から背景色を自動生成、最大2文字表示、本人にはオレンジの「私」バッジ',
+	'test.friends.clicked': '友達をクリック：{name}{self}',
+	'test.friends.selfSuffix': '（本人）',
+	'test.homepage.participants': '参加者リストスタイル',
+	'test.homepage.bills': '請求リストスタイル',
+	'test.homepage.payer': '支払者',
+	'test.homepage.amount': '金額',
+	'test.homepage.debtors': '負担者',
 } as const;

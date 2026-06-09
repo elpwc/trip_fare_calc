@@ -3,7 +3,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import BottomMenu from '@/src/components/BottomMenu';
 import { AuthProvider } from '@/src/utils/auth-provider';
 import { PageTitleSync, PreferencesProvider } from '@/src/utils/preferences-provider';
-import { APP_NAME } from '@/src/utils/preferences/constants';
+import { zhCN } from '@/src/utils/i18n/locales/zh-CN';
 import 'leaflet/dist/leaflet.css';
 import './globals.css';
 
@@ -19,10 +19,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
 	title: {
-		default: APP_NAME,
-		template: `${APP_NAME} - %s`,
+		default: zhCN['app.name'],
+		template: `${zhCN['app.name']} - %s`,
 	},
-	description: '旅行 AA 账单与结算工具',
+	description: zhCN['app.description'],
 };
 
 const themeInitScript = `(function(){try{var t=localStorage.getItem('tripFareCalc:theme')||'system';var l=localStorage.getItem('tripFareCalc:language')||'zh-CN';document.documentElement.lang=l;document.documentElement.dataset.theme=t;if(t==='dark'||(t==='system'&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark')}else{document.documentElement.classList.remove('dark')}}catch(e){}})();`;

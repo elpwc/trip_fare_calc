@@ -321,4 +321,13 @@ export const en = {
 
 	'selector.noFriends': 'No friends yet',
 	'modal.closeAria': 'Close',
+
+	'test.friends.desc': 'Test: auto background color from name, up to two characters, orange "Me" badge for self',
+	'test.friends.clicked': 'Clicked friend: {name}{self}',
+	'test.friends.selfSuffix': ' (self)',
+	'test.homepage.participants': 'Participant list style',
+	'test.homepage.bills': 'Bill list style',
+	'test.homepage.payer': 'Payer',
+	'test.homepage.amount': 'Amount',
+	'test.homepage.debtors': 'Owed by',
 } as const satisfies Record<keyof typeof import('./zh-CN').zhCN, string>;

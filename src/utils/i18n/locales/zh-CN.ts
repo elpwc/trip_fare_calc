@@ -321,6 +321,15 @@ export const zhCN = {
 
 	'selector.noFriends': '暂无好友',
 	'modal.closeAria': '关闭',
+
+	'test.friends.desc': '测试功能：根据名称自动生成不同背景色，最多显示两个文字，本人显示橙色「我」标识',
+	'test.friends.clicked': '点击了朋友：{name}{self}',
+	'test.friends.selfSuffix': '（本人）',
+	'test.homepage.participants': '参与者列表样式',
+	'test.homepage.bills': '账单列表样式',
+	'test.homepage.payer': '付钱人',
+	'test.homepage.amount': '金额',
+	'test.homepage.debtors': '欠钱人',
 } as const;
 
 export type ZhCNMessages = typeof zhCN;
