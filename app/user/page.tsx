@@ -401,28 +401,28 @@ export default function UserPage() {
 							showCancelButton
 							cancelText="取消"
 						>
-							<div className="space-y-4">
-								<div>
-									<label className="block text-sm font-medium mb-2">分享链接</label>
+							<div className="modal-stack">
+								<div className="modal-field">
+									<label className="app-label">分享链接</label>
 									<input
 										type="text"
 										value={joinLink}
 										onChange={(event) => setJoinLink(event.target.value)}
 										placeholder="粘贴完整链接，或仅粘贴 token"
-										className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-900"
+										className="settings-input py-2 text-sm"
 									/>
 								</div>
-								<div>
-									<label className="block text-sm font-medium mb-2">分享密码</label>
+								<div className="modal-field">
+									<label className="app-label">分享密码</label>
 									<input
 										type="text"
 										value={joinPassword}
 										onChange={(event) => setJoinPassword(event.target.value)}
 										placeholder="请输入分享密码"
-										className="w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm dark:border-slate-700 dark:bg-slate-900"
+										className="settings-input py-2 text-sm"
 									/>
 								</div>
-								{joinMessage ? <p className="text-sm text-rose-500">{joinMessage}</p> : null}
+								{joinMessage ? <p className="modal-message modal-message-error">{joinMessage}</p> : null}
 							</div>
 						</Modal>
 					</>

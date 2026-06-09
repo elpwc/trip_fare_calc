@@ -365,19 +365,16 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 			</div>
 
 			<Modal isOpen={isPaymentMethodModalOpen} onClose={() => setIsPaymentMethodModalOpen(false)} title="支付方法" showOkButton={false} showCancelButton cancelText="关闭">
-				<div className="grid grid-cols-2 gap-3">
+				<div className="modal-option-grid">
 					{PAYMENT_METHODS.map((method) => (
 						<button
 							key={method}
+							type="button"
 							onClick={() => {
 								setPaymentMethod(method);
 								setIsPaymentMethodModalOpen(false);
 							}}
-							className={`py-3 px-4 border-3 rounded-lg font-semibold transition ${
-								paymentMethod === method
-									? 'border-blue-600 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-									: 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-blue-500'
-							}`}
+							className={`modal-option ${paymentMethod === method ? 'modal-option-active' : ''}`}
 						>
 							{method}
 						</button>
@@ -386,10 +383,11 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 			</Modal>
 
 			<Modal isOpen={isCurrencyModalOpen} onClose={() => setIsCurrencyModalOpen(false)} title="币种" showOkButton={false} showCancelButton cancelText="关闭">
-				<div className="grid grid-cols-2 gap-3">
+				<div className="modal-option-grid">
 					{Object.entries(CURRENCY_DEFINITIONS).map(([key, curr]: [string, Currency]) => (
 						<button
 							key={curr.code}
+							type="button"
 							onClick={() => {
 								setCurrency(curr.code);
 								if (typeof window !== 'undefined') {
@@ -397,11 +395,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 								}
 								setIsCurrencyModalOpen(false);
 							}}
-							className={`grid grid-cols-2 gap-2 py-3 px-4 border-3 rounded-lg font-semibold transition ${
-								currency === curr.code
-									? 'border-blue-600 bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-									: 'border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-blue-500'
-							}`}
+							className={`modal-option modal-option-currency ${currency === curr.code ? 'modal-option-active' : ''}`}
 						>
 							<FlagSVG currency={curr} />
 							{curr.code}

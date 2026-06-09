@@ -316,27 +316,21 @@ export default function HomePage() {
 
 				{/* New Trip Modal */}
 				<Modal isOpen={isNewTripModalOpen} onClose={() => setIsNewTripModalOpen(false)} title="新建旅行" onOk={handleCreateTrip} okText="创建" showOkButton showCancelButton cancelText="取消">
-					<div className="space-y-4">
-						<div>
-							<label className="block text-sm font-medium mb-2">旅行名称</label>
-							<input type="text" value={newTripName} onChange={(e) => setNewTripName(e.target.value)} placeholder="例如：上海美食周" className="w-full px-3 py-2 border rounded" />
+					<div className="modal-stack">
+						<div className="modal-field">
+							<label className="app-label">旅行名称</label>
+							<input type="text" value={newTripName} onChange={(e) => setNewTripName(e.target.value)} placeholder="例如：上海美食周" className="settings-input py-2 text-sm" />
 						</div>
-						<div>
-							<label className="block text-sm font-medium mb-2">开始时间</label>
-							<input type="date" value={newTripStartDate} onChange={(e) => setNewTripStartDate(e.target.value)} className="w-full px-3 py-2 border rounded" />
+						<div className="modal-field">
+							<label className="app-label">开始时间</label>
+							<input type="date" value={newTripStartDate} onChange={(e) => setNewTripStartDate(e.target.value)} className="settings-input py-2 text-sm" />
 						</div>
-						<div>
-							<label className="block text-sm font-medium mb-2">备注</label>
-							<textarea
-								value={newTripDescription}
-								onChange={(e) => setNewTripDescription(e.target.value)}
-								placeholder="可选的旅行备注"
-								rows={3}
-								className="w-full px-3 py-2 border rounded"
-							/>
+						<div className="modal-field">
+							<label className="app-label">备注</label>
+							<textarea value={newTripDescription} onChange={(e) => setNewTripDescription(e.target.value)} placeholder="可选的旅行备注" rows={3} className="settings-input resize-none py-2 text-sm" />
 						</div>
-						<div>
-							<label className="block text-sm font-medium mb-2">选择参与者</label>
+						<div className="modal-field">
+							<label className="app-label">选择参与者</label>
 							<FriendSelector
 								friends={friends}
 								selectedFriends={selectedFriendsForTrip}
@@ -514,27 +508,21 @@ export default function HomePage() {
 
 			{/* New Trip Modal */}
 			<Modal isOpen={isNewTripModalOpen} onClose={() => setIsNewTripModalOpen(false)} title="新建旅行" onOk={handleCreateTrip} okText="创建" showOkButton showCancelButton cancelText="取消">
-				<div className="space-y-4">
-					<div>
-						<label className="block text-sm font-medium mb-2">旅行名称</label>
-						<input type="text" value={newTripName} onChange={(e) => setNewTripName(e.target.value)} placeholder="例如：上海美食周" className="w-full px-3 py-2 border rounded" />
+				<div className="modal-stack">
+					<div className="modal-field">
+						<label className="app-label">旅行名称</label>
+						<input type="text" value={newTripName} onChange={(e) => setNewTripName(e.target.value)} placeholder="例如：上海美食周" className="settings-input py-2 text-sm" />
 					</div>
-					<div>
-						<label className="block text-sm font-medium mb-2">开始时间</label>
-						<input type="date" value={newTripStartDate} onChange={(e) => setNewTripStartDate(e.target.value)} className="w-full px-3 py-2 border rounded" />
+					<div className="modal-field">
+						<label className="app-label">开始时间</label>
+						<input type="date" value={newTripStartDate} onChange={(e) => setNewTripStartDate(e.target.value)} className="settings-input py-2 text-sm" />
 					</div>
-					<div>
-						<label className="block text-sm font-medium mb-2">备注</label>
-						<textarea
-							value={newTripDescription}
-							onChange={(e) => setNewTripDescription(e.target.value)}
-							placeholder="可选的旅行备注"
-							rows={3}
-							className="w-full px-3 py-2 border rounded"
-						/>
+					<div className="modal-field">
+						<label className="app-label">备注</label>
+						<textarea value={newTripDescription} onChange={(e) => setNewTripDescription(e.target.value)} placeholder="可选的旅行备注" rows={3} className="settings-input resize-none py-2 text-sm" />
 					</div>
-					<div>
-						<label className="block text-sm font-medium mb-2">选择参与者</label>
+					<div className="modal-field">
+						<label className="app-label">选择参与者</label>
 						<FriendSelector
 							friends={friends}
 							selectedFriends={selectedFriendsForTrip}
@@ -557,8 +545,8 @@ export default function HomePage() {
 				showCancelButton
 				cancelText="取消"
 			>
-				<div className="space-y-4">
-					<p className="text-sm text-slate-600">点击选择要添加到这个旅行的好友</p>
+				<div className="modal-stack">
+					<p className="modal-hint">点击选择要添加到这个旅行的好友</p>
 					<FriendSelector
 						friends={friends.filter((f) => !(currentTrip?.members || []).some((m) => m.id === f.id))}
 						selectedFriends={selectedFriendsForTrip}
@@ -571,51 +559,43 @@ export default function HomePage() {
 
 			{/* Map Details Modal */}
 			<Modal isOpen={isMapModalOpen} onClose={() => setIsMapModalOpen(false)} title="账单地图详情" showOkButton={false} showCancelButton cancelText="关闭" className="max-w-5xl">
-				<div className="space-y-4">
-					<div className="flex flex-wrap items-center gap-3">
-						<button
-							type="button"
-							onClick={() => setMapTileLayer('osm')}
-							className={`rounded-3xl px-4 py-2 text-sm font-semibold ${mapTileLayer === 'osm' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'}`}
-						>
+				<div className="modal-stack">
+					<div className="flex flex-wrap items-center gap-1.5">
+						<button type="button" onClick={() => setMapTileLayer('osm')} className={`app-toolbar-chip ${mapTileLayer === 'osm' ? 'app-toolbar-chip-active' : ''}`}>
 							OSM 地图
 						</button>
-						<button
-							type="button"
-							onClick={() => setMapTileLayer('satellite')}
-							className={`rounded-3xl px-4 py-2 text-sm font-semibold ${mapTileLayer === 'satellite' ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'}`}
-						>
+						<button type="button" onClick={() => setMapTileLayer('satellite')} className={`app-toolbar-chip ${mapTileLayer === 'satellite' ? 'app-toolbar-chip-active' : ''}`}>
 							卫星影像
 						</button>
 					</div>
-					<div className="h-140 rounded-3xl border border-slate-200 bg-white/95 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+					<div className="app-panel h-140 overflow-hidden">
 						<BillMap bills={currentBills} interactive={true} tileLayer={mapTileLayer} />
 					</div>
 				</div>
 			</Modal>
 
 			{/* Member Detail Modal */}
-			<Modal isOpen={isMemberDetailModalOpen} onClose={() => setIsMemberDetailModalOpen(false)} title="" showCloseButton={false} className="max-w-md">
+			<Modal isOpen={isMemberDetailModalOpen} onClose={() => setIsMemberDetailModalOpen(false)} title="成员详情" showCloseButton={false} className="max-w-md">
 				{selectedMember && (
-					<div className="space-y-4">
-						<div className="flex items-center space-x-4">
-							<div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">{selectedMember.name.charAt(0).toUpperCase()}</div>
-							<div className="flex-1">
-								<h3 className="font-semibold">{selectedMember.name}</h3>
-								<p className="text-sm text-slate-600">{selectedMember.description || '无描述'}</p>
+					<div className="modal-stack">
+						<div className="modal-member-row">
+							<FriendIcon name={selectedMember.name} size="lg" isSelf={selectedMember.isSelf} />
+							<div className="modal-member-meta">
+								<h3 className="modal-member-name">{selectedMember.name}</h3>
+								<p className="modal-hint">{selectedMember.description || '无描述'}</p>
 							</div>
 						</div>
 
-						<div>
-							<h4 className="font-semibold mb-2">参加过的旅行</h4>
-							<p className="text-sm text-slate-600">共参加过 {selectedMember.participationCount} 次旅行</p>
+						<div className="modal-panel">
+							<p className="modal-panel-title">参加过的旅行</p>
+							<p className="modal-hint">共参加过 {selectedMember.participationCount} 次旅行</p>
 						</div>
 
-						<div className="flex justify-between">
-							<button onClick={handleRemoveMember} className="px-4 py-2 bg-red-500 text-white rounded">
+						<div className="modal-actions">
+							<button type="button" onClick={handleRemoveMember} className="app-btn-compact app-btn-compact-danger">
 								从这个旅行中移除
 							</button>
-							<button onClick={() => setIsMemberDetailModalOpen(false)} className="px-4 py-2 bg-gray-500 text-white rounded">
+							<button type="button" onClick={() => setIsMemberDetailModalOpen(false)} className="app-btn-compact">
 								关闭
 							</button>
 						</div>
@@ -625,57 +605,34 @@ export default function HomePage() {
 
 			{/* Edit Trip Modal */}
 			<Modal isOpen={isEditTripModalOpen} onClose={() => setIsEditTripModalOpen(false)} title="编辑旅行名称" onOk={handleEditTrip} okText="保存" showOkButton showCancelButton cancelText="取消">
-				<div className="space-y-4">
-					<div>
-						<label className="block text-sm font-medium mb-2">旅行名称</label>
-						<input
-							type="text"
-							value={editTripName}
-							onChange={(e) => setEditTripName(e.target.value)}
-							placeholder="输入新的旅行名称"
-							className="w-full px-3 py-2 border rounded dark:bg-slate-800 dark:border-slate-700"
-						/>
-					</div>
+				<div className="modal-field">
+					<label className="app-label">旅行名称</label>
+					<input type="text" value={editTripName} onChange={(e) => setEditTripName(e.target.value)} placeholder="输入新的旅行名称" className="settings-input py-2 text-sm" />
 				</div>
 			</Modal>
 
 			<Modal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} title="分享旅行" showOkButton={false} showCancelButton cancelText="关闭">
-				<div className="space-y-4">
-					<p className="text-sm text-slate-600 dark:text-slate-400">设置分享密码后，将链接发送给旅伴，对方输入密码即可加入并共同编辑。</p>
-					<div>
-						<label className="block text-sm font-medium mb-2">分享密码</label>
-						<input
-							type="text"
-							value={sharePassword}
-							onChange={(e) => setSharePassword(e.target.value)}
-							placeholder="设置一个便于记忆的密码"
-							className="w-full px-3 py-2 border rounded dark:bg-slate-800 dark:border-slate-700"
-						/>
+				<div className="modal-stack">
+					<p className="modal-hint">设置分享密码后，将链接发送给旅伴，对方输入密码即可加入并共同编辑。</p>
+					<div className="modal-field">
+						<label className="app-label">分享密码</label>
+						<input type="text" value={sharePassword} onChange={(e) => setSharePassword(e.target.value)} placeholder="设置一个便于记忆的密码" className="settings-input py-2 text-sm" />
 					</div>
-					<button
-						type="button"
-						onClick={handleCreateShare}
-						disabled={isSharing}
-						className="w-full rounded-2xl bg-sky-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-sky-500 disabled:opacity-60"
-					>
+					<button type="button" onClick={handleCreateShare} disabled={isSharing} className="settings-btn-primary w-full py-2.5 text-sm disabled:opacity-60">
 						{isSharing ? '生成中...' : shareUrl ? '更新分享密码' : '生成分享链接'}
 					</button>
 					{shareUrl ? (
-						<div className="space-y-2">
-							<label className="block text-sm font-medium">分享链接</label>
+						<div className="modal-field">
+							<label className="app-label">分享链接</label>
 							<div className="flex gap-2">
-								<input type="text" readOnly value={shareUrl} className="flex-1 min-w-0 px-3 py-2 border rounded text-xs dark:bg-slate-800 dark:border-slate-700" />
-								<button
-									type="button"
-									onClick={handleCopyShareLink}
-									className="rounded-2xl bg-slate-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800 dark:bg-slate-100 dark:text-slate-900 dark:hover:bg-white"
-								>
+								<input type="text" readOnly value={shareUrl} className="settings-input min-w-0 flex-1 py-2 text-xs" />
+								<button type="button" onClick={handleCopyShareLink} className="app-btn-compact app-btn-compact-primary shrink-0 px-3 py-2">
 									复制
 								</button>
 							</div>
 						</div>
 					) : null}
-					{shareMessage ? <p className="text-sm text-sky-600 dark:text-sky-400">{shareMessage}</p> : null}
+					{shareMessage ? <p className="modal-message modal-message-info">{shareMessage}</p> : null}
 				</div>
 			</Modal>
 
@@ -689,7 +646,7 @@ export default function HomePage() {
 				showCancelButton
 				cancelText="取消"
 			>
-				<p className="text-sm text-slate-600 dark:text-slate-400">
+				<p className="modal-hint">
 					{currentTrip?.isOwner === false ? '移除后该旅行将从你的列表中消失，但不会影响其他参与者。' : '删除后该旅行及其所有账单将被隐藏，分享链接也会失效。'}
 				</p>
 			</Modal>

@@ -4,6 +4,7 @@ import { Modal } from '@/src/components/Modal';
 import AppShell from '@/src/components/layout/AppShell';
 import { getAuthHeaders } from '@/src/utils/auth';
 import FriendList from '@/src/components/FriendList';
+import FriendIcon from '@/src/components/FriendIcon';
 import React, { useState, useEffect } from 'react';
 import { Friend } from '@/src/types';
 
@@ -212,80 +213,77 @@ const FriendsPage: React.FC = () => {
 				</button>
 			</div>
 			{/* Friend Modal */}
-			<Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="" showCloseButton={false} className="max-w-md">
+			<Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="旅伴详情" showCloseButton={false} className="max-w-md">
 				{selectedFriend && (
-					<div className="space-y-4">
-						{/* Row 1: Icon, Name, Edit Name Button */}
-						<div className="flex items-center space-x-4">
-							<div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">{selectedFriend.name.charAt(0).toUpperCase()}</div>
+					<div className="modal-stack">
+						<div className="modal-member-row">
+							<FriendIcon name={selectedFriend.name} size="lg" isSelf={selectedFriend.isSelf} />
 							{isEditingName ? (
-								<div className="flex-1 flex space-x-2">
-									<input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} className="flex-1 px-2 py-1 border rounded" />
-									<button onClick={handleUpdateName} className="px-3 py-1 bg-blue-500 text-white rounded">
+								<div className="modal-member-meta flex items-center gap-2">
+									<input type="text" value={newName} onChange={(e) => setNewName(e.target.value)} className="settings-input min-w-0 flex-1 py-1.5 text-sm" />
+									<button type="button" onClick={handleUpdateName} className="app-btn-compact app-btn-compact-primary">
 										保存
 									</button>
-									<button onClick={() => setIsEditingName(false)} className="px-3 py-1 bg-gray-500 text-white rounded">
+									<button type="button" onClick={() => setIsEditingName(false)} className="app-btn-compact">
 										取消
 									</button>
 								</div>
 							) : (
-								<>
-									<span className="flex-1 font-semibold">{selectedFriend.name}</span>
-									<button onClick={() => setIsEditingName(true)} className="px-3 py-1 bg-blue-500 text-white rounded text-sm">
+								<div className="modal-member-meta flex items-center gap-2">
+									<span className="modal-member-name flex-1">{selectedFriend.name}</span>
+									<button type="button" onClick={() => setIsEditingName(true)} className="app-btn-compact">
 										修改
 									</button>
-								</>
+								</div>
 							)}
 						</div>
 
-						{/* Row 2: Description */}
-						<div className="flex items-start space-x-2">
+						<div className="modal-field">
 							{isEditingDescription ? (
-								<div className="flex-1 flex space-x-2">
-									<input type="text" value={newDescription} onChange={(e) => setNewDescription(e.target.value)} className="flex-1 px-2 py-1 border rounded" placeholder="描述" />
-									<button onClick={handleUpdateDescription} className="px-3 py-1 bg-blue-500 text-white rounded">
+								<div className="flex items-center gap-2">
+									<input type="text" value={newDescription} onChange={(e) => setNewDescription(e.target.value)} className="settings-input min-w-0 flex-1 py-1.5 text-sm" placeholder="描述" />
+									<button type="button" onClick={handleUpdateDescription} className="app-btn-compact app-btn-compact-primary">
 										保存
 									</button>
-									<button onClick={() => setIsEditingDescription(false)} className="px-3 py-1 bg-gray-500 text-white rounded">
+									<button type="button" onClick={() => setIsEditingDescription(false)} className="app-btn-compact">
 										取消
 									</button>
 								</div>
 							) : (
-								<>
-									<p className="flex-1">{selectedFriend.description || '无描述'}</p>
-									<button onClick={() => setIsEditingDescription(true)} className="px-2 py-1 bg-gray-300 text-gray-700 rounded text-sm">
+								<div className="flex items-start gap-2">
+									<p className="modal-hint flex-1">{selectedFriend.description || '无描述'}</p>
+									<button type="button" onClick={() => setIsEditingDescription(true)} className="app-btn-compact shrink-0">
 										编辑
 									</button>
-								</>
+								</div>
 							)}
 						</div>
 
-						{/* Row 3: Trips */}
-						<div>
-							<h3 className="font-semibold mb-2">参加过的旅行 ({selectedFriend.trips.length} 次)</h3>
-							<ul className="space-y-1">
+						<div className="modal-panel">
+							<p className="modal-panel-title">参加过的旅行 ({selectedFriend.trips.length} 次)</p>
+							<ul className="modal-trip-list">
 								{selectedFriend.trips.map((trip) => (
-									<li key={trip.id} className="text-sm">
-										{trip.name} - {trip.date}
+									<li key={trip.id}>
+										{trip.name} · {trip.date}
 									</li>
 								))}
 							</ul>
 						</div>
 
-						{/* Row 4: Set as Self, Delete and Close Buttons */}
-						<div className="flex justify-between">
-							<div className="flex space-x-2">
+						<div className="modal-actions">
+							<div className="modal-actions-start">
 								<button
+									type="button"
 									onClick={handleSetAsSelf}
-									className={`px-4 py-2 rounded ${selectedFriend.isSelf ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+									className={`app-btn-compact ${selectedFriend.isSelf ? 'app-btn-compact-danger' : 'app-btn-compact-primary'}`}
 								>
 									{selectedFriend.isSelf ? '这不是我本人' : '这是我本人'}
 								</button>
-								<button onClick={handleDeleteFriend} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
+								<button type="button" onClick={handleDeleteFriend} className="app-btn-compact app-btn-compact-danger">
 									删除
 								</button>
 							</div>
-							<button onClick={() => setIsModalOpen(false)} className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+							<button type="button" onClick={() => setIsModalOpen(false)} className="app-btn-compact">
 								关闭
 							</button>
 						</div>
@@ -295,16 +293,21 @@ const FriendsPage: React.FC = () => {
 
 			{/* Add Friend Modal */}
 			<Modal isOpen={isAddingFriend} onClose={() => setIsAddingFriend(false)} title="添加朋友" onOk={handleAddFriend} okText="添加" showOkButton showCancelButton cancelText="取消">
-				<div className="space-y-4">
-					<input type="text" placeholder="朋友姓名" value={newFriendName} onChange={(e) => setNewFriendName(e.target.value)} className="w-full px-3 py-2 border rounded" />
-					<input type="text" placeholder="描述（可选）" value={newFriendDescription} onChange={(e) => setNewFriendDescription(e.target.value)} className="w-full px-3 py-2 border rounded" />
+				<div className="modal-stack">
+					<div className="modal-field">
+						<label className="app-label">朋友姓名</label>
+						<input type="text" placeholder="朋友姓名" value={newFriendName} onChange={(e) => setNewFriendName(e.target.value)} className="settings-input py-2 text-sm" />
+					</div>
+					<div className="modal-field">
+						<label className="app-label">描述（可选）</label>
+						<input type="text" placeholder="描述（可选）" value={newFriendDescription} onChange={(e) => setNewFriendDescription(e.target.value)} className="settings-input py-2 text-sm" />
+					</div>
 					<button
-						onClick={() => {
-							setNewFriendIsMe(!newFriendIsMe);
-						}}
-						className={`px-4 py-2 rounded ${newFriendIsMe ? 'bg-orange-500 text-white hover:bg-orange-600' : 'bg-blue-500 text-white hover:bg-blue-600'}`}
+						type="button"
+						onClick={() => setNewFriendIsMe(!newFriendIsMe)}
+						className={`settings-chip w-full ${newFriendIsMe ? 'settings-chip-active' : ''}`}
 					>
-						{newFriendIsMe ? '这是我本人(已选择)' : '这是我本人'}
+						{newFriendIsMe ? '这是我本人（已选择）' : '这是我本人'}
 					</button>
 				</div>
 			</Modal>

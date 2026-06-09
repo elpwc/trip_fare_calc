@@ -217,16 +217,13 @@ function SharePageContent() {
 				showCancelButton
 				cancelText="取消"
 			>
-				<div className="space-y-3">
-					<p className="text-sm text-slate-600 dark:text-slate-400">请输入分享者提供的密码以查看或加入此旅行。</p>
-					<input
-						type="text"
-						value={password}
-						onChange={(e) => setPassword(e.target.value)}
-						placeholder="分享密码"
-						className="settings-input"
-					/>
-					{passwordError ? <p className="text-sm text-rose-500">{passwordError}</p> : null}
+				<div className="modal-stack">
+					<p className="modal-hint">请输入分享者提供的密码以查看或加入此旅行。</p>
+					<div className="modal-field">
+						<label className="app-label">分享密码</label>
+						<input type="text" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="分享密码" className="settings-input py-2 text-sm" />
+					</div>
+					{passwordError ? <p className="modal-message modal-message-error">{passwordError}</p> : null}
 				</div>
 			</Modal>
 		</AppShell>

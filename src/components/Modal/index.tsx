@@ -1,6 +1,6 @@
 'use client';
 
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode } from 'react';
 import './index.css';
 import clsx from 'clsx';
 
@@ -49,53 +49,67 @@ export const Modal: React.FC<Props> = ({
 }) => {
 	if (!isOpen) return null;
 
+	const hasFooter = showCancelButton || showCancel2Button || showOkButton;
+
 	return (
-		isOpen && (
-			<div
-				className="modal-overlay"
-				onClick={(e) => {
-					e.preventDefault();
-					onClose();
-				}}
-			>
-				<div className={clsx(`modal-content mobile-${mobileMode}`, className)} style={style} onClick={(e) => e.stopPropagation()}>
-					{showCloseButton && (
-						<button
-							className="modal-close-btn"
-							onClick={(e) => {
-								e.preventDefault();
-								onClose();
-							}}
-						>
-							×
-						</button>
-					)}
+		<div
+			className="modal-overlay"
+			onClick={(e) => {
+				e.preventDefault();
+				onClose();
+			}}
+		>
+			<div className={clsx('modal-content', `mobile-${mobileMode}`, className)} style={style} onClick={(e) => e.stopPropagation()}>
+				{showCloseButton ? (
+					<button
+						type="button"
+						className="modal-close-btn"
+						aria-label="关闭"
+						onClick={(e) => {
+							e.preventDefault();
+							onClose();
+						}}
+					>
+						×
+					</button>
+				) : null}
 
-					{title && <div className="modal-title">{title}</div>}
-
-					<div className={clsx('modal-body', bodyClassName)} style={bodyStyle}>
-						{children}
+				{title ? (
+					<div className="modal-head">
+						<div className="modal-title">{title}</div>
+						<div className="modal-perforation" aria-hidden />
 					</div>
+				) : null}
 
-					<div className="modal-footer">
-						{showCancelButton && (
-							<button className="modal-btn styled-button" onClick={onCancel || onClose}>
-								{cancelText}
-							</button>
-						)}
-						{showCancel2Button && (
-							<button className="modal-btn styled-button" onClick={onCancel2}>
-								{cancel2Text}
-							</button>
-						)}
-						{showOkButton && (
-							<button className="modal-btn styled-button primary-button" onClick={onOk}>
-								{okText}
-							</button>
-						)}
-					</div>
+				<div className={clsx('modal-body', bodyClassName)} style={bodyStyle}>
+					{children}
 				</div>
+
+				{hasFooter ? (
+					<>
+						<div className="modal-perforation" aria-hidden />
+						<div className="modal-footer">
+							{showCancelButton ? (
+								<button type="button" className="settings-btn-ghost modal-footer-btn" onClick={onCancel || onClose}>
+									{cancelText}
+								</button>
+							) : null}
+							{showCancel2Button ? (
+								<button type="button" className="settings-btn-ghost modal-footer-btn" onClick={onCancel2}>
+									{cancel2Text}
+								</button>
+							) : null}
+							{showOkButton ? (
+								<button type="button" className="settings-btn-primary modal-footer-btn" onClick={onOk}>
+									{okText}
+								</button>
+							) : null}
+						</div>
+					</>
+				) : null}
+
+				<div className="settings-receipt-teeth" aria-hidden />
 			</div>
-		)
+		</div>
 	);
 };
