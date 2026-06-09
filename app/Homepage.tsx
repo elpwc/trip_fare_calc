@@ -22,7 +22,7 @@ export default function HomePage() {
 	const [isMemberDetailModalOpen, setIsMemberDetailModalOpen] = useState(false);
 	const [selectedMember, setSelectedMember] = useState<TripMember | null>(null);
 	const [newTripName, setNewTripName] = useState('');
-	const [newTripStartDate, setNewTripStartDate] = useState('');
+	const [newTripStartDate, setNewTripStartDate] = useState(new Date().toISOString().split('T')[0]);
 	const [newTripDescription, setNewTripDescription] = useState('');
 	const [selectedFriendsForTrip, setSelectedFriendsForTrip] = useState<string[]>([]);
 	const [isMapModalOpen, setIsMapModalOpen] = useState(false);
@@ -327,7 +327,13 @@ export default function HomePage() {
 						</div>
 						<div className="modal-field">
 							<label className="app-label">备注</label>
-							<textarea value={newTripDescription} onChange={(e) => setNewTripDescription(e.target.value)} placeholder="可选的旅行备注" rows={3} className="settings-input resize-none py-2 text-sm" />
+							<textarea
+								value={newTripDescription}
+								onChange={(e) => setNewTripDescription(e.target.value)}
+								placeholder="可选的旅行备注"
+								rows={3}
+								className="settings-input resize-none py-2 text-sm"
+							/>
 						</div>
 						<div className="modal-field">
 							<label className="app-label">选择参与者</label>
@@ -387,7 +393,14 @@ export default function HomePage() {
 
 			<div className="mt-1.5 flex flex-wrap items-center gap-1">
 				{currentTrip && !currentTrip.isOwner ? <span className="app-tag app-tag-share">分享·{currentTrip.ownerName}</span> : null}
-				<button type="button" onClick={() => { setEditTripName(currentTrip?.name || ''); setIsEditTripModalOpen(true); }} className="app-toolbar-chip">
+				<button
+					type="button"
+					onClick={() => {
+						setEditTripName(currentTrip?.name || '');
+						setIsEditTripModalOpen(true);
+					}}
+					className="app-toolbar-chip"
+				>
 					改名
 				</button>
 				<button type="button" onClick={() => setIsDeleteTripModalOpen(true)} className="app-toolbar-chip">
@@ -511,7 +524,7 @@ export default function HomePage() {
 				<div className="modal-stack">
 					<div className="modal-field">
 						<label className="app-label">旅行名称</label>
-						<input type="text" value={newTripName} onChange={(e) => setNewTripName(e.target.value)} placeholder="例如：上海美食周" className="settings-input py-2 text-sm" />
+						<input type="text" value={newTripName} onChange={(e) => setNewTripName(e.target.value)} placeholder="例：下北泽美食节旅" className="settings-input py-2 text-sm" />
 					</div>
 					<div className="modal-field">
 						<label className="app-label">开始时间</label>
@@ -519,7 +532,13 @@ export default function HomePage() {
 					</div>
 					<div className="modal-field">
 						<label className="app-label">备注</label>
-						<textarea value={newTripDescription} onChange={(e) => setNewTripDescription(e.target.value)} placeholder="可选的旅行备注" rows={3} className="settings-input resize-none py-2 text-sm" />
+						<textarea
+							value={newTripDescription}
+							onChange={(e) => setNewTripDescription(e.target.value)}
+							placeholder="可选的旅行备注"
+							rows={3}
+							className="settings-input resize-none py-2 text-sm"
+						/>
 					</div>
 					<div className="modal-field">
 						<label className="app-label">选择参与者</label>
@@ -646,9 +665,7 @@ export default function HomePage() {
 				showCancelButton
 				cancelText="取消"
 			>
-				<p className="modal-hint">
-					{currentTrip?.isOwner === false ? '移除后该旅行将从你的列表中消失，但不会影响其他参与者。' : '删除后该旅行及其所有账单将被隐藏，分享链接也会失效。'}
-				</p>
+				<p className="modal-hint">{currentTrip?.isOwner === false ? '移除后该旅行将从你的列表中消失，但不会影响其他参与者。' : '删除后该旅行及其所有账单将被隐藏，分享链接也会失效。'}</p>
 			</Modal>
 		</AppShell>
 	);
