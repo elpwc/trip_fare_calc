@@ -1,13 +1,16 @@
 'use client';
 
 import { useState } from 'react';
+import { Modal } from '@/src/components/Modal';
+import PwaInstallGuide from '@/src/components/PwaInstallGuide';
 import { usePwa } from '@/src/utils/pwa/pwa-provider';
 import { usePreferences } from '@/src/utils/preferences-provider';
 
 export default function PwaInstallButton() {
 	const { t } = usePreferences();
-	const { canInstall, isInstalled, isIos, install } = usePwa();
+	const { canInstall, isInstalled, install } = usePwa();
 	const [message, setMessage] = useState('');
+	const [guideOpen, setGuideOpen] = useState(false);
 
 	const handleClick = async () => {
 		setMessage('');
@@ -18,10 +21,13 @@ export default function PwaInstallButton() {
 			if (result === 'dismissed') {
 				setMessage(t('pwa.installDismissed'));
 			}
+			if (result === 'unavailable') {
+				setGuideOpen(true);
+			}
 			return;
 		}
 
-		setMessage(isIos ? t('pwa.iosHint') : t('pwa.installUnavailable'));
+		setGuideOpen(true);
 	};
 
 	return (
@@ -37,6 +43,10 @@ export default function PwaInstallButton() {
 				{isInstalled ? t('pwa.installed') : t('pwa.installDesktop')}
 			</button>
 			{message ? <p className="text-app-muted mt-2 text-[12px] leading-relaxed">{message}</p> : null}
+
+			<Modal isOpen={guideOpen} onClose={() => setGuideOpen(false)} title={t('pwa.guideTitleBrowser')} showOkButton okText={t('common.ok')} onOk={() => setGuideOpen(false)}>
+				<PwaInstallGuide />
+			</Modal>
 		</div>
 	);
 }

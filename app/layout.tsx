@@ -5,6 +5,7 @@ import PwaInstallPrompt from '@/src/components/PwaInstallPrompt';
 import { AuthProvider } from '@/src/utils/auth-provider';
 import { PageTitleSync, PreferencesProvider } from '@/src/utils/preferences-provider';
 import { PwaProvider } from '@/src/utils/pwa/pwa-provider';
+import { BASE_PATH } from '@/src/config/base-path';
 import { zhCN } from '@/src/utils/i18n/locales/zh-CN';
 import 'leaflet/dist/leaflet.css';
 import './globals.css';
@@ -25,9 +26,18 @@ export const metadata: Metadata = {
 		template: `${zhCN['app.name']} - %s`,
 	},
 	description: zhCN['app.description'],
+	applicationName: '算钱',
+	manifest: `${BASE_PATH}/manifest.webmanifest`,
+	icons: {
+		icon: [
+			{ url: `${BASE_PATH}/icons/icon192.png`, sizes: '192x192', type: 'image/png' },
+			{ url: `${BASE_PATH}/icons/icon512.png`, sizes: '512x512', type: 'image/png' },
+		],
+		apple: [{ url: `${BASE_PATH}/icons/icon.png`, sizes: '180x180', type: 'image/png' }],
+	},
 	appleWebApp: {
 		capable: true,
-		title: zhCN['app.name'],
+		title: '算钱',
 		statusBarStyle: 'default',
 	},
 };

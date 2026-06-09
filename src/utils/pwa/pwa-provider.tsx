@@ -2,6 +2,7 @@
 
 import { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import type { BeforeInstallPromptEvent, PwaInstallResult } from '@/src/utils/pwa/types';
+import { PWA_SCOPE, PWA_SW_URL } from '@/src/utils/pwa/config';
 
 type PwaContextValue = {
 	canInstall: boolean;
@@ -37,7 +38,7 @@ export function PwaProvider({ children }: { children: ReactNode }) {
 		setIsInstalled(detectStandalone());
 
 		if ('serviceWorker' in navigator) {
-			navigator.serviceWorker.register('/sw.js').catch(() => undefined);
+			navigator.serviceWorker.register(PWA_SW_URL, { scope: PWA_SCOPE }).catch(() => undefined);
 		}
 
 		const onBeforeInstallPrompt = (event: Event) => {
