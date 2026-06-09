@@ -44,23 +44,26 @@ function getSizeClasses(size: 'sm' | 'md' | 'lg' | 'xl'): { container: string; b
 	const sizeMap = {
 		sm: {
 			container: 'h-6 w-6 text-[8px]',
-			badge: 'text-[6px] px-0.5 -bottom-1 -right-1',
+			badge: 'min-h-[14px] min-w-[14px] px-0.5 text-[9px] -bottom-1 -right-1.5',
 		},
 		md: {
 			container: 'h-8 w-8 text-[10px]',
-			badge: 'text-[7px] px-0.5 -bottom-1 -right-1',
+			badge: 'min-h-[16px] min-w-[16px] px-0.5 text-[10px] -bottom-1 -right-2',
 		},
 		lg: {
 			container: 'h-11 w-11 text-[11px]',
-			badge: 'text-[8px] px-1 -bottom-1.5 -right-1.5',
+			badge: 'min-h-[18px] min-w-[18px] px-1 text-[11px] -bottom-1 -right-2',
 		},
 		xl: {
 			container: 'h-14 w-14 text-xs',
-			badge: 'text-[9px] px-1 -bottom-1.5 -right-1.5',
+			badge: 'min-h-[20px] min-w-[20px] px-1 text-xs -bottom-1 -right-2.5',
 		},
 	};
 	return sizeMap[size];
 }
+
+const SELF_BADGE_BASE =
+	'absolute z-10 inline-flex items-center justify-center rounded-full border-2 border-[#1a1814] bg-[#e63946] font-bold leading-none text-[#fffdf8] shadow-[1px_1px_0_rgba(26,24,20,0.35)] ring-1 ring-[#fffdf8] dark:border-[#f4efe4] dark:bg-[#ff6b6b] dark:text-[#1a1814] dark:ring-[#1c1a18] dark:shadow-[1px_1px_0_rgba(244,239,228,0.2)]';
 
 const STAMP_BASE =
 	'relative inline-flex shrink-0 items-center justify-center border-2 border-[#1a1814] font-bold shadow-[2px_2px_0_rgba(26,24,20,0.12)] transition-transform dark:border-[#f4efe4] dark:shadow-[2px_2px_0_rgba(244,239,228,0.06)] settings-mono';
@@ -79,11 +82,7 @@ export const FriendIcon: React.FC<FriendIconProps> = ({ name, size = 'md', isSel
 		>
 			{displayText}
 			{isSelf ? (
-				<span
-					className={`absolute border border-[#1a1814] bg-[#2a9d8f] font-bold leading-none text-[#fffdf8] dark:border-[#f4efe4] dark:bg-[#5fd3c4] dark:text-[#1a1814] ${sizeClasses.badge}`}
-				>
-					{t('common.self')}
-				</span>
+				<span className={`${SELF_BADGE_BASE} ${sizeClasses.badge}`}>{t('common.self')}</span>
 			) : null}
 		</div>
 	);

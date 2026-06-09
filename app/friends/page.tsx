@@ -6,6 +6,7 @@ import { getAuthHeaders } from '@/src/utils/auth';
 import { apiPath } from '@/src/config/paths';
 import FriendList from '@/src/components/FriendList';
 import FriendIcon from '@/src/components/FriendIcon';
+import AddFriendModal from '@/src/components/AddFriendModal';
 import { usePreferences } from '@/src/utils/preferences-provider';
 import { useRequireAuth } from '@/src/utils/use-require-auth';
 import React, { useState, useEffect } from 'react';
@@ -22,9 +23,6 @@ const FriendsPage: React.FC = () => {
 	const [newName, setNewName] = useState('');
 	const [newDescription, setNewDescription] = useState('');
 	const [isAddingFriend, setIsAddingFriend] = useState(false);
-	const [newFriendName, setNewFriendName] = useState('');
-	const [newFriendDescription, setNewFriendDescription] = useState('');
-	const [newFriendIsMe, setNewFriendIsMe] = useState(false);
 
 	useEffect(() => {
 		fetchFriends();
@@ -162,34 +160,6 @@ const FriendsPage: React.FC = () => {
 		}
 	};
 
-	const handleAddFriend = async () => {
-		if (!newFriendName.trim()) return;
-		try {
-			const response = await fetch(apiPath('/api/friends'), {
-				method: 'POST',
-				headers: {
-					...getAuthHeaders(),
-					'Content-Type': 'application/json',
-				},
-				body: JSON.stringify({
-					name: newFriendName.trim(),
-					description: newFriendDescription,
-					isSelf: newFriendIsMe,
-				}),
-			});
-			if (response.ok) {
-				const newFriend = await response.json();
-				setFriends([...friends, { ...newFriend, trips: [] }]);
-				setNewFriendName('');
-				setNewFriendDescription('');
-				setNewFriendIsMe(false);
-				setIsAddingFriend(false);
-			}
-		} catch (error) {
-			console.error('Failed to add friend:', error);
-		}
-	};
-
 	const formatTripDate = (date: string) => {
 		const parsed = new Date(date);
 		return Number.isNaN(parsed.getTime()) ? date : parsed.toLocaleDateString(locale);
@@ -301,40 +271,7 @@ const FriendsPage: React.FC = () => {
 				)}
 			</Modal>
 
-			<Modal
-				isOpen={isAddingFriend}
-				onClose={() => setIsAddingFriend(false)}
-				title={t('friends.addTitle')}
-				onOk={handleAddFriend}
-				okText={t('common.add')}
-				showOkButton
-				showCancelButton
-				cancelText={t('common.cancel')}
-			>
-				<div className="modal-stack">
-					<div className="modal-field">
-						<label className="app-label">{t('friends.name')}</label>
-						<input type="text" placeholder={t('friends.namePlaceholder')} value={newFriendName} onChange={(e) => setNewFriendName(e.target.value)} className="settings-input py-2 text-sm" />
-					</div>
-					<div className="modal-field">
-						<label className="app-label">{t('friends.description')}</label>
-						<input
-							type="text"
-							placeholder={t('friends.descriptionPlaceholder')}
-							value={newFriendDescription}
-							onChange={(e) => setNewFriendDescription(e.target.value)}
-							className="settings-input py-2 text-sm"
-						/>
-					</div>
-					<button
-						type="button"
-						onClick={() => setNewFriendIsMe(!newFriendIsMe)}
-						className={`settings-chip w-full ${newFriendIsMe ? 'settings-chip-active' : ''}`}
-					>
-						{newFriendIsMe ? t('friends.isSelfSelected') : t('friends.isSelf')}
-					</button>
-				</div>
-			</Modal>
+			<AddFriendModal isOpen={isAddingFriend} onClose={() => setIsAddingFriend(false)} onAdded={(newFriend) => setFriends((prev) => [...prev, newFriend])} />
 			{AuthRequiredModal}
 		</AppShell>
 	);

@@ -41,12 +41,24 @@ export async function POST(request: NextRequest) {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const user = await prisma.user.create({
-      data: {
-        email,
-        name,
-        password: passwordHash,
-      },
+    const user = await prisma.$transaction(async (tx) => {
+      const createdUser = await tx.user.create({
+        data: {
+          email,
+          name,
+          password: passwordHash,
+        },
+      });
+
+      await tx.friend.create({
+        data: {
+          userId: createdUser.id,
+          name: name.trim(),
+          isSelf: true,
+        },
+      });
+
+      return createdUser;
     });
 
     await prisma.emailVerification.delete({

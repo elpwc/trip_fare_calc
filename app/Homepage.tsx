@@ -8,6 +8,7 @@ import FriendSelector from '@/src/components/FriendSelector';
 import BillMap from '@/src/components/BillMap';
 import HomeBillList from '@/src/components/HomeBillList';
 import FriendIcon from '@/src/components/FriendIcon';
+import AddFriendModal from '@/src/components/AddFriendModal';
 import { getAuthHeaders } from '@/src/utils/auth';
 import { apiPath, withBasePath } from '@/src/config/paths';
 import { Friend, TripMember, Trip, Bill } from '@/src/types';
@@ -48,6 +49,7 @@ export default function HomePage() {
 	const [shareMessage, setShareMessage] = useState('');
 	const [isSharing, setIsSharing] = useState(false);
 	const [isDeleteTripModalOpen, setIsDeleteTripModalOpen] = useState(false);
+	const [isAddFriendModalOpen, setIsAddFriendModalOpen] = useState(false);
 
 	useEffect(() => {
 		fetchTrips();
@@ -148,7 +150,7 @@ export default function HomePage() {
 	};
 
 	const handleAddMembers = async () => {
-		if (!currentTrip) return;
+		if (!currentTrip || selectedFriendsForTrip.length === 0) return;
 
 		try {
 			for (const friendId of selectedFriendsForTrip) {
@@ -441,7 +443,17 @@ export default function HomePage() {
 							<p className="max-w-11 truncate text-[10px]">{member.name}</p>
 						</button>
 					))}
-					<button type="button" onClick={() => guardAuth(() => setIsAddMemberModalOpen(true))} className="app-toolbar-chip h-6 min-w-6 px-1" aria-label={t('home.addMember')}>
+					<button
+						type="button"
+						onClick={() =>
+							guardAuth(() => {
+								setSelectedFriendsForTrip([]);
+								setIsAddMemberModalOpen(true);
+							})
+						}
+						className="app-toolbar-chip h-6 min-w-6 px-1"
+						aria-label={t('home.addMember')}
+					>
 						+
 					</button>
 				</div>
@@ -521,13 +533,16 @@ export default function HomePage() {
 				onClose={() => setIsAddMemberModalOpen(false)}
 				title={t('home.modal.addMembers')}
 				onOk={handleAddMembers}
-				okText={t('common.add')}
+				okText={t('home.modal.addSelectedMembers')}
 				showOkButton
 				showCancelButton
 				cancelText={t('common.cancel')}
 			>
 				<div className="modal-stack">
 					<p className="modal-hint">{t('home.modal.addMembersHint')}</p>
+					<button type="button" onClick={() => setIsAddFriendModalOpen(true)} className="settings-btn-ghost w-full py-2.5 text-sm">
+						{t('home.modal.addNewCompanion')}
+					</button>
 					<FriendSelector
 						friends={friends.filter((f) => !(currentTrip?.members || []).some((m) => m.id === f.id))}
 						selectedFriends={selectedFriendsForTrip}
@@ -537,6 +552,15 @@ export default function HomePage() {
 					/>
 				</div>
 			</Modal>
+
+			<AddFriendModal
+				isOpen={isAddFriendModalOpen}
+				onClose={() => setIsAddFriendModalOpen(false)}
+				onAdded={(newFriend) => {
+					setFriends((prev) => [...prev, newFriend]);
+					setSelectedFriendsForTrip((prev) => (prev.includes(newFriend.id) ? prev : [...prev, newFriend.id]));
+				}}
+			/>
 
 			{/* Map Details Modal */}
 			<Modal isOpen={isMapModalOpen} onClose={() => setIsMapModalOpen(false)} title={t('home.modal.mapTitle')} showOkButton={false} showCancelButton cancelText={t('common.close')} className="max-w-5xl">
