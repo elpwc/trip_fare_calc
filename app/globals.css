@@ -936,9 +936,98 @@ html.dark .app-header-add:hover {
 }
 
 .app-bill-time {
-	display: block;
-	font-size: 11px;
-	line-height: 1.35;
-	white-space: nowrap;
-	@apply text-[#6b6458] dark:text-[#a89f8f];
+  display: block;
+  font-size: 11px;
+  line-height: 1.35;
+  white-space: nowrap;
+  @apply text-[#6b6458] dark:text-[#a89f8f];
+}
+
+/* ── Settle page ── */
+.app-settle-results-panel {
+  border-width: 2px;
+  box-shadow: 4px 4px 0 rgba(42, 157, 143, 0.35);
+}
+
+html.dark .app-settle-results-panel {
+  box-shadow: 4px 4px 0 rgba(95, 211, 196, 0.2);
+}
+
+.app-settle-results-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.75rem 0.85rem;
+  @apply bg-[#2a9d8f] text-[#fffdf8] dark:bg-[#5fd3c4] dark:text-[#1a1814];
+}
+
+.app-settle-results-table tbody tr {
+  @apply bg-[#2a9d8f]/6 dark:bg-[#5fd3c4]/8;
+}
+
+.app-settle-results-table tbody tr:hover {
+  @apply bg-[#2a9d8f]/14 dark:bg-[#5fd3c4]/14;
+}
+
+.app-settle-history-panel {
+  @apply border-dashed opacity-95;
+}
+
+.app-settle-history-head {
+  @apply bg-[#1a1814]/3 dark:bg-[#f4efe4]/5;
+}
+
+.app-settle-chart-panel {
+  border-width: 2px;
+}
+
+.app-settle-chart-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.85rem;
+  @apply border-b border-dashed border-[#1a1814]/14 bg-[#1a1814]/4 dark:border-[#f4efe4]/12 dark:bg-[#121110];
+}
+
+.app-settle-chart-controls {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem 0.85rem;
+  padding: 0.65rem 0.85rem;
+  @apply border-b border-dashed border-[#1a1814]/10 dark:border-[#f4efe4]/8;
+}
+
+.app-settle-chart-control {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  min-width: 0;
+}
+
+.app-settle-chart-legend {
+  border-top: 1px dashed rgba(26, 24, 20, 0.12);
+  padding-top: 0.65rem;
+}
+
+html.dark .app-settle-chart-legend {
+  border-top-color: rgba(244, 239, 228, 0.1);
+}
+
+.app-settle-chart-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 10px;
+  @apply text-[#6b6458] dark:text-[#a89f8f];
+}
+
+.app-settle-chart-dot {
+  display: inline-block;
+  height: 0.55rem;
+  width: 0.55rem;
+  border: 1px solid rgba(26, 24, 20, 0.2);
+  flex-shrink: 0;
 }

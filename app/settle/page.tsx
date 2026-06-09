@@ -5,6 +5,9 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import AppShell from '@/src/components/layout/AppShell';
 import { getAuthHeaders } from '@/src/utils/auth';
 import { formatAmount } from '@/src/utils/currencies';
+import SettleSpendingChart from '@/src/components/settle/SettleSpendingChart';
+import { buildNestedChartData, type ChartDimension } from '@/src/utils/settle-chart';
+import type { Locale } from '@/src/utils/preferences/constants';
 import { Trip, FlowItem } from '@/src/types';
 import { usePreferences } from '@/src/utils/preferences-provider';
 import type { MessageKey } from '@/src/utils/i18n/messages';
@@ -23,6 +26,12 @@ type ExchangeInfo = {
 };
 
 const SAME_CURRENCY_SOURCE = '__same_currency__';
+
+const DATE_LOCALE_MAP: Record<Locale, string> = {
+	'zh-CN': 'zh-CN',
+	en: 'en-US',
+	ja: 'ja-JP',
+};
 
 function getStorageKey(tripId: string) {
 	return `settle-history-${tripId}`;
@@ -74,6 +83,7 @@ function SettlePageContent() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const { t, locale } = usePreferences();
+	const dateLocale = DATE_LOCALE_MAP[locale];
 	const tripId = searchParams.get('tripId');
 
 	const [trip, setTrip] = useState<Trip | null>(null);
@@ -87,6 +97,8 @@ function SettlePageContent() {
 	const [rateRefreshKey, setRateRefreshKey] = useState(0);
 	const [savedRecords, setSavedRecords] = useState<SettledRecord[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
+	const [chartOuterDim, setChartOuterDim] = useState<ChartDimension>('owed');
+	const [chartInnerDim, setChartInnerDim] = useState<ChartDimension>('status');
 
 	useEffect(() => {
 		if (!tripId) {
@@ -216,6 +228,18 @@ function SettlePageContent() {
 	const totalOpenAmount = useMemo(() => liveFlows.reduce((sum, item) => sum + item.amount, 0), [liveFlows]);
 	const totalSettledAmount = useMemo(() => savedRecords.reduce((sum, item) => sum + item.amount, 0), [savedRecords]);
 
+	const chartSlices = useMemo(() => {
+		if (!trip || !exchangeInfo) return [];
+		const settledFlowPairs = new Set(savedRecords.map((record) => `${record.fromId}|${record.toId}`));
+		return buildNestedChartData(trip, chartOuterDim, chartInnerDim, selectedCurrency, exchangeInfo.rates, {
+			t,
+			memberNames: new Map(),
+			memberOrder: new Map(),
+			dateLocale,
+			settledFlowPairs,
+		});
+	}, [trip, chartOuterDim, chartInnerDim, selectedCurrency, exchangeInfo, savedRecords, t, dateLocale]);
+
 	const handleSettleItem = (item: FlowItem) => {
 		if (!trip) return;
 		const exchangeNotes =
@@ -297,12 +321,15 @@ function SettlePageContent() {
 
 			{exchangeError ? <p className="mb-2 text-[11px] text-app-danger">{exchangeError}</p> : null}
 
-			<section className="app-panel overflow-hidden">
-				<div className="app-panel-head">
-					<span className="app-label">{t('settle.results')}</span>
-					<span className="settings-mono text-[10px] text-app-muted">{t('settle.excludeSettled')}</span>
+			<section className="app-panel app-settle-results-panel overflow-hidden">
+				<div className="app-settle-results-head">
+					<div>
+						<span className="settings-mono text-[10px] uppercase tracking-[0.24em] opacity-90">{t('settle.resultsBadge')}</span>
+						<p className="mt-1 text-base font-bold leading-tight">{t('settle.results')}</p>
+					</div>
+					<span className="settings-mono text-[10px] opacity-90">{t('settle.excludeSettled')}</span>
 				</div>
-				<table className="app-data-table">
+				<table className="app-data-table app-settle-results-table">
 					<thead>
 						<tr>
 							<th>{t('table.payer')}</th>
@@ -340,8 +367,8 @@ function SettlePageContent() {
 				</table>
 			</section>
 
-			<section className="app-panel mt-2 overflow-hidden">
-				<div className="app-panel-head">
+			<section className="app-panel app-settle-history-panel mt-2 overflow-hidden">
+				<div className="app-panel-head app-settle-history-head">
 					<span className="app-label">{t('settle.settledSection')}</span>
 					<span className="settings-mono text-[10px] text-app-muted">
 						{savedRecords.length} {t('common.recordsUnit')}
@@ -380,6 +407,15 @@ function SettlePageContent() {
 					</tbody>
 				</table>
 			</section>
+
+			<SettleSpendingChart
+				slices={chartSlices}
+				outerDim={chartOuterDim}
+				innerDim={chartInnerDim}
+				onOuterDimChange={setChartOuterDim}
+				onInnerDimChange={setChartInnerDim}
+				currency={selectedCurrency}
+			/>
 
 			{exchangeInfo ? (
 				<div className="mt-2 settings-mono text-[10px] leading-relaxed text-app-muted">
