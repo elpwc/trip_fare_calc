@@ -581,7 +581,7 @@ export default function HomePage() {
 					</button>
 
 					{isTripDropdownOpen ? (
-						<div className="app-dropdown absolute top-full left-0 right-0 z-500 mt-0.5 max-h-48 overflow-y-auto">
+						<div className="app-dropdown absolute top-full left-0 right-0 z-2000 mt-0.5 max-h-48 overflow-y-auto">
 							{trips.map((trip) => (
 								<button
 									key={trip.id}
@@ -946,7 +946,14 @@ export default function HomePage() {
 				/>
 			) : null}
 
-			<Modal isOpen={isCollaboratorsModalOpen} onClose={() => setIsCollaboratorsModalOpen(false)} title={t('home.modal.collaboratorsTitle')} showOkButton={false} showCancelButton cancelText={t('common.close')}>
+			<Modal
+				isOpen={isCollaboratorsModalOpen}
+				onClose={() => setIsCollaboratorsModalOpen(false)}
+				title={t('home.modal.collaboratorsTitle')}
+				showOkButton={false}
+				showCancelButton
+				cancelText={t('common.close')}
+			>
 				{currentTrip ? (
 					<CollaboratorList
 						collaborators={currentTrip.collaborators || []}

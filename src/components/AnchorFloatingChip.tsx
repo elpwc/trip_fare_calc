@@ -23,13 +23,10 @@ export default function AnchorFloatingChip({ targetId, placement, onClick, child
 	if (!mounted || !rect || !visible) return null;
 
 	const centerX = rect.left + rect.width / 2;
-	const style =
-		placement === 'bottom'
-			? { top: rect.bottom + 8, left: centerX, transform: 'translate(-50%, 0)' }
-			: { top: rect.top - 8, left: centerX, transform: 'translate(-50%, -100%)' };
+	const style = placement === 'bottom' ? { top: rect.bottom + 2, left: centerX, transform: 'translate(-50%, 0)' } : { top: rect.top - 8, left: centerX, transform: 'translate(-50%, -100%)' };
 
 	return createPortal(
-		<button type="button" onClick={onClick} className={`fixed z-[51] whitespace-nowrap ${className}`} style={style}>
+		<button type="button" onClick={onClick} className={`fixed z-114515 whitespace-nowrap ${className}`} style={style}>
 			{children}
 		</button>,
 		document.body,

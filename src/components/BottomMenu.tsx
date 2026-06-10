@@ -57,7 +57,7 @@ export default function BottomMenu() {
   const { t } = usePreferences();
 
   return (
-    <nav className="app-nav fixed inset-x-0 bottom-0 z-50 px-1 py-1">
+    <nav className="app-nav fixed inset-x-0 bottom-0 z-114514 px-1 py-1">
       <div className="mx-auto flex max-w-245 items-center justify-between gap-0.5">
         {menuItems.map((item) => {
           const active = pathname === item.href || (item.href !== '/' && pathname?.startsWith(item.href));
