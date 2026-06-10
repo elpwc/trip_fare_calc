@@ -12,14 +12,7 @@ import { FlagSVG } from '@/src/components/FlagSVG';
 import { Member } from '@/src/types';
 import { usePreferences } from '@/src/utils/preferences-provider';
 import type { MessageKey } from '@/src/utils/i18n/messages';
-import {
-	isSharesBalanced,
-	recalculateAaShares,
-	resetAllToAa,
-	roundMoney,
-	sharesTotal,
-	type OwedShareInput,
-} from '@/src/utils/bill-split';
+import { isSharesBalanced, recalculateAaShares, resetAllToAa, roundMoney, sharesTotal, type OwedShareInput } from '@/src/utils/bill-split';
 
 type Friend = Member;
 
@@ -175,8 +168,13 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 				shareAmount: roundMoney(Number(owed.shareAmount ?? 0)),
 				isCustomShare: Boolean(owed.isCustomShare),
 			}));
-			if (loadedShares.length > 0 && loadedShares.every((entry) => entry.shareAmount <= 0)) {
-				setOwedShares(resetAllToAa(Number(data.amount ?? 0), loadedShares.map((entry) => entry.friendId)));
+			if (loadedShares.length > 0 && loadedShares.every((entry: any) => entry.shareAmount <= 0)) {
+				setOwedShares(
+					resetAllToAa(
+						Number(data.amount ?? 0),
+						loadedShares.map((entry: any) => entry.friendId),
+					),
+				);
 			} else {
 				setOwedShares(loadedShares);
 			}
@@ -226,13 +224,23 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 
 	const handleSelectAllFriends = () => {
 		clearShareDrafts();
-		setOwedShares(resetAllToAa(billTotal, tripMembers.map((friend) => friend.id)));
+		setOwedShares(
+			resetAllToAa(
+				billTotal,
+				tripMembers.map((friend) => friend.id),
+			),
+		);
 	};
 
 	const handleResetAa = () => {
 		if (owedShares.length === 0) return;
 		clearShareDrafts();
-		setOwedShares(resetAllToAa(billTotal, owedShares.map((entry) => entry.friendId)));
+		setOwedShares(
+			resetAllToAa(
+				billTotal,
+				owedShares.map((entry) => entry.friendId),
+			),
+		);
 	};
 
 	const handleToggleFriend = (friendId: string) => {
@@ -266,9 +274,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 
 		const parsed = value === '' || value === '.' ? 0 : roundMoney(Number(value));
 		setOwedShares((prev) => {
-			const next = prev.map((entry) =>
-				entry.friendId === friendId ? { ...entry, shareAmount: parsed, isCustomShare: true } : entry,
-			);
+			const next = prev.map((entry) => (entry.friendId === friendId ? { ...entry, shareAmount: parsed, isCustomShare: true } : entry));
 			return recalculateAaShares(billTotal, next);
 		});
 	};
@@ -421,7 +427,12 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 					<div className="mb-2 flex flex-wrap items-center justify-between gap-1">
 						<span className="app-bill-section-title">{t('bills.selectOwed')}</span>
 						<div className="flex flex-wrap gap-1">
-							<button type="button" onClick={handleResetAa} disabled={owedShares.length === 0} className="app-btn-compact app-btn-compact-primary px-2 py-1 text-[10px] disabled:opacity-50">
+							<button
+								type="button"
+								onClick={handleResetAa}
+								disabled={owedShares.length === 0}
+								className="app-btn-compact app-btn-compact-primary px-2 py-1 text-[10px] disabled:opacity-50"
+							>
 								{t('bills.resetAa')}
 							</button>
 							<button type="button" onClick={handleSelectAllFriends} className="app-btn-compact px-2 py-1 text-[10px]">
@@ -469,9 +480,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 														className={`app-bill-share-input settings-mono text-center ${exceedsTotal ? 'app-bill-share-input-danger' : ''}`}
 														aria-invalid={exceedsTotal}
 													/>
-													<span className={`app-bill-share-currency settings-mono ${exceedsTotal ? 'app-bill-share-currency-danger' : ''}`}>
-														{currencySymbol}
-													</span>
+													<span className={`app-bill-share-currency settings-mono ${exceedsTotal ? 'app-bill-share-currency-danger' : ''}`}>{currencySymbol}</span>
 												</div>
 												{share.isCustomShare ? (
 													<span className="text-[8px] font-semibold leading-none text-[#e85d4c]">{t('bills.shareCustom')}</span>
@@ -527,7 +536,14 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 				</div>
 			</div>
 
-			<Modal isOpen={isPaymentMethodModalOpen} onClose={() => setIsPaymentMethodModalOpen(false)} title={t('bills.modal.paymentMethod')} showOkButton={false} showCancelButton cancelText={t('common.close')}>
+			<Modal
+				isOpen={isPaymentMethodModalOpen}
+				onClose={() => setIsPaymentMethodModalOpen(false)}
+				title={t('bills.modal.paymentMethod')}
+				showOkButton={false}
+				showCancelButton
+				cancelText={t('common.close')}
+			>
 				<div className="modal-option-grid">
 					{PAYMENT_METHODS.map((method) => (
 						<button
