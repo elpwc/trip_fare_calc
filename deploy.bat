@@ -3,14 +3,19 @@
 :: 2026-06-10 uni
 title tripfarecalc deployment
 color 03
-echo ---- Pulling from git repo ----
+
+pm2 delete tripfarecalc-app
+
+echo ---- Pulling ----
 git pull
 
-echo ---- Building the project ----
+echo ---- Generate db files ----
+npx prisma generate
+
+echo ---- Building ----
 call _deploy.bat
 
-echo ---- Restarting the app ----
-pm2 delete tripfarecalc-app
+echo ---- Starting the app ----
 pm2 start
 
 echo ---- Done ----
