@@ -84,3 +84,28 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
+
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const userId = getUserId(request);
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { id: tripId } = await params;
+    const access = await getTripAccess(userId, tripId);
+
+    if (!access?.isOwner) {
+      return NextResponse.json({ error: 'Only trip owner can manage sharing' }, { status: 403 });
+    }
+
+    await prisma.tripShare.deleteMany({
+      where: { tripId },
+    });
+
+    return NextResponse.json({ message: 'Share cancelled' });
+  } catch (error) {
+    console.error('Cancel trip share error:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import prisma from '@/lib/prisma';
 import { verifyJwtToken } from '@/src/lib/jwt';
-import { fetchTripWithDetails, formatTripResponse } from '@/lib/trip-access';
+import { fetchTripWithDetails, formatTripResponse, grantTripAccess } from '@/lib/trip-access';
 
 function getUserId(request: NextRequest): string | null {
   const authHeader = request.headers.get('authorization');
@@ -104,12 +104,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ tripId: share.tripId, message: 'Already joined' });
     }
 
-    await prisma.tripAccess.create({
-      data: {
-        tripId: share.tripId,
-        userId,
-      },
-    });
+    await grantTripAccess(share.tripId, userId);
 
     const trip = await fetchTripWithDetails(share.tripId);
     if (!trip) {

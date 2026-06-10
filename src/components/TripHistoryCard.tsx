@@ -28,6 +28,8 @@ export default function TripHistoryCard({ trip, onClick }: TripHistoryCardProps)
   const totalExpense = trip.bills.reduce((sum, bill) => sum + (bill.amount || 0), 0);
   const displayDate = trip.startDate || trip.createdAt;
   const participantNames = trip.members.map((member) => member.name).join('·') || '-';
+  const collaboratorCount = trip.collaboratorCount ?? trip.collaborators?.length ?? 0;
+  const collaboratorNames = (trip.collaborators || []).map((entry) => entry.name).join(' · ');
 
   return (
     <button type="button" onClick={onClick} className="app-panel w-full text-left transition hover:-translate-y-px">
@@ -35,12 +37,23 @@ export default function TripHistoryCard({ trip, onClick }: TripHistoryCardProps)
         <div className="min-w-0">
           <div className="flex items-start justify-between gap-2">
             <p className="truncate text-sm font-semibold leading-tight">{trip.name}</p>
-            {!trip.isOwner ? <span className="app-tag app-tag-share shrink-0">{t('common.share')}</span> : null}
+            <div className="flex shrink-0 flex-wrap items-center justify-end gap-1">
+              {!trip.isOwner ? <span className="app-tag app-tag-share text-[9px]">{t('common.share')}</span> : null}
+              {trip.isOwner && trip.isShared ? <span className="app-tag app-tag-share text-[9px]">{t('home.sharedBadge')}</span> : null}
+            </div>
           </div>
           <p className="settings-mono mt-1 text-[10px] leading-relaxed text-app-muted">
             {t('history.tripMeta', { date: formatDate(displayDate), count: trip.bills.length, amount: totalExpense.toFixed(0) })}
           </p>
+          {collaboratorCount > 0 ? (
+            <p className="mt-0.5 text-[10px] leading-tight text-[#2a9d8f] dark:text-[#5fd3c4]">{t('history.sharedEditing', { count: collaboratorCount })}</p>
+          ) : null}
           <p className="mt-0.5 truncate text-[11px] leading-tight text-app-muted">{participantNames}</p>
+          {collaboratorNames ? (
+            <p className="mt-0.5 text-[10px] leading-snug text-app-muted">
+              {t('history.collaborators')}: {collaboratorNames}
+            </p>
+          ) : null}
         </div>
         <div className="h-[110px] overflow-hidden border border-[#1a1814]/20">
           <BillMap bills={trip.bills} className="h-full w-full" interactive={false} tileLayer="osm" />

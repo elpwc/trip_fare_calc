@@ -12,17 +12,20 @@ datasource db {
 }
 
 model User {
-  id           String               @id @default(cuid())
-  email        String               @unique
-  password     String
-  name         String
-  friends      Friend[]
-  trips        Trip[]
-  bills        Bill[]
-  tripAccess   TripAccess[]
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
-  isDeleted    Boolean              @default(false)
+  id                    String                    @id @default(cuid())
+  email                 String                    @unique
+  password              String
+  name                  String
+  friends               Friend[]
+  trips                 Trip[]
+  bills                 Bill[]
+  tripAccess            TripAccess[]
+  collaboratorHistory   TripCollaboratorHistory[]
+  coeditAsOwner         UserCoeditHistory[]       @relation("CoeditOwner")
+  coeditAsPartner       UserCoeditHistory[]       @relation("CoeditPartner")
+  createdAt             DateTime                  @default(now())
+  updatedAt             DateTime                  @updatedAt
+  isDeleted             Boolean                   @default(false)
 }
 
 model Friend {
@@ -44,20 +47,49 @@ model Friend {
 }
 
 model Trip {
-  id           String               @id @default(cuid())
-  user         User                 @relation(fields: [userId], references: [id])
-  userId       String
-  name         String
-  description  String?
-  members      TripMember[]
-  bills        Bill[]
-  share        TripShare?
-  access       TripAccess[]
-  createdAt    DateTime             @default(now())
-  updatedAt    DateTime             @updatedAt
-  isDeleted    Boolean              @default(false)
+  id                  String                    @id @default(cuid())
+  user                User                      @relation(fields: [userId], references: [id])
+  userId              String
+  name                String
+  description         String?
+  members             TripMember[]
+  bills               Bill[]
+  share               TripShare?
+  access              TripAccess[]
+  collaboratorHistory TripCollaboratorHistory[]
+  createdAt           DateTime                  @default(now())
+  updatedAt           DateTime                  @updatedAt
+  isDeleted           Boolean                   @default(false)
 
   @@index([userId])
+}
+
+model TripCollaboratorHistory {
+  id        String   @id @default(cuid())
+  trip      Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+  tripId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([tripId, userId])
+  @@index([tripId])
+  @@index([userId])
+}
+
+model UserCoeditHistory {
+  id             String   @id @default(cuid())
+  owner          User     @relation("CoeditOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
+  ownerUserId    String
+  coeditor       User     @relation("CoeditPartner", fields: [coeditorUserId], references: [id], onDelete: Cascade)
+  coeditorUserId String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@unique([ownerUserId, coeditorUserId])
+  @@index([ownerUserId])
+  @@index([coeditorUserId])
 }
 
 model TripShare {

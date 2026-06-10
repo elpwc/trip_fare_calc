@@ -33,6 +33,18 @@ export type BillOwed = {
 	friendId: string;
 };
 
+export type TripCollaborator = {
+	id: string;
+	name: string;
+	joinedAt: string;
+};
+
+export type TripShareHistoryUser = {
+	id: string;
+	name: string;
+	isActive: boolean;
+};
+
 /**
  * 账单类型
  */
@@ -51,6 +63,7 @@ export type Bill = {
 	longitude: number | null;
 	createdAt: string;
 	createdById?: string;
+	createdByName?: string;
 };
 
 /**
@@ -67,6 +80,10 @@ export type Trip = {
 	isOwner?: boolean;
 	ownerName?: string;
 	ownerUserId?: string;
+	isShared?: boolean;
+	collaboratorCount?: number;
+	collaborators?: TripCollaborator[];
+	shareHistory?: TripShareHistoryUser[];
 };
 
 /**

@@ -591,6 +591,82 @@ html.dark .app-fab:hover {
 	color: #fffdf8;
 }
 
+.app-fab-share-active {
+	background: #1a1814;
+	color: #5fd3c4;
+	box-shadow: 3px 3px 0 #2a9d8f;
+}
+
+html.dark .app-fab-share-active {
+	background: #f4efe4;
+	color: #2a9d8f;
+	box-shadow: 3px 3px 0 #2a9d8f;
+}
+
+.app-coedit-strip {
+	max-width: 9.5rem;
+	padding: 0.28rem 0.45rem;
+	font-size: 10px;
+	font-weight: 700;
+	line-height: 1.25;
+	text-align: center;
+	@apply border-2 border-[#1a1814] bg-[#fffdf8] text-[#1a1814] dark:border-[#f4efe4] dark:bg-[#1c1a18] dark:text-[#f4efe4];
+	box-shadow: 2px 2px 0 rgba(42, 157, 143, 0.35);
+	transition: transform 0.12s ease;
+}
+
+.app-coedit-strip:hover {
+	transform: translate(-1px, -1px);
+}
+
+.app-collaborator-section-title {
+	margin-bottom: 0.35rem;
+	font-size: 14px;
+	font-weight: 700;
+	line-height: 1.3;
+	letter-spacing: 0.02em;
+	@apply text-[#1a1814] dark:text-[#f4efe4];
+}
+
+.app-collaborator-row-button {
+	border: none;
+	background: transparent;
+	padding: 0;
+	cursor: pointer;
+}
+
+.app-collaborator-row-button:hover .app-collaborator-name {
+	@apply text-[#2a9d8f] dark:text-[#5fd3c4];
+}
+
+.app-collaborator-row-button:disabled {
+	cursor: not-allowed;
+	opacity: 0.6;
+}
+
+.app-collaborator-name {
+	font-size: 13px;
+	font-weight: 600;
+}
+
+.app-collaborator-meta {
+	font-size: 11px;
+	color: #6b6458;
+}
+
+html.dark .app-collaborator-meta {
+	color: #a89f8f;
+}
+
+.app-collaborator-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+	padding: 0.45rem 0.5rem;
+	@apply border border-dashed border-[#1a1814]/15 dark:border-[#f4efe4]/15;
+}
+
 .app-fab-add {
 	background: #e85d4c;
 	color: #fffdf8;

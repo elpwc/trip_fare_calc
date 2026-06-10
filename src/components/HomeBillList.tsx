@@ -101,6 +101,7 @@ type HomeBillListProps = {
 	members: TripMember[];
 	onBillClick: (bill: Bill) => void;
 	dateLocale: string;
+	currentUserId?: string;
 };
 
 function hasActiveFilters(filters: BillFilters): boolean {
@@ -117,7 +118,7 @@ function hasActiveFilters(filters: BillFilters): boolean {
 	);
 }
 
-export default function HomeBillList({ bills, members, onBillClick, dateLocale }: HomeBillListProps) {
+export default function HomeBillList({ bills, members, onBillClick, dateLocale, currentUserId }: HomeBillListProps) {
 	const { t } = usePreferences();
 	const [sort, setSort] = useState<BillSort>(DEFAULT_SORT);
 	const [filters, setFilters] = useState<BillFilters>(EMPTY_FILTERS);
@@ -359,6 +360,9 @@ export default function HomeBillList({ bills, members, onBillClick, dateLocale }
 										</td>
 										<td>
 											<span className="app-bill-time settings-mono">{formatTime(bill.createdAt)}</span>
+											{bill.createdById && currentUserId && bill.createdById !== currentUserId && bill.createdByName ? (
+												<p className="mt-0.5 text-[9px] leading-tight text-app-muted">{t('home.billAddedBy', { name: bill.createdByName })}</p>
+											) : null}
 										</td>
 										<td>
 											<span className={`app-tag ${isSettled ? 'app-tag-settled' : 'app-tag-open'}`}>{isSettled ? t('table.settledShort') : t('table.unsettledShort')}</span>

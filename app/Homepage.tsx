@@ -10,6 +10,10 @@ import HomeBillList from '@/src/components/HomeBillList';
 import FriendIcon from '@/src/components/FriendIcon';
 import AddFriendModal from '@/src/components/AddFriendModal';
 import TripBillToastStack, { useTripBillToasts } from '@/src/components/TripBillToastStack';
+import CollaboratorList from '@/src/components/CollaboratorList';
+import GuideBubble from '@/src/components/onboarding/GuideBubble';
+import AnchorFloatingChip from '@/src/components/AnchorFloatingChip';
+import { getStoredSelectedTripId, setStoredSelectedTripId } from '@/src/utils/selected-trip-storage';
 import { getAuthHeaders } from '@/src/utils/auth';
 import { useAuth } from '@/src/utils/auth-provider';
 import { formatAmount } from '@/src/utils/currencies';
@@ -56,6 +60,10 @@ export default function HomePage() {
 	const [shareUrl, setShareUrl] = useState('');
 	const [shareMessage, setShareMessage] = useState('');
 	const [isSharing, setIsSharing] = useState(false);
+	const [isCollaboratorBusy, setIsCollaboratorBusy] = useState(false);
+	const [isCollaboratorsModalOpen, setIsCollaboratorsModalOpen] = useState(false);
+	const [showShareHint, setShowShareHint] = useState(false);
+	const [shareHintTripId, setShareHintTripId] = useState<string | null>(null);
 	const [isDeleteTripModalOpen, setIsDeleteTripModalOpen] = useState(false);
 	const [isAddFriendModalOpen, setIsAddFriendModalOpen] = useState(false);
 
@@ -103,12 +111,31 @@ export default function HomePage() {
 			return;
 		}
 
-		if (!selectedTripId) {
-			setSelectedTripId(trips[0].id);
+		setSelectedTripId((current) => {
+			if (current && trips.some((trip) => trip.id === current)) {
+				return current;
+			}
+
+			const savedTripId = user?.id ? getStoredSelectedTripId(user.id) : null;
+			if (savedTripId && trips.some((trip) => trip.id === savedTripId)) {
+				return savedTripId;
+			}
+
+			return trips[0].id;
+		});
+	}, [trips, searchParams, user?.id]);
+
+	useEffect(() => {
+		if (user?.id && selectedTripId) {
+			setStoredSelectedTripId(user.id, selectedTripId);
 		}
-	}, [trips, selectedTripId, searchParams]);
+	}, [user?.id, selectedTripId]);
 
 	const currentTrip = useMemo(() => trips.find((trip) => trip.id === selectedTripId) || null, [trips, selectedTripId]);
+
+	const applyTripUpdate = useCallback((updated: Trip) => {
+		setTrips((prev) => prev.map((trip) => (trip.id === updated.id ? updated : trip)));
+	}, []);
 
 	const currentBills = useMemo(() => currentTrip?.bills || [], [currentTrip]);
 
@@ -187,6 +214,8 @@ export default function HomePage() {
 				}
 				setSelectedFriendsForTrip([]);
 				await fetchTrips(); // Refresh to get updated members
+				setShowShareHint(true);
+				setShareHintTripId(newTrip.id);
 				window.dispatchEvent(new Event(ONBOARDING_TRIP_CREATED_EVENT));
 			}
 		} catch (error) {
@@ -288,9 +317,109 @@ export default function HomePage() {
 		guardAuth(() => {
 			setSharePassword('');
 			setShareMessage('');
-			fetchShareInfo(currentTrip.id);
+			setShowShareHint(false);
+			setShareHintTripId(null);
+			void fetchShareInfo(currentTrip.id);
+			void fetchTrips();
 			setIsShareModalOpen(true);
 		});
+	};
+
+	const dismissShareHint = () => {
+		setShowShareHint(false);
+		setShareHintTripId(null);
+	};
+
+	const handleCancelShare = async () => {
+		if (!currentTrip) return;
+		setIsSharing(true);
+		setShareMessage('');
+		try {
+			const response = await fetch(apiPath(`/api/trips/${currentTrip.id}/share`), {
+				method: 'DELETE',
+				headers: getAuthHeaders(),
+			});
+			if (response.ok) {
+				setShareUrl('');
+				setSharePassword('');
+				setShareMessage(t('home.share.cancelled'));
+				await fetchTrips();
+			} else {
+				const data = await response.json();
+				setShareMessage(data.error || t('home.share.generateFailed'));
+			}
+		} catch (error) {
+			console.error('Failed to cancel share:', error);
+			setShareMessage(t('home.share.generateFailed'));
+		} finally {
+			setIsSharing(false);
+		}
+	};
+
+	const handleRevokeCollaborator = async (targetUserId: string) => {
+		if (!currentTrip) return;
+		setIsCollaboratorBusy(true);
+		try {
+			const response = await fetch(apiPath(`/api/trips/${currentTrip.id}/collaborators`), {
+				method: 'DELETE',
+				headers: {
+					...getAuthHeaders(),
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ userId: targetUserId }),
+			});
+			if (response.ok) {
+				applyTripUpdate(await response.json());
+			}
+		} catch (error) {
+			console.error('Failed to revoke collaborator:', error);
+		} finally {
+			setIsCollaboratorBusy(false);
+		}
+	};
+
+	const handleInviteCollaborator = async (targetUserId: string) => {
+		if (!currentTrip) return;
+		setIsCollaboratorBusy(true);
+		try {
+			const response = await fetch(apiPath(`/api/trips/${currentTrip.id}/collaborators`), {
+				method: 'POST',
+				headers: {
+					...getAuthHeaders(),
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ userId: targetUserId }),
+			});
+			if (response.ok) {
+				applyTripUpdate(await response.json());
+			}
+		} catch (error) {
+			console.error('Failed to invite collaborator:', error);
+		} finally {
+			setIsCollaboratorBusy(false);
+		}
+	};
+
+	const handleRemoveCollaboratorHistory = async (targetUserId: string) => {
+		if (!currentTrip) return;
+		setIsCollaboratorBusy(true);
+		try {
+			const response = await fetch(apiPath(`/api/trips/${currentTrip.id}/collaborators/history`), {
+				method: 'DELETE',
+				headers: {
+					...getAuthHeaders(),
+					'Content-Type': 'application/json',
+				},
+				body: JSON.stringify({ userId: targetUserId }),
+			});
+			if (response.ok) {
+				applyTripUpdate(await response.json());
+			}
+		} catch (error) {
+			console.error('Failed to remove collaborator history:', error);
+		} finally {
+			setIsCollaboratorBusy(false);
+		}
 	};
 
 	const handleCreateShare = async () => {
@@ -317,6 +446,7 @@ export default function HomePage() {
 			if (response.ok) {
 				setShareUrl(`${window.location.origin}${withBasePath(`/share?token=${data.shareToken}`)}`);
 				setShareMessage(t('home.share.generated'));
+				await fetchTrips();
 			} else {
 				setShareMessage(data.error || t('home.share.generateFailed'));
 			}
@@ -437,8 +567,14 @@ export default function HomePage() {
 						<div className="flex items-center justify-between gap-2">
 							<div className="min-w-0 flex-1">
 								<p className="app-label">{t('home.currentTrip')}</p>
-								<p className="truncate text-sm font-semibold leading-tight">{currentTrip?.name}</p>
+								<div className="flex min-w-0 items-center gap-1.5">
+									<p className="truncate text-sm font-semibold leading-tight">{currentTrip?.name}</p>
+									{currentTrip?.isOwner && currentTrip.isShared ? <span className="app-tag app-tag-share shrink-0 text-[9px]">{t('home.sharedBadge')}</span> : null}
+								</div>
 								{currentTrip ? <p className="settings-mono text-[10px] text-app-muted">{formatDate(currentTrip.createdAt)}</p> : null}
+								{(currentTrip?.collaboratorCount ?? 0) > 0 ? (
+									<p className="settings-mono text-[10px] text-[#2a9d8f] dark:text-[#5fd3c4]">{t('home.coEditCount', { count: currentTrip?.collaboratorCount ?? 0 })}</p>
+								) : null}
 							</div>
 							<span className="settings-mono text-xs">{isTripDropdownOpen ? '▲' : '▼'}</span>
 						</div>
@@ -456,8 +592,15 @@ export default function HomePage() {
 									}}
 									className="app-dropdown-item"
 								>
-									<p className="truncate text-xs font-semibold">{trip.name}</p>
+									<div className="flex items-center gap-1.5">
+										<p className="min-w-0 flex-1 truncate text-xs font-semibold">{trip.name}</p>
+										{!trip.isOwner ? <span className="app-tag app-tag-share shrink-0 text-[8px]">{t('common.share')}</span> : null}
+										{trip.isOwner && trip.isShared ? <span className="app-tag app-tag-share shrink-0 text-[8px]">{t('home.sharedBadge')}</span> : null}
+									</div>
 									<p className="settings-mono text-[10px] text-app-muted">{formatDate(trip.createdAt)}</p>
+									{(trip.collaboratorCount ?? 0) > 0 ? (
+										<p className="settings-mono text-[10px] text-[#2a9d8f] dark:text-[#5fd3c4]">{t('home.coEditCount', { count: trip.collaboratorCount ?? 0 })}</p>
+									) : null}
 								</button>
 							))}
 						</div>
@@ -537,7 +680,7 @@ export default function HomePage() {
 						<span className="app-label">{t('home.billList')}</span>
 						<span className="settings-mono text-[10px] text-app-muted">{t('home.tapToEdit')}</span>
 					</div>
-					<HomeBillList bills={currentBills} members={currentTrip?.members || []} onBillClick={handleBillClick} dateLocale={dateLocale} />
+					<HomeBillList bills={currentBills} members={currentTrip?.members || []} onBillClick={handleBillClick} dateLocale={dateLocale} currentUserId={user?.id} />
 				</div>
 			</section>
 
@@ -546,11 +689,24 @@ export default function HomePage() {
 					{t('home.settle')}
 				</button>
 				{currentTrip?.isOwner ? (
-					<button type="button" onClick={openShareModal} className="app-fab app-fab-icon app-fab-share" aria-label={t('home.shareTrip')}>
-						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-							<path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5" />
-						</svg>
-					</button>
+					<>
+						{(currentTrip.collaboratorCount ?? 0) > 0 ? (
+							<AnchorFloatingChip targetId="share-trip" placement="bottom" onClick={() => setIsCollaboratorsModalOpen(true)}>
+								{t('home.coEditing', { count: currentTrip.collaboratorCount ?? 0 })}
+							</AnchorFloatingChip>
+						) : null}
+						<button
+							type="button"
+							onClick={openShareModal}
+							className={`app-fab app-fab-icon app-fab-share ${currentTrip.isShared ? 'app-fab-share-active' : ''}`}
+							aria-label={t('home.shareTrip')}
+							data-onboarding-target="share-trip"
+						>
+							<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+								<path d="M11 2.5a2.5 2.5 0 1 1 .603 1.628l-6.718 3.12a2.5 2.5 0 0 1 0 1.504l6.718 3.12a2.5 2.5 0 1 1-.488.876l-6.718-3.12a2.5 2.5 0 1 1 0-3.256l6.718-3.12A2.5 2.5 0 0 1 11 2.5" />
+							</svg>
+						</button>
+					</>
 				) : null}
 				<button
 					type="button"
@@ -727,6 +883,18 @@ export default function HomePage() {
 			<Modal isOpen={isShareModalOpen} onClose={() => setIsShareModalOpen(false)} title={t('home.modal.shareTitle')} showOkButton={false} showCancelButton cancelText={t('common.close')}>
 				<div className="modal-stack">
 					<p className="modal-hint">{t('home.modal.shareHint')}</p>
+					{currentTrip ? (
+						<CollaboratorList
+							collaborators={currentTrip.collaborators || []}
+							shareHistory={currentTrip.shareHistory || []}
+							isOwner={!!currentTrip.isOwner}
+							isBusy={isCollaboratorBusy}
+							onRevoke={handleRevokeCollaborator}
+							onInvite={handleInviteCollaborator}
+							onRemoveHistory={handleRemoveCollaboratorHistory}
+							alwaysShowHistory
+						/>
+					) : null}
 					<div className="modal-field">
 						<label className="app-label">{t('home.modal.sharePassword')}</label>
 						<input
@@ -749,10 +917,48 @@ export default function HomePage() {
 									{t('common.copy')}
 								</button>
 							</div>
+							<button type="button" onClick={handleCancelShare} disabled={isSharing} className="settings-btn-ghost mt-2 w-full py-2 text-sm text-[#e85d4c] disabled:opacity-60">
+								{isSharing ? t('home.share.cancelling') : t('home.share.cancelShare')}
+							</button>
 						</div>
 					) : null}
 					{shareMessage ? <p className="modal-message modal-message-info">{shareMessage}</p> : null}
 				</div>
+			</Modal>
+
+			{showShareHint && shareHintTripId && shareHintTripId === currentTrip?.id ? (
+				<GuideBubble
+					targetId="share-trip"
+					message={t('home.shareHintBubble')}
+					placement="top"
+					showOverlay
+					showHighlight
+					footer={
+						<>
+							<button type="button" onClick={openShareModal} className="settings-btn-primary !px-2.5 !py-1.5 text-[11px]">
+								{t('home.shareTrip')}
+							</button>
+							<button type="button" onClick={dismissShareHint} className="settings-btn-ghost !px-2.5 !py-1.5 text-[11px]">
+								{t('common.close')}
+							</button>
+						</>
+					}
+				/>
+			) : null}
+
+			<Modal isOpen={isCollaboratorsModalOpen} onClose={() => setIsCollaboratorsModalOpen(false)} title={t('home.modal.collaboratorsTitle')} showOkButton={false} showCancelButton cancelText={t('common.close')}>
+				{currentTrip ? (
+					<CollaboratorList
+						collaborators={currentTrip.collaborators || []}
+						shareHistory={currentTrip.shareHistory || []}
+						isOwner={!!currentTrip.isOwner}
+						isBusy={isCollaboratorBusy}
+						onRevoke={handleRevokeCollaborator}
+						onInvite={handleInviteCollaborator}
+						onRemoveHistory={handleRemoveCollaboratorHistory}
+						showHistory={false}
+					/>
+				) : null}
 			</Modal>
 
 			<Modal
