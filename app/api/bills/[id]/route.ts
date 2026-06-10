@@ -3,7 +3,14 @@ import prisma from '@/lib/prisma';
 import { verifyJwtToken } from '@/src/lib/jwt';
 import { getTripAccess } from '@/lib/trip-access';
 import { notifyTripBillChange } from '@/lib/trip-realtime';
+import { isSharesBalanced, roundMoney } from '@/src/utils/bill-split';
 import type { ExpenseStatus } from '@prisma/client';
+
+type OwedSharePayload = {
+  friendId: string;
+  shareAmount: number;
+  isCustomShare?: boolean;
+};
 
 type BillUpdateRequestBody = {
   payerId: string;
@@ -15,6 +22,7 @@ type BillUpdateRequestBody = {
   category: string;
   status: ExpenseStatus;
   owedFriendIds?: string[];
+  owedShares?: OwedSharePayload[];
   latitude?: number | null;
   longitude?: number | null;
 };
@@ -30,11 +38,42 @@ function getUserId(request: NextRequest): string | null {
   return decoded?.userId || null;
 }
 
+function normalizeOwedShares(body: BillUpdateRequestBody) {
+  const billAmount = roundMoney(Number(body.amount));
+
+  if (body.owedShares?.length) {
+    const shares = body.owedShares.map((entry) => ({
+      friendId: entry.friendId,
+      shareAmount: roundMoney(Number(entry.shareAmount)),
+      isCustomShare: Boolean(entry.isCustomShare),
+    }));
+
+    if (!isSharesBalanced(billAmount, shares)) {
+      return { error: 'Owed share amounts must add up to the bill total' as const };
+    }
+
+    return { shares };
+  }
+
+  if (body.owedFriendIds?.length) {
+    const perPerson = roundMoney(billAmount / body.owedFriendIds.length);
+    return {
+      shares: body.owedFriendIds.map((friendId) => ({
+        friendId,
+        shareAmount: perPerson,
+        isCustomShare: false,
+      })),
+    };
+  }
+
+  return { shares: [] as { friendId: string; shareAmount: number; isCustomShare: boolean }[] };
+}
+
 async function canAccessBill(userId: string, billId: string) {
   const bill = await prisma.bill.findFirst({
     where: { id: billId, isDeleted: false },
     include: {
-      owedFriends: true,
+      owedFriends: { where: { isDeleted: false } },
       trip: {
         include: {
           members: {
@@ -100,7 +139,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
     }
 
     const body = (await request.json()) as BillUpdateRequestBody;
-    const { payerId, amount, currency = 'CNY', paymentMethod = 'Cash', name, description, category, status, owedFriendIds, latitude, longitude } = body;
+    const { payerId, amount, currency = 'CNY', paymentMethod = 'Cash', name, description, category, status, owedFriendIds, owedShares, latitude, longitude } = body;
 
     if (!payerId || !amount || !category || !status) {
       return NextResponse.json({ error: 'Missing required bill fields' }, { status: 400 });
@@ -111,11 +150,16 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
       return NextResponse.json({ error: 'Bill not found' }, { status: 404 });
     }
 
+    const owedResult = normalizeOwedShares({ ...body, owedFriendIds, owedShares });
+    if ('error' in owedResult) {
+      return NextResponse.json({ error: owedResult.error }, { status: 400 });
+    }
+
     const updatedBill = await prisma.bill.update({
       where: { id },
       data: {
         payerId,
-        amount: Number(amount),
+        amount: roundMoney(Number(amount)),
         currency,
         paymentMethod,
         name,
@@ -124,15 +168,20 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         status,
         latitude: latitude ?? null,
         longitude: longitude ?? null,
-        owedFriends: owedFriendIds
-          ? {
-              deleteMany: {},
-              create: owedFriendIds.map((friendId) => ({ friendId })),
-            }
-          : undefined,
+        owedFriends:
+          owedFriendIds || owedShares
+            ? {
+                deleteMany: {},
+                create: owedResult.shares.map((entry) => ({
+                  friendId: entry.friendId,
+                  shareAmount: entry.shareAmount,
+                  isCustomShare: entry.isCustomShare,
+                })),
+              }
+            : undefined,
       },
       include: {
-        owedFriends: true,
+        owedFriends: { where: { isDeleted: false } },
       },
     });
 

@@ -667,6 +667,57 @@ html.dark .app-collaborator-meta {
 	@apply border border-dashed border-[#1a1814]/15 dark:border-[#f4efe4]/15;
 }
 
+.app-bill-section-title {
+	font-family: var(--font-geist-mono), ui-monospace, monospace;
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	@apply text-[#1a1814] dark:text-[#f4efe4];
+}
+
+.app-bill-share-input {
+	width: 2.75rem;
+	border: 1px solid rgba(26, 24, 20, 0.18);
+	background: #fffdf8;
+	font-size: 9px;
+	line-height: 1.2;
+	padding: 0.1rem 0.15rem;
+}
+
+html.dark .app-bill-share-input {
+	border-color: rgba(244, 239, 228, 0.18);
+	background: #121110;
+}
+
+.app-bill-share-input:focus {
+	outline: 2px solid rgba(42, 157, 143, 0.45);
+	outline-offset: 1px;
+}
+
+.app-bill-share-input-danger {
+	border-color: #e85d4c;
+	color: #e85d4c;
+}
+
+html.dark .app-bill-share-input-danger {
+	border-color: #ff6b6b;
+	color: #ff6b6b;
+}
+
+.app-bill-share-currency {
+	font-size: 8px;
+	line-height: 1;
+	@apply text-[#6b6458] dark:text-[#a89f8f];
+}
+
+.app-bill-share-currency-danger {
+	color: #e85d4c;
+}
+
+html.dark .app-bill-share-currency-danger {
+	color: #ff6b6b;
+}
+
 .app-fab-add {
 	background: #e85d4c;
 	color: #fffdf8;

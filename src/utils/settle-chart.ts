@@ -1,4 +1,5 @@
 import { getBillCategoryLabelKey, getBillCategoryTone } from '@/src/utils/bill-category';
+import { buildBillShareRows } from '@/src/utils/bill-split';
 import type { MessageKey } from '@/src/utils/i18n/types';
 import type { Bill, Trip } from '@/src/types';
 
@@ -82,15 +83,15 @@ function resolveFlowStatusKey(owedId: string, payerId: string, settledFlowPairs:
 	return settledFlowPairs.has(`${owedId}|${payerId}`) ? 'settled' : 'unsettled';
 }
 
-function expandBill(bill: Bill, converted: number, settledFlowPairs: Set<string>): BillRow[] {
-	if (converted <= 0) return [];
-
+function expandBill(bill: Bill, selectedCurrency: string, rates: Record<string, number>, settledFlowPairs: Set<string>): BillRow[] {
 	const payerId = bill.payerId || '__unknown__';
 	const dateKey = bill.createdAt.split('T')[0];
 	const category = bill.category || '其他';
-	const owedIds = bill.owedFriends.map((owed) => owed.friendId);
+	const rows = buildBillShareRows(bill);
 
-	if (!owedIds.length) {
+	if (!rows.length) {
+		const converted = convertAmount(bill.amount, bill.currency || 'CNY', selectedCurrency, rates);
+		if (converted <= 0) return [];
 		return [
 			{
 				amount: converted,
@@ -103,15 +104,17 @@ function expandBill(bill: Bill, converted: number, settledFlowPairs: Set<string>
 		];
 	}
 
-	const share = converted / owedIds.length;
-	return owedIds.map((owedId) => ({
-		amount: share,
-		payerId,
-		owedId,
-		category,
-		dateKey,
-		statusKey: resolveFlowStatusKey(owedId, payerId, settledFlowPairs),
-	}));
+	return rows
+		.filter((row) => row.shareAmount > 0)
+		.map((row) => ({
+			amount: convertAmount(row.shareAmount, bill.currency || 'CNY', selectedCurrency, rates),
+			payerId: row.payerId,
+			owedId: row.owedId,
+			category,
+			dateKey,
+			statusKey: resolveFlowStatusKey(row.owedId, row.payerId, settledFlowPairs),
+		}))
+		.filter((row) => row.amount > 0);
 }
 
 function rowDimensionKey(row: BillRow, dimension: ChartDimension): string {
@@ -181,8 +184,7 @@ export function buildNestedChartData(
 
 	trip.bills.forEach((bill) => {
 		if (bill.status === 'SETTLED') return;
-		const converted = convertAmount(bill.amount, bill.currency || 'CNY', selectedCurrency, rates);
-		expandBill(bill, converted, ctx.settledFlowPairs).forEach((row) => {
+		expandBill(bill, selectedCurrency, rates, ctx.settledFlowPairs).forEach((row) => {
 			const outerKey = rowDimensionKey(row, outerDim);
 			const innerKey = rowDimensionKey(row, innerDim);
 			const outerMap = nested.get(outerKey) ?? new Map<string, number>();

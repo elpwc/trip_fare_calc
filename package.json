@@ -8,6 +8,7 @@
 		"start": "next start",
 		"postinstall": "prisma generate",
 		"db:ensure-coedit": "npx tsx prisma/scripts/ensure-coedit-tables.ts",
+		"db:ensure-bill-share": "npx tsx prisma/scripts/ensure-bill-share-columns.ts",
 		"lint": "eslint"
 	},
 	"dependencies": {

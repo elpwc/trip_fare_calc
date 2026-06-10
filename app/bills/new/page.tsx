@@ -12,11 +12,21 @@ import { FlagSVG } from '@/src/components/FlagSVG';
 import { Member } from '@/src/types';
 import { usePreferences } from '@/src/utils/preferences-provider';
 import type { MessageKey } from '@/src/utils/i18n/messages';
+import {
+	isSharesBalanced,
+	recalculateAaShares,
+	resetAllToAa,
+	roundMoney,
+	sharesTotal,
+	type OwedShareInput,
+} from '@/src/utils/bill-split';
 
 type Friend = Member;
 
-type BillOwed = {
+type LoadedBillOwed = {
 	friendId: string;
+	shareAmount?: number;
+	isCustomShare?: boolean;
 };
 
 const LAST_BILL_CURRENCY_KEY = 'tripFareCalc:lastBillCurrency';
@@ -96,7 +106,8 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 	const [category, setCategory] = useState('吃饭');
 	const [billName, setBillName] = useState('');
 	const [payerId, setPayerId] = useState<string>('');
-	const [owedFriendIds, setOwedFriendIds] = useState<string[]>([]);
+	const [owedShares, setOwedShares] = useState<OwedShareInput[]>([]);
+	const [shareDrafts, setShareDrafts] = useState<Record<string, string>>({});
 	const [description, setDescription] = useState('');
 	const [status, setStatus] = useState('UNRETURNED');
 	const [latitude, setLatitude] = useState<number | null>(null);
@@ -159,7 +170,16 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 			setCategory(data.category || '吃饭');
 			setBillName(data.name || '');
 			setPayerId(data.payerId || '');
-			setOwedFriendIds((data.owedFriends || []).map((owed: BillOwed) => owed.friendId));
+			const loadedShares = (data.owedFriends || []).map((owed: LoadedBillOwed) => ({
+				friendId: owed.friendId,
+				shareAmount: roundMoney(Number(owed.shareAmount ?? 0)),
+				isCustomShare: Boolean(owed.isCustomShare),
+			}));
+			if (loadedShares.length > 0 && loadedShares.every((entry) => entry.shareAmount <= 0)) {
+				setOwedShares(resetAllToAa(Number(data.amount ?? 0), loadedShares.map((entry) => entry.friendId)));
+			} else {
+				setOwedShares(loadedShares);
+			}
 			setDescription(data.description || '');
 			setStatus(data.status || 'UNRETURNED');
 			setLatitude(data.latitude ?? null);
@@ -190,18 +210,89 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 		}
 	};
 
+	const billTotal = roundMoney(Number(amount) || 0);
+	const assignedTotal = sharesTotal(owedShares);
+	const currencySuffix = CURRENCY_DEFINITIONS[currency]?.suffix || '¥';
+	const currencySymbol = CURRENCY_DEFINITIONS[currency]?.symbol || '¥';
+
+	const clearShareDrafts = () => setShareDrafts({});
+
+	const handleAmountChange = (value: string) => {
+		setAmount(value);
+		clearShareDrafts();
+		const nextTotal = roundMoney(Number(value) || 0);
+		setOwedShares((prev) => (prev.length ? recalculateAaShares(nextTotal, prev) : prev));
+	};
+
 	const handleSelectAllFriends = () => {
-		setOwedFriendIds(tripMembers.map((f) => f.id));
+		clearShareDrafts();
+		setOwedShares(resetAllToAa(billTotal, tripMembers.map((friend) => friend.id)));
+	};
+
+	const handleResetAa = () => {
+		if (owedShares.length === 0) return;
+		clearShareDrafts();
+		setOwedShares(resetAllToAa(billTotal, owedShares.map((entry) => entry.friendId)));
 	};
 
 	const handleToggleFriend = (friendId: string) => {
-		setOwedFriendIds((prev) => (prev.includes(friendId) ? prev.filter((id) => id !== friendId) : [...prev, friendId]));
+		setShareDrafts((prev) => {
+			if (!(friendId in prev)) return prev;
+			const next = { ...prev };
+			delete next[friendId];
+			return next;
+		});
+		setOwedShares((prev) => {
+			if (prev.some((entry) => entry.friendId === friendId)) {
+				return recalculateAaShares(
+					billTotal,
+					prev.filter((entry) => entry.friendId !== friendId),
+				);
+			}
+			return recalculateAaShares(billTotal, [...prev, { friendId, shareAmount: 0, isCustomShare: false }]);
+		});
 	};
+
+	const getShareInputValue = (friendId: string, share: OwedShareInput) => {
+		if (friendId in shareDrafts) return shareDrafts[friendId];
+		if (share.isCustomShare && share.shareAmount === 0) return '';
+		return String(share.shareAmount);
+	};
+
+	const handleShareAmountChange = (friendId: string, value: string) => {
+		if (value !== '' && !/^\d*\.?\d{0,2}$/.test(value)) return;
+
+		setShareDrafts((prev) => ({ ...prev, [friendId]: value }));
+
+		const parsed = value === '' || value === '.' ? 0 : roundMoney(Number(value));
+		setOwedShares((prev) => {
+			const next = prev.map((entry) =>
+				entry.friendId === friendId ? { ...entry, shareAmount: parsed, isCustomShare: true } : entry,
+			);
+			return recalculateAaShares(billTotal, next);
+		});
+	};
+
+	const handleShareAmountBlur = (friendId: string) => {
+		setShareDrafts((prev) => {
+			if (!(friendId in prev)) return prev;
+			const next = { ...prev };
+			delete next[friendId];
+			return next;
+		});
+	};
+
+	const getShareForFriend = (friendId: string) => owedShares.find((entry) => entry.friendId === friendId);
 
 	const handleCreateBill = async () => {
 		const selectedTripId = effectiveTripId || tripId;
 		if (!selectedTripId || !amount || !payerId) {
 			alert(t('bills.requiredFields'));
+			return;
+		}
+
+		if (owedShares.length > 0 && !isSharesBalanced(Number(amount), owedShares)) {
+			alert(t('bills.shareMismatch'));
 			return;
 		}
 
@@ -217,7 +308,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 				description: finalDescription,
 				category,
 				status,
-				owedFriendIds,
+				owedShares,
 				latitude,
 				longitude,
 			};
@@ -277,7 +368,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 					<input
 						type="number"
 						value={amount}
-						onChange={(e) => setAmount(e.target.value)}
+						onChange={(e) => handleAmountChange(e.target.value)}
 						placeholder={t('bills.amount')}
 						className="settings-input min-w-0 flex-1 border-0 py-3 text-3xl font-bold shadow-none focus:shadow-none"
 					/>
@@ -308,8 +399,8 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 				<input type="text" value={billName} onChange={(e) => setBillName(e.target.value)} placeholder={t('bills.namePlaceholder')} className="settings-input py-2 text-sm" />
 
 				<div className="app-panel p-2">
-					<div className="mb-1 flex items-center justify-between">
-						<span className="app-label">{t('bills.payer')}</span>
+					<div className="mb-2 flex items-center justify-between">
+						<span className="app-bill-section-title">{t('bills.selectPayer')}</span>
 					</div>
 					<div className="flex flex-wrap justify-center gap-1">
 						{tripMembers.map((friend) => (
@@ -317,34 +408,84 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 								key={friend.id}
 								type="button"
 								onClick={() => setPayerId(friend.id)}
-								className={`flex min-w-14 flex-col items-center gap-0.5 p-1 ${payerId === friend.id ? 'ring-2 ring-[#2a9d8f]' : ''}`}
+								className={`flex w-[4.75rem] flex-col items-center gap-0.5 p-1 ${payerId === friend.id ? 'ring-2 ring-[#2a9d8f]' : ''}`}
 							>
 								<FriendIcon name={friend.name} size="md" isSelf={friend.isSelf} />
-								<span className="max-w-14 truncate text-[9px]">{friend.name}</span>
+								<span className="max-w-[4.25rem] truncate text-[9px]">{friend.name}</span>
 							</button>
 						))}
 					</div>
 				</div>
 
 				<div className="app-panel p-2">
-					<div className="mb-1 flex items-center justify-between">
-						<span className="app-label">{t('bills.owed')}</span>
-						<button type="button" onClick={handleSelectAllFriends} className="app-btn-compact">
-							{t('bills.selectAll')}
-						</button>
-					</div>
-					<div className="flex flex-wrap justify-center gap-1">
-						{tripMembers.map((friend) => (
-							<button
-								key={friend.id}
-								type="button"
-								onClick={() => handleToggleFriend(friend.id)}
-								className={`flex min-w-14 flex-col items-center gap-0.5 p-1 ${owedFriendIds.includes(friend.id) ? 'ring-2 ring-[#2a9d8f]' : ''}`}
-							>
-								<FriendIcon name={friend.name} size="md" isSelf={friend.isSelf} />
-								<span className="max-w-14 truncate text-[9px]">{friend.name}</span>
+					<div className="mb-2 flex flex-wrap items-center justify-between gap-1">
+						<span className="app-bill-section-title">{t('bills.selectOwed')}</span>
+						<div className="flex flex-wrap gap-1">
+							<button type="button" onClick={handleResetAa} disabled={owedShares.length === 0} className="app-btn-compact app-btn-compact-primary px-2 py-1 text-[10px] disabled:opacity-50">
+								{t('bills.resetAa')}
 							</button>
-						))}
+							<button type="button" onClick={handleSelectAllFriends} className="app-btn-compact px-2 py-1 text-[10px]">
+								{t('bills.selectAll')}
+							</button>
+						</div>
+					</div>
+					<p className="mb-2 text-[11px] leading-relaxed text-app-muted">{t('bills.shareHint')}</p>
+					{owedShares.length > 0 ? (
+						<p className={`settings-mono mb-2 text-[10px] ${isSharesBalanced(billTotal, owedShares) ? 'text-[#2a9d8f]' : 'text-app-danger'}`}>
+							{t('bills.shareTotal', { assigned: assignedTotal.toFixed(2), total: billTotal.toFixed(2) })}
+							{currencySuffix}
+						</p>
+					) : null}
+					<div className="flex flex-wrap justify-center gap-1">
+						{tripMembers.map((friend) => {
+							const share = getShareForFriend(friend.id);
+							const selected = Boolean(share);
+							const shareAmount = share?.shareAmount ?? 0;
+							const exceedsTotal = billTotal > 0 && shareAmount > billTotal;
+
+							return (
+								<button
+									key={friend.id}
+									type="button"
+									onClick={() => handleToggleFriend(friend.id)}
+									className={`flex w-[4.75rem] flex-col items-center gap-0.5 p-1 ${selected ? 'ring-2 ring-[#2a9d8f]' : ''}`}
+								>
+									<FriendIcon name={friend.name} size="md" isSelf={friend.isSelf} />
+									<span className="max-w-[4.25rem] truncate text-[9px]">{friend.name}</span>
+									<div
+										className="flex h-[2.125rem] w-full flex-col items-center justify-start gap-0.5"
+										onClick={(event) => event.stopPropagation()}
+										onKeyDown={(event) => event.stopPropagation()}
+									>
+										{selected && share ? (
+											<>
+												<div className="flex items-center justify-center gap-0.5">
+													<input
+														type="text"
+														inputMode="decimal"
+														value={getShareInputValue(friend.id, share)}
+														onChange={(event) => handleShareAmountChange(friend.id, event.target.value)}
+														onBlur={() => handleShareAmountBlur(friend.id)}
+														className={`app-bill-share-input settings-mono text-center ${exceedsTotal ? 'app-bill-share-input-danger' : ''}`}
+														aria-invalid={exceedsTotal}
+													/>
+													<span className={`app-bill-share-currency settings-mono ${exceedsTotal ? 'app-bill-share-currency-danger' : ''}`}>
+														{currencySymbol}
+													</span>
+												</div>
+												{share.isCustomShare ? (
+													<span className="text-[8px] font-semibold leading-none text-[#e85d4c]">{t('bills.shareCustom')}</span>
+												) : (
+													<span className="h-[8px]" aria-hidden="true" />
+												)}
+											</>
+										) : (
+											<span className="h-full" aria-hidden="true" />
+										)}
+									</div>
+								</button>
+							);
+						})}
 					</div>
 				</div>
 

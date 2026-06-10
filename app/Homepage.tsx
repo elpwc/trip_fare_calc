@@ -105,15 +105,14 @@ export default function HomePage() {
 	useEffect(() => {
 		if (trips.length === 0) return;
 
-		const queryTripId = searchParams.get('tripId');
-		if (queryTripId && trips.some((trip) => trip.id === queryTripId)) {
-			setSelectedTripId(queryTripId);
-			return;
-		}
-
 		setSelectedTripId((current) => {
 			if (current && trips.some((trip) => trip.id === current)) {
 				return current;
+			}
+
+			const queryTripId = searchParams.get('tripId');
+			if (queryTripId && trips.some((trip) => trip.id === queryTripId)) {
+				return queryTripId;
 			}
 
 			const savedTripId = user?.id ? getStoredSelectedTripId(user.id) : null;
@@ -589,6 +588,7 @@ export default function HomePage() {
 									onClick={() => {
 										setSelectedTripId(trip.id);
 										setIsTripDropdownOpen(false);
+										router.replace(`/?tripId=${trip.id}`);
 									}}
 									className="app-dropdown-item"
 								>

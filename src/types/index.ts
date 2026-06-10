@@ -31,6 +31,8 @@ export type TripMember = Member & {
 export type BillOwed = {
 	id: string;
 	friendId: string;
+	shareAmount?: number;
+	isCustomShare?: boolean;
 };
 
 export type TripCollaborator = {

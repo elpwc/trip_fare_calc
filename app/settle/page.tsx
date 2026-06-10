@@ -8,6 +8,7 @@ import { apiPath } from '@/src/config/paths';
 import { formatAmount } from '@/src/utils/currencies';
 import SettleSpendingChart from '@/src/components/settle/SettleSpendingChart';
 import { buildNestedChartData, type ChartDimension } from '@/src/utils/settle-chart';
+import { buildBillShareRows } from '@/src/utils/bill-split';
 import type { Locale } from '@/src/utils/preferences/constants';
 import { Trip, FlowItem } from '@/src/types';
 import { usePreferences } from '@/src/utils/preferences-provider';
@@ -177,18 +178,17 @@ function SettlePageContent() {
 
 		trip.bills.forEach((bill) => {
 			if (bill.status === 'SETTLED') return;
-			const owedIds = bill.owedFriends.map((owed) => owed.friendId);
-			if (!owedIds.length) return;
-			const share = bill.amount / owedIds.length;
 			const billCurrency = bill.currency || 'CNY';
 			const conversionRate = billCurrency === selectedCurrency ? 1 : exchangeInfo.rates[billCurrency];
-			const convertedShare = billCurrency === selectedCurrency ? share : conversionRate ? share / conversionRate : 0;
 
-			owedIds.forEach((owedId) => {
-				const key = `${owedId}|${bill.payerId}`;
+			buildBillShareRows(bill).forEach(({ owedId, payerId, shareAmount }) => {
+				const convertedShare = billCurrency === selectedCurrency ? shareAmount : conversionRate ? shareAmount / conversionRate : 0;
+				if (convertedShare <= 0) return;
+
+				const key = `${owedId}|${payerId}`;
 				const existing = flowMap.get(key) ?? { amount: 0, originalTotals: {} };
 				existing.amount += convertedShare;
-				existing.originalTotals[billCurrency] = (existing.originalTotals[billCurrency] ?? 0) + share;
+				existing.originalTotals[billCurrency] = (existing.originalTotals[billCurrency] ?? 0) + shareAmount;
 				flowMap.set(key, existing);
 			});
 		});
