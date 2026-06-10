@@ -326,62 +326,61 @@ function UserPageContent() {
 									<div className="min-w-0">
 										<p className="settings-display truncate text-2xl">{user.name}</p>
 										<p className="settings-mono text-app-muted mt-2 text-[11px]">{user.email}</p>
+										<div className="flex gap-3">
+											<button
+												type="button"
+												className="settings-mono mt-3 text-[11px] uppercase tracking-[0.18em] text-[#2a9d8f] underline-offset-4 hover:underline dark:text-[#5fd3c4]"
+												onClick={async () => {
+													const newName = window.prompt(t('user.promptNewName'), user.name);
+													if (newName && newName !== user.name) {
+														try {
+															await updateName(newName);
+															setMessage(t('user.nameUpdated'));
+														} catch (err) {
+															setMessage(resolveAuthErrorMessage(err, t));
+														}
+													}
+												}}
+											>
+												{t('user.editName')}
+											</button>
+											<button
+												type="button"
+												className="settings-mono mt-3 text-[11px] uppercase tracking-[0.18em] text-[#2a9d8f] underline-offset-4 hover:underline dark:text-[#5fd3c4]"
+												onClick={async () => {
+													const newEmail = window.prompt(t('user.promptNewEmail'), user.email);
+													if (newEmail && newEmail !== user.email) {
+														try {
+															await updateEmail(newEmail);
+															setMessage(t('user.emailUpdated'));
+														} catch (err) {
+															setMessage(resolveAuthErrorMessage(err, t));
+														}
+													}
+												}}
+											>
+												{t('user.changeEmail')}
+											</button>
+											<button
+												type="button"
+												className="settings-mono mt-3 text-[11px] uppercase tracking-[0.18em] text-[#2a9d8f] underline-offset-4 hover:underline dark:text-[#5fd3c4]"
+												onClick={async () => {
+													const oldPassword = window.prompt(t('user.promptOldPassword'));
+													const newPassword = window.prompt(t('user.promptNewPassword'));
+													if (!oldPassword || !newPassword) return;
+													try {
+														await changePassword(oldPassword, newPassword);
+														setMessage(t('user.passwordUpdated'));
+													} catch (err) {
+														setMessage(resolveAuthErrorMessage(err, t));
+													}
+												}}
+											>
+												{t('user.changePassword')}
+											</button>
+										</div>
 									</div>
 								</div>
-								<div className="settings-stamp shrink-0 -rotate-6">ON BOARD</div>
-							</div>
-							<div className="flex gap-3">
-								<button
-									type="button"
-									className="settings-mono mt-3 text-[11px] uppercase tracking-[0.18em] text-[#2a9d8f] underline-offset-4 hover:underline dark:text-[#5fd3c4]"
-									onClick={async () => {
-										const newName = window.prompt(t('user.promptNewName'), user.name);
-										if (newName && newName !== user.name) {
-											try {
-												await updateName(newName);
-												setMessage(t('user.nameUpdated'));
-											} catch (err) {
-												setMessage(resolveAuthErrorMessage(err, t));
-											}
-										}
-									}}
-								>
-									{t('user.editName')}
-								</button>
-								<button
-									type="button"
-									className="settings-mono mt-3 text-[11px] uppercase tracking-[0.18em] text-[#2a9d8f] underline-offset-4 hover:underline dark:text-[#5fd3c4]"
-									onClick={async () => {
-										const newEmail = window.prompt(t('user.promptNewEmail'), user.email);
-										if (newEmail && newEmail !== user.email) {
-											try {
-												await updateEmail(newEmail);
-												setMessage(t('user.emailUpdated'));
-											} catch (err) {
-												setMessage(resolveAuthErrorMessage(err, t));
-											}
-										}
-									}}
-								>
-									{t('user.changeEmail')}
-								</button>
-								<button
-									type="button"
-									className="settings-mono mt-3 text-[11px] uppercase tracking-[0.18em] text-[#2a9d8f] underline-offset-4 hover:underline dark:text-[#5fd3c4]"
-									onClick={async () => {
-										const oldPassword = window.prompt(t('user.promptOldPassword'));
-										const newPassword = window.prompt(t('user.promptNewPassword'));
-										if (!oldPassword || !newPassword) return;
-										try {
-											await changePassword(oldPassword, newPassword);
-											setMessage(t('user.passwordUpdated'));
-										} catch (err) {
-											setMessage(resolveAuthErrorMessage(err, t));
-										}
-									}}
-								>
-									{t('user.changePassword')}
-								</button>
 							</div>
 						</ReceiptPanel>
 
