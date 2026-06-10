@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { verifyJwtToken } from '@/src/lib/jwt';
+import prisma from '@/lib/prisma';
 import { fetchTripWithDetails, formatTripResponse, getTripAccess, grantTripAccess, canInviteCoeditor } from '@/lib/trip-access';
 
 function getUserId(request: NextRequest): string | null {
