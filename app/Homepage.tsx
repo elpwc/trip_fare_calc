@@ -375,11 +375,26 @@ export default function HomePage() {
 				</div>
 
 				{/* New Trip Modal */}
-				<Modal isOpen={isNewTripModalOpen} onClose={() => setIsNewTripModalOpen(false)} title={t('home.modal.newTrip')} onOk={handleCreateTrip} okText={t('common.create')} showOkButton showCancelButton cancelText={t('common.cancel')}>
+				<Modal
+					isOpen={isNewTripModalOpen}
+					onClose={() => setIsNewTripModalOpen(false)}
+					title={t('home.modal.newTrip')}
+					onOk={handleCreateTrip}
+					okText={t('common.create')}
+					showOkButton
+					showCancelButton
+					cancelText={t('common.cancel')}
+				>
 					<div className="modal-stack">
 						<div className="modal-field">
 							<label className="app-label">{t('home.modal.tripName')}</label>
-							<input type="text" value={newTripName} onChange={(e) => setNewTripName(e.target.value)} placeholder={t('home.modal.tripNamePlaceholder')} className="settings-input py-2 text-sm" />
+							<input
+								type="text"
+								value={newTripName}
+								onChange={(e) => setNewTripName(e.target.value)}
+								placeholder={t('home.modal.tripNamePlaceholder')}
+								className="settings-input py-2 text-sm"
+							/>
 						</div>
 						<div className="modal-field">
 							<label className="app-label">{t('home.modal.startDate')}</label>
@@ -430,7 +445,7 @@ export default function HomePage() {
 					</button>
 
 					{isTripDropdownOpen ? (
-						<div className="app-dropdown absolute top-full left-0 right-0 z-20 mt-0.5 max-h-48 overflow-y-auto">
+						<div className="app-dropdown absolute top-full left-0 right-0 z-500 mt-0.5 max-h-48 overflow-y-auto">
 							{trips.map((trip) => (
 								<button
 									key={trip.id}
@@ -471,7 +486,9 @@ export default function HomePage() {
 				<button type="button" onClick={() => guardAuth(() => setIsDeleteTripModalOpen(true))} className="app-toolbar-chip">
 					{currentTrip?.isOwner === false ? t('common.remove') : t('common.delete')}
 				</button>
-				<span className="app-label ml-auto">{currentBills.length} {t('common.billsUnit')}</span>
+				<span className="app-label ml-auto">
+					{currentBills.length} {t('common.billsUnit')}
+				</span>
 			</div>
 
 			<section className="mt-1.5">
@@ -535,17 +552,38 @@ export default function HomePage() {
 						</svg>
 					</button>
 				) : null}
-				<button type="button" onClick={() => guardAuth(() => router.push(`/bills/new?tripId=${selectedTripId}`))} className="app-fab app-fab-icon app-fab-add" aria-label={t('home.newBill')} data-onboarding-target="new-bill">
+				<button
+					type="button"
+					onClick={() => guardAuth(() => router.push(`/bills/new?tripId=${selectedTripId}`))}
+					className="app-fab app-fab-icon app-fab-add"
+					aria-label={t('home.newBill')}
+					data-onboarding-target="new-bill"
+				>
 					+
 				</button>
 			</div>
 
 			{/* New Trip Modal */}
-			<Modal isOpen={isNewTripModalOpen} onClose={() => setIsNewTripModalOpen(false)} title={t('home.modal.newTrip')} onOk={handleCreateTrip} okText={t('common.create')} showOkButton showCancelButton cancelText={t('common.cancel')}>
+			<Modal
+				isOpen={isNewTripModalOpen}
+				onClose={() => setIsNewTripModalOpen(false)}
+				title={t('home.modal.newTrip')}
+				onOk={handleCreateTrip}
+				okText={t('common.create')}
+				showOkButton
+				showCancelButton
+				cancelText={t('common.cancel')}
+			>
 				<div className="modal-stack">
 					<div className="modal-field">
 						<label className="app-label">{t('home.modal.tripName')}</label>
-						<input type="text" value={newTripName} onChange={(e) => setNewTripName(e.target.value)} placeholder={t('home.modal.tripNamePlaceholder')} className="settings-input py-2 text-sm" />
+						<input
+							type="text"
+							value={newTripName}
+							onChange={(e) => setNewTripName(e.target.value)}
+							placeholder={t('home.modal.tripNamePlaceholder')}
+							className="settings-input py-2 text-sm"
+						/>
 					</div>
 					<div className="modal-field">
 						<label className="app-label">{t('home.modal.startDate')}</label>
@@ -610,7 +648,15 @@ export default function HomePage() {
 			/>
 
 			{/* Map Details Modal */}
-			<Modal isOpen={isMapModalOpen} onClose={() => setIsMapModalOpen(false)} title={t('home.modal.mapTitle')} showOkButton={false} showCancelButton cancelText={t('common.close')} className="max-w-5xl">
+			<Modal
+				isOpen={isMapModalOpen}
+				onClose={() => setIsMapModalOpen(false)}
+				title={t('home.modal.mapTitle')}
+				showOkButton={false}
+				showCancelButton
+				cancelText={t('common.close')}
+				className="max-w-5xl"
+			>
 				<div className="modal-stack">
 					<div className="flex flex-wrap items-center gap-1.5">
 						<button type="button" onClick={() => setMapTileLayer('osm')} className={`app-toolbar-chip ${mapTileLayer === 'osm' ? 'app-toolbar-chip-active' : ''}`}>
@@ -656,10 +702,25 @@ export default function HomePage() {
 			</Modal>
 
 			{/* Edit Trip Modal */}
-			<Modal isOpen={isEditTripModalOpen} onClose={() => setIsEditTripModalOpen(false)} title={t('home.modal.editTripName')} onOk={handleEditTrip} okText={t('common.save')} showOkButton showCancelButton cancelText={t('common.cancel')}>
+			<Modal
+				isOpen={isEditTripModalOpen}
+				onClose={() => setIsEditTripModalOpen(false)}
+				title={t('home.modal.editTripName')}
+				onOk={handleEditTrip}
+				okText={t('common.save')}
+				showOkButton
+				showCancelButton
+				cancelText={t('common.cancel')}
+			>
 				<div className="modal-field">
 					<label className="app-label">{t('home.modal.tripName')}</label>
-					<input type="text" value={editTripName} onChange={(e) => setEditTripName(e.target.value)} placeholder={t('home.modal.editTripNamePlaceholder')} className="settings-input py-2 text-sm" />
+					<input
+						type="text"
+						value={editTripName}
+						onChange={(e) => setEditTripName(e.target.value)}
+						placeholder={t('home.modal.editTripNamePlaceholder')}
+						className="settings-input py-2 text-sm"
+					/>
 				</div>
 			</Modal>
 
@@ -668,7 +729,13 @@ export default function HomePage() {
 					<p className="modal-hint">{t('home.modal.shareHint')}</p>
 					<div className="modal-field">
 						<label className="app-label">{t('home.modal.sharePassword')}</label>
-						<input type="text" value={sharePassword} onChange={(e) => setSharePassword(e.target.value)} placeholder={t('home.modal.sharePasswordPlaceholder')} className="settings-input py-2 text-sm" />
+						<input
+							type="text"
+							value={sharePassword}
+							onChange={(e) => setSharePassword(e.target.value)}
+							placeholder={t('home.modal.sharePasswordPlaceholder')}
+							className="settings-input py-2 text-sm"
+						/>
 					</div>
 					<button type="button" onClick={handleCreateShare} disabled={isSharing} className="settings-btn-primary w-full py-2.5 text-sm disabled:opacity-60">
 						{isSharing ? t('home.modal.generating') : shareUrl ? t('home.modal.updateSharePassword') : t('home.modal.generateShareLink')}
