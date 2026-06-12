@@ -729,6 +729,31 @@ html.dark .app-bill-share-currency-danger {
 	text-align: center;
 }
 
+.app-skeleton-stack {
+	pointer-events: none;
+}
+
+.app-skeleton {
+	@apply bg-[#f4efe4]/70 dark:bg-[#2a2824];
+	animation: app-skeleton-pulse 1.2s ease-in-out infinite;
+	border-radius: 2px;
+}
+
+@keyframes app-skeleton-pulse {
+	0%,
+	100% {
+		opacity: 0.55;
+	}
+	50% {
+		opacity: 1;
+	}
+}
+
+.app-loading-caption {
+	@apply text-center text-[12px] text-[#6b6458] dark:text-[#a89f8f];
+	margin-top: 0.75rem;
+}
+
 .app-summary-strip {
 	@apply flex flex-wrap gap-x-4 gap-y-[0.65rem] border-2 border-[#1a1814] bg-[#fffdf8] text-[12px] dark:border-[#f4efe4] dark:bg-[#1c1a18] dark:text-[#f4efe4];
 	padding: 0.45rem 0.6rem;

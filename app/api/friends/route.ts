@@ -24,9 +24,12 @@ export async function GET(request: NextRequest) {
       where: { userId, isDeleted: false },
       include: {
         tripMembers: {
+          where: {
+            trip: { isDeleted: false },
+          },
           include: {
             trip: {
-              select: { id: true, name: true, createdAt: true, startDate: true },
+              select: { id: true, name: true, createdAt: true, startDate: true, isDeleted: true },
             },
           },
         },
@@ -36,7 +39,9 @@ export async function GET(request: NextRequest) {
 
     const friendsWithTrips = friends.map(friend => ({
       ...friend,
-      trips: friend.tripMembers.map(tm => ({
+      trips: friend.tripMembers
+        .filter((tm) => !tm.trip.isDeleted)
+        .map(tm => ({
         id: tm.trip.id,
         name: tm.trip.name,
         startDate: formatPrismaDateOnly(tm.trip.startDate) ?? null,

@@ -19,16 +19,22 @@ export default function AddFriendModal({ isOpen, onClose, onAdded }: AddFriendMo
 	const [name, setName] = useState('');
 	const [description, setDescription] = useState('');
 	const [isSelf, setIsSelf] = useState(false);
+	const [nameError, setNameError] = useState('');
 
 	useEffect(() => {
 		if (!isOpen) return;
 		setName('');
 		setDescription('');
 		setIsSelf(false);
+		setNameError('');
 	}, [isOpen]);
 
 	const handleAdd = async () => {
-		if (!name.trim()) return;
+		if (!name.trim()) {
+			setNameError(t('friends.nameRequired'));
+			return;
+		}
+		setNameError('');
 
 		try {
 			const response = await fetch(apiPath('/api/friends'), {
@@ -69,7 +75,17 @@ export default function AddFriendModal({ isOpen, onClose, onAdded }: AddFriendMo
 			<div className="modal-stack">
 				<div className="modal-field">
 					<label className="app-label">{t('friends.name')}</label>
-					<input type="text" placeholder={t('friends.namePlaceholder')} value={name} onChange={(e) => setName(e.target.value)} className="settings-input py-2 text-sm" />
+					<input
+						type="text"
+						placeholder={t('friends.namePlaceholder')}
+						value={name}
+						onChange={(e) => {
+							setName(e.target.value);
+							if (nameError) setNameError('');
+						}}
+						className="settings-input py-2 text-sm"
+					/>
+					{nameError ? <p className="modal-message modal-message-error">{nameError}</p> : null}
 				</div>
 				<div className="modal-field">
 					<label className="app-label">{t('friends.description')}</label>

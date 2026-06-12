@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyJwtToken } from '@/src/lib/jwt';
-import { getTripAccess } from '@/lib/trip-access';
+import { getTripAccess, formatTripMemberForViewer } from '@/lib/trip-access';
 import { notifyTripBillChange } from '@/lib/trip-realtime';
 import { isSharesBalanced, roundMoney } from '@/src/utils/bill-split';
 import type { ExpenseStatus } from '@prisma/client';
@@ -79,7 +79,7 @@ async function canAccessBill(userId: string, billId: string) {
           members: {
             include: {
               friend: {
-                select: { id: true, name: true, description: true, participationCount: true, isSelf: true },
+                select: { id: true, name: true, description: true, participationCount: true, isSelf: true, userId: true },
               },
             },
           },
@@ -116,11 +116,11 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
     return NextResponse.json({
       ...bill,
       createdById: bill.userId,
-      tripMembers: bill.trip?.members.map((member) => member.friend) || [],
+      tripMembers: bill.trip?.members.map((member) => formatTripMemberForViewer(member.friend, userId)) || [],
       trip: bill.trip
         ? {
             ...bill.trip,
-            members: bill.trip.members.map((member) => member.friend),
+            members: bill.trip.members.map((member) => formatTripMemberForViewer(member.friend, userId)),
           }
         : null,
     });

@@ -56,7 +56,7 @@ export async function GET(request: NextRequest) {
     }
 
     const userId = getUserId(request);
-    const viewerId = userId || trip.userId;
+    const viewerId = userId ?? '';
 
     return NextResponse.json({
       ...formatTripResponse(trip, viewerId),

@@ -149,7 +149,7 @@ const tripInclude = {
     where: { isDeleted: false },
     include: {
       friend: {
-        select: { id: true, name: true, description: true, participationCount: true, isSelf: true },
+        select: { id: true, name: true, description: true, participationCount: true, isSelf: true, userId: true },
       },
     },
   },
@@ -262,6 +262,26 @@ export async function fetchTripWithDetails(tripId: string) {
   return { ...trip, ownerCoeditHistory };
 }
 
+export function formatTripMemberForViewer(
+  friend: {
+    id: string;
+    name: string;
+    description: string | null;
+    participationCount: number;
+    isSelf: boolean;
+    userId: string;
+  },
+  viewerUserId: string,
+) {
+  return {
+    id: friend.id,
+    name: friend.name,
+    description: friend.description ?? '',
+    participationCount: friend.participationCount,
+    isSelf: Boolean(viewerUserId) && friend.userId === viewerUserId && friend.isSelf,
+  };
+}
+
 export function formatTripResponse(
   trip: NonNullable<Awaited<ReturnType<typeof fetchTripWithDetails>>>,
   viewerUserId: string,
@@ -273,7 +293,7 @@ export function formatTripResponse(
     recordBillLocation: trip.recordBillLocation,
     startDate: formatPrismaDateOnly(trip.startDate),
     createdAt: trip.createdAt,
-    members: trip.members.map((tm) => tm.friend),
+    members: trip.members.map((tm) => formatTripMemberForViewer(tm.friend, viewerUserId)),
     bills: trip.bills.map((bill) => ({
       id: bill.id,
       payerId: bill.payerId,

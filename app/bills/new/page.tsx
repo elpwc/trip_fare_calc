@@ -6,6 +6,7 @@ import { Modal } from '@/src/components/Modal';
 import AppShell from '@/src/components/layout/AppShell';
 import FriendIcon from '@/src/components/FriendIcon';
 import LocationSettingField, { SettingSwitch } from '@/src/components/AppSettingToggle';
+import PageLoadingSkeleton from '@/src/components/PageLoadingSkeleton';
 import { getAuthHeaders } from '@/src/utils/auth';
 import { apiPath } from '@/src/config/paths';
 import { Currency, CURRENCY_DEFINITIONS } from '@/src/utils/currencies';
@@ -111,7 +112,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 	const [recordThisBillLocation, setRecordThisBillLocation] = useState(true);
 
 	const [tripMembers, setTripMembers] = useState<Friend[]>([]);
-	const [isLoaded, setIsLoaded] = useState(!billId);
+	const [isLoaded, setIsLoaded] = useState(false);
 	const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
 	const [isPaymentMethodModalOpen, setIsPaymentMethodModalOpen] = useState(false);
@@ -160,6 +161,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 			if (!response.ok) {
 				const errorData = await response.json();
 				setErrorMessage(errorData?.error || t('bills.fetchFailed'));
+				setIsLoaded(true);
 				return;
 			}
 
@@ -199,6 +201,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 		} catch (error) {
 			console.error('Failed to fetch bill:', error);
 			setErrorMessage(t('bills.fetchFailed'));
+			setIsLoaded(true);
 		}
 	};
 
@@ -224,6 +227,10 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 			}
 		} catch (error) {
 			console.error('Failed to fetch trips:', error);
+		} finally {
+			if (!billId) {
+				setIsLoaded(true);
+			}
 		}
 	};
 
@@ -378,7 +385,15 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 	if (!isLoaded) {
 		return (
 			<AppShell tight>
-				<div className="app-empty mt-8">{t('common.loading')}</div>
+				<header className="mb-2 flex items-center justify-between gap-2">
+					<button type="button" onClick={() => router.back()} className="app-label hover:text-app-danger">
+						← {t('common.back')}
+					</button>
+					<h1 className="settings-display text-xl">{billId ? t('bills.editTitle') : t('bills.newTitle')}</h1>
+					<span className="settings-stamp scale-75">BILL</span>
+				</header>
+				<PageLoadingSkeleton variant="billMembers" />
+				<p className="app-loading-caption">{t('common.loading')}</p>
 			</AppShell>
 		);
 	}

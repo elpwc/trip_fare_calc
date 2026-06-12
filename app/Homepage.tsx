@@ -14,6 +14,7 @@ import CollaboratorList from '@/src/components/CollaboratorList';
 import GuideBubble from '@/src/components/onboarding/GuideBubble';
 import AnchorFloatingChip from '@/src/components/AnchorFloatingChip';
 import LocationSettingField from '@/src/components/AppSettingToggle';
+import PageLoadingSkeleton from '@/src/components/PageLoadingSkeleton';
 import { formatTripDisplayDate, getLocalDateInputValue } from '@/src/utils/date';
 import { getStoredSelectedTripId, setStoredSelectedTripId } from '@/src/utils/selected-trip-storage';
 import { getAuthHeaders } from '@/src/utils/auth';
@@ -69,6 +70,9 @@ export default function HomePage() {
 	const [shareHintTripId, setShareHintTripId] = useState<string | null>(null);
 	const [isDeleteTripModalOpen, setIsDeleteTripModalOpen] = useState(false);
 	const [isAddFriendModalOpen, setIsAddFriendModalOpen] = useState(false);
+	const [hasLoadedTrips, setHasLoadedTrips] = useState(false);
+	const [newTripNameError, setNewTripNameError] = useState('');
+	const [editTripNameError, setEditTripNameError] = useState('');
 
 	const searchParams = useSearchParams();
 
@@ -83,6 +87,8 @@ export default function HomePage() {
 			}
 		} catch (error) {
 			console.error('Failed to fetch trips:', error);
+		} finally {
+			setHasLoadedTrips(true);
 		}
 	}, []);
 
@@ -178,7 +184,11 @@ export default function HomePage() {
 	});
 
 	const handleCreateTrip = async () => {
-		if (!newTripName.trim()) return;
+		if (!newTripName.trim()) {
+			setNewTripNameError(t('home.modal.tripNameRequired'));
+			return;
+		}
+		setNewTripNameError('');
 
 		try {
 			const response = await fetch(apiPath('/api/trips'), {
@@ -274,7 +284,12 @@ export default function HomePage() {
 	};
 
 	const handleEditTrip = async () => {
-		if (!currentTrip || !editTripName.trim()) return;
+		if (!currentTrip) return;
+		if (!editTripName.trim()) {
+			setEditTripNameError(t('home.modal.tripNameRequired'));
+			return;
+		}
+		setEditTripNameError('');
 
 		try {
 			const response = await fetch(apiPath(`/api/trips/${currentTrip.id}`), {
@@ -495,13 +510,24 @@ export default function HomePage() {
 
 	const formatDate = (trip: Trip) => formatTripDisplayDate(trip, dateLocale);
 
+	if (!hasLoadedTrips) {
+		return (
+			<AppShell>
+				<p className="app-label">{t('page.home')}</p>
+				<PageLoadingSkeleton variant="home" />
+				<p className="app-loading-caption">{t('home.loading')}</p>
+				{AuthRequiredModal}
+			</AppShell>
+		);
+	}
+
 	if (trips.length === 0) {
 		return (
 			<AppShell>
 				<div className="app-empty mt-8">
 					<p className="settings-display text-xl">{t('home.noTripsTitle')}</p>
 					<p className="mt-2 text-[12px]">{t('home.noTripsHint')}</p>
-					<button type="button" onClick={() => guardAuth(() => { setNewTripRecordBillLocation(true); setNewTripStartDate(getLocalDateInputValue()); setIsNewTripModalOpen(true); })} className="settings-btn-primary mt-4" data-onboarding-target="new-trip">
+					<button type="button" onClick={() => guardAuth(() => { setNewTripRecordBillLocation(true); setNewTripStartDate(getLocalDateInputValue()); setNewTripNameError(''); setIsNewTripModalOpen(true); })} className="settings-btn-primary mt-4" data-onboarding-target="new-trip">
 						+ {t('home.newTrip')}
 					</button>
 				</div>
@@ -523,10 +549,14 @@ export default function HomePage() {
 							<input
 								type="text"
 								value={newTripName}
-								onChange={(e) => setNewTripName(e.target.value)}
+								onChange={(e) => {
+									setNewTripName(e.target.value);
+									if (newTripNameError) setNewTripNameError('');
+								}}
 								placeholder={t('home.modal.tripNamePlaceholder')}
 								className="settings-input py-2 text-sm"
 							/>
+							{newTripNameError ? <p className="modal-message modal-message-error">{newTripNameError}</p> : null}
 						</div>
 						<div className="modal-field">
 							<label className="app-label">{t('home.modal.startDate')}</label>
@@ -619,7 +649,7 @@ export default function HomePage() {
 					) : null}
 				</div>
 
-				<button type="button" onClick={() => guardAuth(() => { setNewTripRecordBillLocation(true); setNewTripStartDate(getLocalDateInputValue()); setIsNewTripModalOpen(true); })} className="app-header-add shrink-0" aria-label={t('home.newTrip')} data-onboarding-target="new-trip">
+				<button type="button" onClick={() => guardAuth(() => { setNewTripRecordBillLocation(true); setNewTripStartDate(getLocalDateInputValue()); setNewTripNameError(''); setIsNewTripModalOpen(true); })} className="app-header-add shrink-0" aria-label={t('home.newTrip')} data-onboarding-target="new-trip">
 					+
 				</button>
 			</header>
@@ -631,6 +661,7 @@ export default function HomePage() {
 					onClick={() =>
 						guardAuth(() => {
 							setEditTripName(currentTrip?.name || '');
+							setEditTripNameError('');
 							setIsEditTripModalOpen(true);
 						})
 					}
@@ -748,10 +779,14 @@ export default function HomePage() {
 						<input
 							type="text"
 							value={newTripName}
-							onChange={(e) => setNewTripName(e.target.value)}
+							onChange={(e) => {
+								setNewTripName(e.target.value);
+								if (newTripNameError) setNewTripNameError('');
+							}}
 							placeholder={t('home.modal.tripNamePlaceholder')}
 							className="settings-input py-2 text-sm"
 						/>
+						{newTripNameError ? <p className="modal-message modal-message-error">{newTripNameError}</p> : null}
 					</div>
 					<div className="modal-field">
 						<label className="app-label">{t('home.modal.startDate')}</label>
@@ -894,10 +929,14 @@ export default function HomePage() {
 					<input
 						type="text"
 						value={editTripName}
-						onChange={(e) => setEditTripName(e.target.value)}
+						onChange={(e) => {
+							setEditTripName(e.target.value);
+							if (editTripNameError) setEditTripNameError('');
+						}}
 						placeholder={t('home.modal.editTripNamePlaceholder')}
 						className="settings-input py-2 text-sm"
 					/>
+					{editTripNameError ? <p className="modal-message modal-message-error">{editTripNameError}</p> : null}
 				</div>
 			</Modal>
 

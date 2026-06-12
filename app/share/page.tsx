@@ -12,6 +12,7 @@ import { useAuth } from '@/src/utils/auth-provider';
 import { usePreferences } from '@/src/utils/preferences-provider';
 import { Bill, Trip, TripMember } from '@/src/types';
 import { formatTripDisplayDate } from '@/src/utils/date';
+import { resolveShareErrorMessage } from '@/src/utils/share-errors';
 import { CURRENCY_DEFINITIONS } from '@/src/utils/currencies';
 
 type SharedTrip = Trip & {
@@ -58,7 +59,7 @@ function SharePageContent() {
 
 		const data = await response.json();
 		if (!response.ok) {
-			throw new Error(data.error || t('share.passwordError'));
+			throw new Error(data.error || 'Invalid token or password');
 		}
 
 		return data as SharedTrip;
@@ -84,7 +85,7 @@ function SharePageContent() {
 				router.replace(`/?tripId=${data.id}`);
 			}
 		} catch (error) {
-			setPasswordError((error as Error).message);
+			setPasswordError(resolveShareErrorMessage(error, t));
 		} finally {
 			setIsLoading(false);
 		}
@@ -108,7 +109,7 @@ function SharePageContent() {
 
 			const data = await response.json();
 			if (!response.ok) {
-				setJoinMessage(data.error || t('share.joinFailed'));
+				setJoinMessage(resolveShareErrorMessage(data.error, t));
 				return;
 			}
 

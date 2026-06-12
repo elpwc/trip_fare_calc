@@ -7,6 +7,7 @@ import { apiPath } from '@/src/config/paths';
 import FriendList from '@/src/components/FriendList';
 import FriendIcon from '@/src/components/FriendIcon';
 import AddFriendModal from '@/src/components/AddFriendModal';
+import PageLoadingSkeleton from '@/src/components/PageLoadingSkeleton';
 import { usePreferences } from '@/src/utils/preferences-provider';
 import { useRequireAuth } from '@/src/utils/use-require-auth';
 import React, { useState, useEffect } from 'react';
@@ -24,6 +25,8 @@ const FriendsPage: React.FC = () => {
 	const [newName, setNewName] = useState('');
 	const [newDescription, setNewDescription] = useState('');
 	const [isAddingFriend, setIsAddingFriend] = useState(false);
+	const [hasLoadedFriends, setHasLoadedFriends] = useState(false);
+	const [isDeleteConfirmOpen, setIsDeleteConfirmOpen] = useState(false);
 
 	useEffect(() => {
 		fetchFriends();
@@ -40,6 +43,8 @@ const FriendsPage: React.FC = () => {
 			}
 		} catch (error) {
 			console.error('Failed to fetch friends:', error);
+		} finally {
+			setHasLoadedFriends(true);
 		}
 	};
 
@@ -154,6 +159,7 @@ const FriendsPage: React.FC = () => {
 			});
 			if (response.ok) {
 				setFriends(friends.filter((f) => f.id !== selectedFriend.id));
+				setIsDeleteConfirmOpen(false);
 				setIsModalOpen(false);
 			}
 		} catch (error) {
@@ -172,18 +178,29 @@ const FriendsPage: React.FC = () => {
 			</header>
 
 			<div className="app-panel h-[calc(100vh-220px)] min-h-72 overflow-hidden">
-				<div className="app-panel-head">
-					<span className="app-label">{t('friends.count', { count: friends.length })}</span>
-					<span className="settings-mono text-app-muted text-[9px]">{t('friends.tapAvatar')}</span>
-				</div>
-				<FriendList friends={friends} onFriendClick={handleFriendClick} />
+				{hasLoadedFriends ? (
+					<>
+						<div className="app-panel-head">
+							<span className="app-label">{t('friends.count', { count: friends.length })}</span>
+							<span className="settings-mono text-app-muted text-[9px]">{t('friends.tapAvatar')}</span>
+						</div>
+						<FriendList friends={friends} onFriendClick={handleFriendClick} />
+					</>
+				) : (
+					<div className="p-2">
+						<PageLoadingSkeleton variant="friends" />
+						<p className="app-loading-caption">{t('friends.loading')}</p>
+					</div>
+				)}
 			</div>
 
-			<div className="app-fab-bar">
-				<button type="button" onClick={() => guardAuth(() => setIsAddingFriend(true))} className="app-fab app-fab-icon app-fab-add" aria-label={t('friends.addFriend')} data-onboarding-target="add-friend">
-					+
-				</button>
-			</div>
+			{hasLoadedFriends ? (
+				<div className="app-fab-bar">
+					<button type="button" onClick={() => guardAuth(() => setIsAddingFriend(true))} className="app-fab app-fab-icon app-fab-add" aria-label={t('friends.addFriend')} data-onboarding-target="add-friend">
+						+
+					</button>
+				</div>
+			) : null}
 
 			<Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title={t('friends.detailTitle')} showCloseButton={false} className="max-w-md">
 				{selectedFriend && (
@@ -257,7 +274,7 @@ const FriendsPage: React.FC = () => {
 								>
 									{selectedFriend.isSelf ? t('friends.notSelf') : t('friends.isSelf')}
 								</button>
-								<button type="button" onClick={handleDeleteFriend} className="app-btn-compact app-btn-compact-danger">
+								<button type="button" onClick={() => setIsDeleteConfirmOpen(true)} className="app-btn-compact app-btn-compact-danger">
 									{t('common.delete')}
 								</button>
 							</div>
@@ -270,6 +287,19 @@ const FriendsPage: React.FC = () => {
 			</Modal>
 
 			<AddFriendModal isOpen={isAddingFriend} onClose={() => setIsAddingFriend(false)} onAdded={(newFriend) => setFriends((prev) => [...prev, newFriend])} />
+
+			<Modal
+				isOpen={isDeleteConfirmOpen}
+				onClose={() => setIsDeleteConfirmOpen(false)}
+				title={t('friends.deleteConfirmTitle')}
+				onOk={handleDeleteFriend}
+				okText={t('common.delete')}
+				showOkButton
+				showCancelButton
+				cancelText={t('common.cancel')}
+			>
+				{selectedFriend ? <p className="modal-hint">{t('friends.deleteConfirmHint', { name: selectedFriend.name })}</p> : null}
+			</Modal>
 			{AuthRequiredModal}
 		</AppShell>
 	);

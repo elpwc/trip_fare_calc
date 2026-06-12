@@ -137,6 +137,12 @@ export default function HomeBillList({ bills, members, onBillClick, dateLocale, 
 		const max = filters.amountMax ? Number(filters.amountMax) : null;
 		const fromTs = filters.dateFrom ? new Date(`${filters.dateFrom}T00:00:00`).getTime() : null;
 		const toTs = filters.dateTo ? new Date(`${filters.dateTo}T23:59:59.999`).getTime() : null;
+		const amountRangeInvalid =
+			min !== null && max !== null && !Number.isNaN(min) && !Number.isNaN(max) && min > max;
+
+		if (amountRangeInvalid) {
+			return [];
+		}
 
 		const result = bills.filter((bill) => {
 			if (search && !bill.name.toLowerCase().includes(search) && !bill.category.toLowerCase().includes(search)) {
@@ -172,6 +178,12 @@ export default function HomeBillList({ bills, members, onBillClick, dateLocale, 
 	};
 
 	const filterActive = hasActiveFilters(filters);
+
+	const amountRangeInvalid = useMemo(() => {
+		const min = filters.amountMin ? Number(filters.amountMin) : null;
+		const max = filters.amountMax ? Number(filters.amountMax) : null;
+		return min !== null && max !== null && !Number.isNaN(min) && !Number.isNaN(max) && min > max;
+	}, [filters.amountMin, filters.amountMax]);
 
 	const updateFilter = <K extends keyof BillFilters>(key: K, value: BillFilters[K]) => {
 		setFilters((prev) => ({ ...prev, [key]: value }));
@@ -302,6 +314,8 @@ export default function HomeBillList({ bills, members, onBillClick, dateLocale, 
 								/>
 							</label>
 						</div>
+
+						{amountRangeInvalid ? <p className="modal-message modal-message-error text-[11px]">{t('home.billFilterAmountRangeInvalid')}</p> : null}
 
 						{filterActive ? (
 							<button type="button" onClick={resetFilters} className="app-bill-filter-reset app-toolbar-chip w-full py-2 text-xs">
