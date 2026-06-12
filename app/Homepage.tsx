@@ -14,6 +14,7 @@ import CollaboratorList from '@/src/components/CollaboratorList';
 import GuideBubble from '@/src/components/onboarding/GuideBubble';
 import AnchorFloatingChip from '@/src/components/AnchorFloatingChip';
 import LocationSettingField from '@/src/components/AppSettingToggle';
+import { formatTripDisplayDate, getLocalDateInputValue } from '@/src/utils/date';
 import { getStoredSelectedTripId, setStoredSelectedTripId } from '@/src/utils/selected-trip-storage';
 import { getAuthHeaders } from '@/src/utils/auth';
 import { useAuth } from '@/src/utils/auth-provider';
@@ -49,7 +50,7 @@ export default function HomePage() {
 	const [isMemberDetailModalOpen, setIsMemberDetailModalOpen] = useState(false);
 	const [selectedMember, setSelectedMember] = useState<TripMember | null>(null);
 	const [newTripName, setNewTripName] = useState('');
-	const [newTripStartDate, setNewTripStartDate] = useState(new Date().toISOString().split('T')[0]);
+	const [newTripStartDate, setNewTripStartDate] = useState(getLocalDateInputValue);
 	const [newTripDescription, setNewTripDescription] = useState('');
 	const [newTripRecordBillLocation, setNewTripRecordBillLocation] = useState(true);
 	const [selectedFriendsForTrip, setSelectedFriendsForTrip] = useState<string[]>([]);
@@ -199,7 +200,7 @@ export default function HomePage() {
 				setTrips([newTrip, ...trips]);
 				setSelectedTripId(newTrip.id);
 				setNewTripName('');
-				setNewTripStartDate('');
+				setNewTripStartDate(getLocalDateInputValue());
 				setNewTripDescription('');
 				setNewTripRecordBillLocation(true);
 				setIsNewTripModalOpen(false);
@@ -492,9 +493,7 @@ export default function HomePage() {
 		}
 	};
 
-	const formatDate = (dateString: string) => {
-		return new Date(dateString).toLocaleDateString(dateLocale);
-	};
+	const formatDate = (trip: Trip) => formatTripDisplayDate(trip, dateLocale);
 
 	if (trips.length === 0) {
 		return (
@@ -502,7 +501,7 @@ export default function HomePage() {
 				<div className="app-empty mt-8">
 					<p className="settings-display text-xl">{t('home.noTripsTitle')}</p>
 					<p className="mt-2 text-[12px]">{t('home.noTripsHint')}</p>
-					<button type="button" onClick={() => guardAuth(() => { setNewTripRecordBillLocation(true); setIsNewTripModalOpen(true); })} className="settings-btn-primary mt-4" data-onboarding-target="new-trip">
+					<button type="button" onClick={() => guardAuth(() => { setNewTripRecordBillLocation(true); setNewTripStartDate(getLocalDateInputValue()); setIsNewTripModalOpen(true); })} className="settings-btn-primary mt-4" data-onboarding-target="new-trip">
 						+ {t('home.newTrip')}
 					</button>
 				</div>
@@ -583,7 +582,7 @@ export default function HomePage() {
 									<p className="truncate text-sm font-semibold leading-tight">{currentTrip?.name}</p>
 									{currentTrip?.isOwner && currentTrip.isShared ? <span className="app-tag app-tag-share shrink-0 text-[9px]">{t('home.sharedBadge')}</span> : null}
 								</div>
-								{currentTrip ? <p className="settings-mono text-[10px] text-app-muted">{formatDate(currentTrip.createdAt)}</p> : null}
+								{currentTrip ? <p className="settings-mono text-[10px] text-app-muted">{formatDate(currentTrip)}</p> : null}
 								{(currentTrip?.collaboratorCount ?? 0) > 0 ? (
 									<p className="settings-mono text-[10px] text-[#2a9d8f] dark:text-[#5fd3c4]">{t('home.coEditCount', { count: currentTrip?.collaboratorCount ?? 0 })}</p>
 								) : null}
@@ -610,7 +609,7 @@ export default function HomePage() {
 										{!trip.isOwner ? <span className="app-tag app-tag-share shrink-0 text-[8px]">{t('common.share')}</span> : null}
 										{trip.isOwner && trip.isShared ? <span className="app-tag app-tag-share shrink-0 text-[8px]">{t('home.sharedBadge')}</span> : null}
 									</div>
-									<p className="settings-mono text-[10px] text-app-muted">{formatDate(trip.createdAt)}</p>
+									<p className="settings-mono text-[10px] text-app-muted">{formatDate(trip)}</p>
 									{(trip.collaboratorCount ?? 0) > 0 ? (
 										<p className="settings-mono text-[10px] text-[#2a9d8f] dark:text-[#5fd3c4]">{t('home.coEditCount', { count: trip.collaboratorCount ?? 0 })}</p>
 									) : null}
@@ -620,7 +619,7 @@ export default function HomePage() {
 					) : null}
 				</div>
 
-				<button type="button" onClick={() => guardAuth(() => { setNewTripRecordBillLocation(true); setIsNewTripModalOpen(true); })} className="app-header-add shrink-0" aria-label={t('home.newTrip')} data-onboarding-target="new-trip">
+				<button type="button" onClick={() => guardAuth(() => { setNewTripRecordBillLocation(true); setNewTripStartDate(getLocalDateInputValue()); setIsNewTripModalOpen(true); })} className="app-header-add shrink-0" aria-label={t('home.newTrip')} data-onboarding-target="new-trip">
 					+
 				</button>
 			</header>

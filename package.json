@@ -10,6 +10,7 @@
 		"db:ensure-coedit": "npx tsx prisma/scripts/ensure-coedit-tables.ts",
 		"db:ensure-bill-share": "npx tsx prisma/scripts/ensure-bill-share-columns.ts",
 		"db:ensure-trip-location": "npx tsx prisma/scripts/ensure-trip-location-column.ts",
+		"db:ensure-trip-start-date": "npx tsx prisma/scripts/ensure-trip-start-date-column.ts",
 		"lint": "eslint"
 	},
 	"dependencies": {

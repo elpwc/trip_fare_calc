@@ -13,6 +13,7 @@ import { buildSettleCalculationDetail } from '@/src/utils/settle-flows';
 import type { Locale } from '@/src/utils/preferences/constants';
 import { Trip, FlowItem } from '@/src/types';
 import { usePreferences } from '@/src/utils/preferences-provider';
+import { getLocalDateInputValue } from '@/src/utils/date';
 import type { MessageKey } from '@/src/utils/i18n/messages';
 
 type SettledRecord = FlowItem & {
@@ -135,7 +136,7 @@ function SettlePageContent() {
 		const currencies = Array.from(new Set(trip.bills.map((bill) => bill.currency).filter((code) => code !== selectedCurrency)));
 
 		if (currencies.length === 0) {
-			setExchangeInfo({ base: selectedCurrency, date: new Date().toISOString().split('T')[0], rates: {}, source: SAME_CURRENCY_SOURCE });
+			setExchangeInfo({ base: selectedCurrency, date: getLocalDateInputValue(), rates: {}, source: SAME_CURRENCY_SOURCE });
 			setExchangeError('');
 			return;
 		}
@@ -155,7 +156,7 @@ function SettlePageContent() {
 						if (item.quote && item.rate) rates[item.quote] = item.rate;
 					});
 				}
-				const date = Array.isArray(result) && result.length > 0 ? result[0].date : new Date().toISOString().split('T')[0];
+				const date = Array.isArray(result) && result.length > 0 ? result[0].date : getLocalDateInputValue();
 				setExchangeInfo({ base: selectedCurrency, date, rates, source: 'frankfurter.dev' });
 			} catch (error) {
 				console.error(error);

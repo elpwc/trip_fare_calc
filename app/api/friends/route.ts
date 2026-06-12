@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { formatPrismaDateOnly } from '@/src/utils/date';
 import prisma from '@/lib/prisma';
 import { verifyJwtToken } from '@/src/lib/jwt';
 
@@ -25,7 +26,7 @@ export async function GET(request: NextRequest) {
         tripMembers: {
           include: {
             trip: {
-              select: { id: true, name: true, createdAt: true },
+              select: { id: true, name: true, createdAt: true, startDate: true },
             },
           },
         },
@@ -38,7 +39,8 @@ export async function GET(request: NextRequest) {
       trips: friend.tripMembers.map(tm => ({
         id: tm.trip.id,
         name: tm.trip.name,
-        date: tm.trip.createdAt.toISOString().split('T')[0],
+        startDate: formatPrismaDateOnly(tm.trip.startDate) ?? null,
+        createdAt: tm.trip.createdAt.toISOString(),
       })),
     }));
 

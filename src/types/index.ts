@@ -8,14 +8,14 @@ export type Member = {
 	description: string;
 	participationCount: number;
 	isSelf?: boolean;
-	trips?: { id: string; name: string; date: string }[];
+	trips?: { id: string; name: string; startDate?: string | null; createdAt: string }[];
 };
 
 /**
  * 朋友类型 - 包含完整信息，包括参加过的旅行
  */
 export type Friend = Member & {
-	trips: { id: string; name: string; date: string }[];
+	trips: { id: string; name: string; startDate?: string | null; createdAt: string }[];
 };
 
 /**

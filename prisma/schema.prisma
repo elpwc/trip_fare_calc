@@ -53,6 +53,7 @@ model Trip {
   name                String
   description         String?
   recordBillLocation  Boolean                   @default(true)
+  startDate           DateTime?                 @db.Date
   members             TripMember[]
   bills               Bill[]
   share               TripShare?

@@ -11,6 +11,7 @@ import { apiPath } from '@/src/config/paths';
 import { useAuth } from '@/src/utils/auth-provider';
 import { usePreferences } from '@/src/utils/preferences-provider';
 import { Bill, Trip, TripMember } from '@/src/types';
+import { formatTripDisplayDate } from '@/src/utils/date';
 import { CURRENCY_DEFINITIONS } from '@/src/utils/currencies';
 
 type SharedTrip = Trip & {
@@ -150,7 +151,7 @@ function SharePageContent() {
 						<p className="app-label">{t('share.sharedTrip')}</p>
 						<h1 className="settings-display text-xl leading-tight">{trip.name}</h1>
 						<p className="settings-mono text-app-muted mt-1 text-[9px]">
-							{new Date(trip.createdAt).toLocaleDateString(locale)}
+							{formatTripDisplayDate(trip, locale)}
 							{trip.ownerName ? ` · ${t('share.createdBy', { name: trip.ownerName })}` : ''}
 						</p>
 					</header>

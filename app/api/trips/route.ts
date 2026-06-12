@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { verifyJwtToken } from '@/src/lib/jwt';
 import { fetchTripWithDetails, formatTripResponse } from '@/lib/trip-access';
+import { dateOnlyStringToUtcDate, isDateOnlyString } from '@/src/utils/date';
 
 function getUserId(request: NextRequest): string | null {
   const authHeader = request.headers.get('authorization');
@@ -70,6 +71,10 @@ export async function POST(request: NextRequest) {
         name,
         description: description || '',
         recordBillLocation: recordBillLocation !== false,
+        startDate:
+          typeof startDate === 'string' && isDateOnlyString(startDate)
+            ? dateOnlyStringToUtcDate(startDate)
+            : null,
       },
     });
 

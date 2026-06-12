@@ -11,6 +11,7 @@ import { usePreferences } from '@/src/utils/preferences-provider';
 import { useRequireAuth } from '@/src/utils/use-require-auth';
 import React, { useState, useEffect } from 'react';
 import { Friend } from '@/src/types';
+import { formatTripDisplayDate } from '@/src/utils/date';
 
 const FriendsPage: React.FC = () => {
 	const { t, locale } = usePreferences();
@@ -160,10 +161,7 @@ const FriendsPage: React.FC = () => {
 		}
 	};
 
-	const formatTripDate = (date: string) => {
-		const parsed = new Date(date);
-		return Number.isNaN(parsed.getTime()) ? date : parsed.toLocaleDateString(locale);
-	};
+	const formatTripDate = (trip: Friend['trips'][number]) => formatTripDisplayDate(trip, locale);
 
 	return (
 		<AppShell tight>
@@ -244,7 +242,7 @@ const FriendsPage: React.FC = () => {
 							<ul className="modal-trip-list">
 								{selectedFriend.trips.map((trip) => (
 									<li key={trip.id}>
-										{trip.name} · {formatTripDate(trip.date)}
+										{trip.name} · {formatTripDate(trip)}
 									</li>
 								))}
 							</ul>

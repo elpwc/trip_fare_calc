@@ -1,4 +1,5 @@
 import prisma from '@/lib/prisma';
+import { formatPrismaDateOnly } from '@/src/utils/date';
 import { Prisma } from '@prisma/client';
 
 function isMissingTableError(error: unknown): boolean {
@@ -270,6 +271,7 @@ export function formatTripResponse(
     name: trip.name,
     description: trip.description,
     recordBillLocation: trip.recordBillLocation,
+    startDate: formatPrismaDateOnly(trip.startDate),
     createdAt: trip.createdAt,
     members: trip.members.map((tm) => tm.friend),
     bills: trip.bills.map((bill) => ({

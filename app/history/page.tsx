@@ -6,9 +6,10 @@ import AppShell from '@/src/components/layout/AppShell';
 import TripHistoryCard from '@/src/components/TripHistoryCard';
 import { getAuthHeaders } from '@/src/utils/auth';
 import { apiPath } from '@/src/config/paths';
-import { usePreferences } from '@/src/utils/preferences-provider';
+import { getTripSortDate } from '@/src/utils/date';
 import type { MessageKey } from '@/src/utils/i18n/messages';
 import { Trip } from '@/src/types';
+import { usePreferences } from '@/src/utils/preferences-provider';
 
 const filterOptions = [
   { value: 'all', labelKey: 'history.filter.all' },
@@ -67,7 +68,7 @@ export default function HistoryPage() {
         if (!nameMatched && !memberMatched) return false;
       }
       if (!cutoff) return true;
-      return new Date(trip.startDate || trip.createdAt) >= cutoff;
+      return getTripSortDate(trip) >= cutoff;
     });
   }, [trips, searchText, filterPeriod]);
 

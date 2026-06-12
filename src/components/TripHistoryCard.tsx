@@ -3,6 +3,7 @@
 import BillMap from './BillMap';
 import { Trip } from '@/src/types';
 import { usePreferences } from '@/src/utils/preferences-provider';
+import { formatTripDisplayDate } from '@/src/utils/date';
 import type { Locale } from '@/src/utils/preferences/constants';
 
 type TripHistoryCardProps = {
@@ -20,13 +21,10 @@ export default function TripHistoryCard({ trip, onClick }: TripHistoryCardProps)
   const { t, locale } = usePreferences();
   const dateLocale = DATE_LOCALE_MAP[locale];
 
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return t('common.unknown');
-    return new Date(dateString).toLocaleDateString(dateLocale, { month: '2-digit', day: '2-digit', year: '2-digit' });
-  };
+  const formatDate = (value: Trip) =>
+    formatTripDisplayDate(value, dateLocale, { month: '2-digit', day: '2-digit', year: '2-digit' });
 
   const totalExpense = trip.bills.reduce((sum, bill) => sum + (bill.amount || 0), 0);
-  const displayDate = trip.startDate || trip.createdAt;
   const participantNames = trip.members.map((member) => member.name).join('·') || '-';
   const collaboratorCount = trip.collaboratorCount ?? trip.collaborators?.length ?? 0;
   const collaboratorNames = (trip.collaborators || []).map((entry) => entry.name).join(' · ');
@@ -43,7 +41,7 @@ export default function TripHistoryCard({ trip, onClick }: TripHistoryCardProps)
             </div>
           </div>
           <p className="settings-mono mt-1 text-[10px] leading-relaxed text-app-muted">
-            {t('history.tripMeta', { date: formatDate(displayDate), count: trip.bills.length, amount: totalExpense.toFixed(0) })}
+            {t('history.tripMeta', { date: formatDate(trip), count: trip.bills.length, amount: totalExpense.toFixed(0) })}
           </p>
           {collaboratorCount > 0 ? (
             <p className="mt-0.5 text-[10px] leading-tight text-[#2a9d8f] dark:text-[#5fd3c4]">{t('history.sharedEditing', { count: collaboratorCount })}</p>
