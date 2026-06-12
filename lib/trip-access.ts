@@ -269,6 +269,7 @@ export function formatTripResponse(
     id: trip.id,
     name: trip.name,
     description: trip.description,
+    recordBillLocation: trip.recordBillLocation,
     createdAt: trip.createdAt,
     members: trip.members.map((tm) => tm.friend),
     bills: trip.bills.map((bill) => ({

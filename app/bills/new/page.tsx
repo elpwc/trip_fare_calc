@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { Modal } from '@/src/components/Modal';
 import AppShell from '@/src/components/layout/AppShell';
 import FriendIcon from '@/src/components/FriendIcon';
+import LocationSettingField, { SettingSwitch } from '@/src/components/AppSettingToggle';
 import { getAuthHeaders } from '@/src/utils/auth';
 import { apiPath } from '@/src/config/paths';
 import { Currency, CURRENCY_DEFINITIONS } from '@/src/utils/currencies';
@@ -106,6 +107,8 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 	const [latitude, setLatitude] = useState<number | null>(null);
 	const [longitude, setLongitude] = useState<number | null>(null);
 	const [locationError, setLocationError] = useState<string | null>(null);
+	const [tripRecordBillLocation, setTripRecordBillLocation] = useState(true);
+	const [recordThisBillLocation, setRecordThisBillLocation] = useState(true);
 
 	const [tripMembers, setTripMembers] = useState<Friend[]>([]);
 	const [isLoaded, setIsLoaded] = useState(!billId);
@@ -136,8 +139,12 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 		if (!tripId) return;
 		setEffectiveTripId(tripId);
 		fetchTripsAndFriends();
-		acquireLocation();
 	}, [tripId]);
+
+	useEffect(() => {
+		if (billId || !tripRecordBillLocation || !recordThisBillLocation) return;
+		acquireLocation();
+	}, [billId, tripRecordBillLocation, recordThisBillLocation, tripId]);
 
 	useEffect(() => {
 		if (!billId) return;
@@ -182,6 +189,10 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 			setStatus(data.status || 'UNRETURNED');
 			setLatitude(data.latitude ?? null);
 			setLongitude(data.longitude ?? null);
+			const tripAllowsLocation = data.trip?.recordBillLocation !== false;
+			setTripRecordBillLocation(tripAllowsLocation);
+			const hasStoredLocation = data.latitude != null && data.longitude != null;
+			setRecordThisBillLocation(tripAllowsLocation && hasStoredLocation);
 			setTripMembers(data.tripMembers || data.trip?.members || []);
 			setEffectiveTripId(data.tripId || tripId);
 			setIsLoaded(true);
@@ -198,9 +209,17 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 			});
 			if (response.ok) {
 				const trips = await response.json();
-				const currentTrip = trips.find((t: { id: string }) => t.id === tripId);
+				const currentTrip = trips.find((t: { id: string; recordBillLocation?: boolean }) => t.id === tripId);
 				if (currentTrip) {
 					setTripMembers(currentTrip.members || []);
+					const allowsLocation = currentTrip.recordBillLocation !== false;
+					setTripRecordBillLocation(allowsLocation);
+					if (!allowsLocation) {
+						setRecordThisBillLocation(false);
+						setLatitude(null);
+						setLongitude(null);
+						setLocationError(null);
+					}
 				}
 			}
 		} catch (error) {
@@ -290,6 +309,19 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 
 	const getShareForFriend = (friendId: string) => owedShares.find((entry) => entry.friendId === friendId);
 
+	const handleRecordThisBillLocationChange = (checked: boolean) => {
+		setRecordThisBillLocation(checked);
+		if (!checked) {
+			setLatitude(null);
+			setLongitude(null);
+			setLocationError(null);
+			return;
+		}
+		acquireLocation();
+	};
+
+	const shouldSaveLocation = tripRecordBillLocation && recordThisBillLocation;
+
 	const handleCreateBill = async () => {
 		const selectedTripId = effectiveTripId || tripId;
 		if (!selectedTripId || !amount || !payerId) {
@@ -315,8 +347,8 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 				category,
 				status,
 				owedShares,
-				latitude,
-				longitude,
+				latitude: shouldSaveLocation ? latitude : null,
+				longitude: shouldSaveLocation ? longitude : null,
 			};
 
 			const url = billId ? apiPath(`/api/bills/${billId}`) : apiPath('/api/bills');
@@ -509,20 +541,46 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 				</div>
 
 				<div className="app-panel p-2">
-					<div className="mb-1 flex items-center justify-between">
-						<span className="app-label">{t('bills.location')}</span>
-						<button type="button" onClick={acquireLocation} className="app-btn-compact app-btn-compact-primary">
-							{t('bills.reacquireLocation')}
-						</button>
-					</div>
-					{locationError ? (
-						<p className="text-[11px] text-app-danger">{locationError}</p>
-					) : latitude != null && longitude != null ? (
-						<p className="settings-mono text-[10px] text-[#2a9d8f]">
-							{latitude.toFixed(5)}, {longitude.toFixed(5)}
-						</p>
+					{tripRecordBillLocation ? (
+						<div className="flex flex-col gap-2">
+							<LocationSettingField
+								label={t('bills.recordThisBillLocation')}
+								description={t('bills.recordThisBillLocationDesc')}
+								checked={recordThisBillLocation}
+								onChange={handleRecordThisBillLocationChange}
+								privacyHint={t('location.privacyNotice')}
+							/>
+							{recordThisBillLocation ? (
+								<div className="app-location-status">
+									<div className="mb-1 flex items-center justify-between gap-2">
+										<span className="app-label">{t('bills.location')}</span>
+										<button type="button" onClick={acquireLocation} className="app-btn-compact app-btn-compact-primary">
+											{t('bills.reacquireLocation')}
+										</button>
+									</div>
+									{locationError ? (
+										<p className="text-[11px] text-app-danger">{locationError}</p>
+									) : latitude != null && longitude != null ? (
+										<p className="settings-mono text-[10px] text-[#2a9d8f] dark:text-[#5fd3c4]">
+											{latitude.toFixed(5)}, {longitude.toFixed(5)}
+										</p>
+									) : (
+										<p className="modal-hint">{t('bills.locating')}</p>
+									)}
+								</div>
+							) : (
+								<p className="modal-hint">{t('bills.skipLocationActive')}</p>
+							)}
+						</div>
 					) : (
-						<p className="text-[11px] text-app-muted">{t('bills.locating')}</p>
+						<div className="flex flex-col gap-2">
+							<div className="flex items-center justify-between gap-3">
+								<span className="app-label">{t('bills.location')}</span>
+								<SettingSwitch checked={false} onChange={() => {}} disabled aria-label={t('bills.location')} />
+							</div>
+							<p className="modal-hint">{t('bills.locationDisabledByTrip')}</p>
+							<p className="app-privacy-tip">{t('location.privacyNotice')}</p>
+						</div>
 					)}
 				</div>
 

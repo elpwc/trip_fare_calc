@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const { name, startDate, description } = await request.json();
+    const { name, startDate, description, recordBillLocation } = await request.json();
 
     if (!name) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 });
@@ -69,6 +69,7 @@ export async function POST(request: NextRequest) {
         userId,
         name,
         description: description || '',
+        recordBillLocation: recordBillLocation !== false,
       },
     });
 

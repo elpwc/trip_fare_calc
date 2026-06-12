@@ -1641,3 +1641,112 @@ html.dark .app-settle-detail-bill-rows li {
 html.dark .app-settle-detail-step--final .app-settle-detail-flow {
 	background: rgba(28, 26, 24, 0.85);
 }
+
+.app-setting-toggle {
+	border: 1px solid rgba(26, 24, 20, 0.1);
+	padding: 0.55rem 0.6rem;
+	@apply bg-[#f4efe4]/35 dark:border-[#f4efe4]/10 dark:bg-[#121110];
+}
+
+.app-setting-toggle-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.65rem;
+}
+
+.app-setting-toggle-copy {
+	min-width: 0;
+	flex: 1;
+}
+
+.app-setting-toggle-label {
+	font-size: 12px;
+	font-weight: 700;
+	line-height: 1.35;
+}
+
+.app-setting-toggle-desc {
+	margin-top: 0.15rem;
+	font-size: 10px;
+	line-height: 1.45;
+	color: #6b6458;
+}
+
+html.dark .app-setting-toggle-desc {
+	color: #a89f8f;
+}
+
+.app-setting-switch {
+	position: relative;
+	height: 1.35rem;
+	width: 2.35rem;
+	flex-shrink: 0;
+	border: 2px solid #1a1814;
+	background: #fffdf8;
+	transition: background 0.18s ease;
+	@apply dark:border-[#f4efe4] dark:bg-[#1c1a18];
+}
+
+.app-setting-switch.is-on {
+	background: #2a9d8f;
+	@apply dark:bg-[#5fd3c4];
+}
+
+.app-setting-switch.is-disabled {
+	opacity: 0.45;
+	cursor: not-allowed;
+}
+
+.app-setting-switch-knob {
+	position: absolute;
+	top: 1px;
+	left: 1px;
+	height: 0.95rem;
+	width: 0.95rem;
+	border: 2px solid #1a1814;
+	background: #fffdf8;
+	transition: transform 0.18s ease;
+	@apply dark:border-[#f4efe4] dark:bg-[#1c1a18];
+}
+
+.app-setting-switch.is-on .app-setting-switch-knob {
+	transform: translateX(0.95rem);
+	border-color: #1a1814;
+	background: #fffdf8;
+}
+
+.app-privacy-tip {
+	margin-top: 0.4rem;
+	border: 1px dashed rgba(42, 157, 143, 0.35);
+	padding: 0.35rem 0.45rem;
+	font-size: 9px;
+	line-height: 1.45;
+	color: #6b6458;
+}
+
+html.dark .app-privacy-tip {
+	border-color: rgba(95, 211, 196, 0.28);
+	color: #a89f8f;
+}
+
+.app-location-status {
+	border-top: 1px dashed rgba(26, 24, 20, 0.1);
+	padding-top: 0.55rem;
+}
+
+html.dark .app-location-status {
+	border-top-color: rgba(244, 239, 228, 0.1);
+}
+
+.app-location-skipped {
+	border-top: 1px dashed rgba(26, 24, 20, 0.1);
+	padding-top: 0.55rem;
+	font-size: 10px;
+	color: #6b6458;
+}
+
+html.dark .app-location-skipped {
+	border-top-color: rgba(244, 239, 228, 0.1);
+	color: #a89f8f;
+}

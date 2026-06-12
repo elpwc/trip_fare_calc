@@ -52,6 +52,7 @@ model Trip {
   userId              String
   name                String
   description         String?
+  recordBillLocation  Boolean                   @default(true)
   members             TripMember[]
   bills               Bill[]
   share               TripShare?

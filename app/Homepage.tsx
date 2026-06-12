@@ -13,6 +13,7 @@ import TripBillToastStack, { useTripBillToasts } from '@/src/components/TripBill
 import CollaboratorList from '@/src/components/CollaboratorList';
 import GuideBubble from '@/src/components/onboarding/GuideBubble';
 import AnchorFloatingChip from '@/src/components/AnchorFloatingChip';
+import LocationSettingField from '@/src/components/AppSettingToggle';
 import { getStoredSelectedTripId, setStoredSelectedTripId } from '@/src/utils/selected-trip-storage';
 import { getAuthHeaders } from '@/src/utils/auth';
 import { useAuth } from '@/src/utils/auth-provider';
@@ -50,6 +51,7 @@ export default function HomePage() {
 	const [newTripName, setNewTripName] = useState('');
 	const [newTripStartDate, setNewTripStartDate] = useState(new Date().toISOString().split('T')[0]);
 	const [newTripDescription, setNewTripDescription] = useState('');
+	const [newTripRecordBillLocation, setNewTripRecordBillLocation] = useState(true);
 	const [selectedFriendsForTrip, setSelectedFriendsForTrip] = useState<string[]>([]);
 	const [isMapModalOpen, setIsMapModalOpen] = useState(false);
 	const [mapTileLayer, setMapTileLayer] = useState<'osm' | 'satellite'>('osm');
@@ -188,6 +190,7 @@ export default function HomePage() {
 					name: newTripName.trim(),
 					startDate: newTripStartDate || null,
 					description: newTripDescription,
+					recordBillLocation: newTripRecordBillLocation,
 				}),
 			});
 
@@ -198,6 +201,7 @@ export default function HomePage() {
 				setNewTripName('');
 				setNewTripStartDate('');
 				setNewTripDescription('');
+				setNewTripRecordBillLocation(true);
 				setIsNewTripModalOpen(false);
 
 				// Add selected friends to the trip
@@ -498,7 +502,7 @@ export default function HomePage() {
 				<div className="app-empty mt-8">
 					<p className="settings-display text-xl">{t('home.noTripsTitle')}</p>
 					<p className="mt-2 text-[12px]">{t('home.noTripsHint')}</p>
-					<button type="button" onClick={() => guardAuth(() => setIsNewTripModalOpen(true))} className="settings-btn-primary mt-4" data-onboarding-target="new-trip">
+					<button type="button" onClick={() => guardAuth(() => { setNewTripRecordBillLocation(true); setIsNewTripModalOpen(true); })} className="settings-btn-primary mt-4" data-onboarding-target="new-trip">
 						+ {t('home.newTrip')}
 					</button>
 				</div>
@@ -547,6 +551,15 @@ export default function HomePage() {
 								onToggleFriend={(friendId) => {
 									setSelectedFriendsForTrip((prev) => (prev.includes(friendId) ? prev.filter((id) => id !== friendId) : [...prev, friendId]));
 								}}
+							/>
+						</div>
+						<div className="modal-field">
+							<LocationSettingField
+								label={t('home.modal.recordBillLocation')}
+								description={t('home.modal.recordBillLocationDesc')}
+								checked={newTripRecordBillLocation}
+								onChange={setNewTripRecordBillLocation}
+								privacyHint={t('location.privacyNotice')}
 							/>
 						</div>
 					</div>
@@ -607,7 +620,7 @@ export default function HomePage() {
 					) : null}
 				</div>
 
-				<button type="button" onClick={() => guardAuth(() => setIsNewTripModalOpen(true))} className="app-header-add shrink-0" aria-label={t('home.newTrip')} data-onboarding-target="new-trip">
+				<button type="button" onClick={() => guardAuth(() => { setNewTripRecordBillLocation(true); setIsNewTripModalOpen(true); })} className="app-header-add shrink-0" aria-label={t('home.newTrip')} data-onboarding-target="new-trip">
 					+
 				</button>
 			</header>
@@ -669,7 +682,7 @@ export default function HomePage() {
 			<section className="mt-1.5">
 				<div className="app-panel overflow-hidden">
 					<div className="h-20 cursor-pointer" onClick={() => setIsMapModalOpen(true)}>
-						<BillMap bills={currentBills} interactive={false} tileLayer="osm" />
+						<BillMap bills={mapBills} interactive={false} tileLayer="osm" showBillMarkers />
 					</div>
 				</div>
 			</section>
@@ -763,6 +776,15 @@ export default function HomePage() {
 							onToggleFriend={(friendId) => {
 								setSelectedFriendsForTrip((prev) => (prev.includes(friendId) ? prev.filter((id) => id !== friendId) : [...prev, friendId]));
 							}}
+						/>
+					</div>
+					<div className="modal-field">
+						<LocationSettingField
+							label={t('home.modal.recordBillLocation')}
+							description={t('home.modal.recordBillLocationDesc')}
+							checked={newTripRecordBillLocation}
+							onChange={setNewTripRecordBillLocation}
+							privacyHint={t('location.privacyNotice')}
 						/>
 					</div>
 				</div>

@@ -75,6 +75,7 @@ export type Trip = {
 	id: string;
 	name: string;
 	description?: string;
+	recordBillLocation?: boolean;
 	createdAt: string;
 	startDate?: string;
 	members: TripMember[];
