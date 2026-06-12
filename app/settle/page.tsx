@@ -7,8 +7,9 @@ import { getAuthHeaders } from '@/src/utils/auth';
 import { apiPath } from '@/src/config/paths';
 import { formatAmount } from '@/src/utils/currencies';
 import SettleSpendingChart from '@/src/components/settle/SettleSpendingChart';
+import SettleCalculationModal from '@/src/components/settle/SettleCalculationModal';
 import { buildNestedChartData, type ChartDimension } from '@/src/utils/settle-chart';
-import { buildBillShareRows } from '@/src/utils/bill-split';
+import { buildSettleCalculationDetail } from '@/src/utils/settle-flows';
 import type { Locale } from '@/src/utils/preferences/constants';
 import { Trip, FlowItem } from '@/src/types';
 import { usePreferences } from '@/src/utils/preferences-provider';
@@ -101,6 +102,7 @@ function SettlePageContent() {
 	const [isLoading, setIsLoading] = useState(true);
 	const [chartOuterDim, setChartOuterDim] = useState<ChartDimension>('owed');
 	const [chartInnerDim, setChartInnerDim] = useState<ChartDimension>('status');
+	const [isCalculationModalOpen, setIsCalculationModalOpen] = useState(false);
 
 	useEffect(() => {
 		if (!tripId) {
@@ -167,64 +169,26 @@ function SettlePageContent() {
 		loadRates();
 	}, [trip, selectedCurrency, rateRefreshKey, t]);
 
-	const liveFlows = useMemo(() => {
-		if (!trip || !exchangeInfo) return [];
+	const settleCalculation = useMemo(() => {
+		if (!trip || !exchangeInfo) return null;
 
-		type FlowBucket = { amount: number; originalTotals: Record<string, number> };
-		const flowMap = new Map<string, FlowBucket>();
 		const memberNames = new Map(trip.members.map((member) => [member.id, member.name]));
+		const settledTransfers = savedRecords.map((record) => ({
+			fromId: record.fromId,
+			toId: record.toId,
+			amount: record.amount,
+		}));
 
-		const settledPairs = new Set(savedRecords.map((record) => `${record.fromId}|${record.toId}`));
-
-		trip.bills.forEach((bill) => {
-			if (bill.status === 'SETTLED') return;
-			const billCurrency = bill.currency || 'CNY';
-			const conversionRate = billCurrency === selectedCurrency ? 1 : exchangeInfo.rates[billCurrency];
-
-			buildBillShareRows(bill).forEach(({ owedId, payerId, shareAmount }) => {
-				const convertedShare = billCurrency === selectedCurrency ? shareAmount : conversionRate ? shareAmount / conversionRate : 0;
-				if (convertedShare <= 0) return;
-
-				const key = `${owedId}|${payerId}`;
-				const existing = flowMap.get(key) ?? { amount: 0, originalTotals: {} };
-				existing.amount += convertedShare;
-				existing.originalTotals[billCurrency] = (existing.originalTotals[billCurrency] ?? 0) + shareAmount;
-				flowMap.set(key, existing);
-			});
+		return buildSettleCalculationDetail({
+			bills: trip.bills,
+			memberNames,
+			selectedCurrency,
+			rates: exchangeInfo.rates,
+			settledTransfers,
 		});
-
-		const processed = new Set<string>();
-		const items: FlowItem[] = [];
-
-		for (const [key, bucket] of flowMap.entries()) {
-			if (processed.has(key)) continue;
-			const [fromId, toId] = key.split('|');
-			const reverseKey = `${toId}|${fromId}`;
-			const reverseBucket = flowMap.get(reverseKey) ?? { amount: 0, originalTotals: {} };
-			processed.add(key);
-			processed.add(reverseKey);
-			if (bucket.amount === reverseBucket.amount) continue;
-
-			const netAmount = Math.abs(bucket.amount - reverseBucket.amount);
-			const sourceKey = bucket.amount > reverseBucket.amount ? key : reverseKey;
-			const sourceBucket = bucket.amount > reverseBucket.amount ? bucket : reverseBucket;
-			const [sourceFrom, sourceTo] = sourceKey.split('|');
-
-			items.push({
-				id: sourceKey,
-				fromId: sourceFrom,
-				toId: sourceTo,
-				fromName: memberNames.get(sourceFrom) || '?',
-				toName: memberNames.get(sourceTo) || '?',
-				amount: netAmount,
-				currency: selectedCurrency,
-				originalTotals: Object.entries(sourceBucket.originalTotals).map(([currency, amount]) => ({ currency, amount })),
-				createdAt: new Date().toISOString(),
-			});
-		}
-
-		return items.filter((item) => !settledPairs.has(`${item.fromId}|${item.toId}`)).sort((a, b) => b.amount - a.amount);
 	}, [trip, exchangeInfo, selectedCurrency, savedRecords]);
+
+	const liveFlows = useMemo(() => settleCalculation?.flows ?? [], [settleCalculation]);
 
 	const totalOpenAmount = useMemo(() => liveFlows.reduce((sum, item) => sum + item.amount, 0), [liveFlows]);
 	const totalSettledAmount = useMemo(() => savedRecords.reduce((sum, item) => sum + item.amount, 0), [savedRecords]);
@@ -311,6 +275,9 @@ function SettlePageContent() {
 			<div className="app-summary-strip mb-2">
 				<span>
 					{t('settle.openTotal')} <strong>{formatAmount(totalOpenAmount, selectedCurrency)}</strong>
+					<span className="app-inline-tip" title={t('settle.openTotalHintTitle')}>
+						{t('settle.openTotalHint')}
+					</span>
 				</span>
 				<span>
 					{t('settle.settledTotal')} <strong>{formatAmount(totalSettledAmount, selectedCurrency)}</strong>
@@ -328,7 +295,12 @@ function SettlePageContent() {
 						<span className="settings-mono text-[10px] uppercase tracking-[0.24em] opacity-90">{t('settle.resultsBadge')}</span>
 						<p className="mt-1 text-base font-bold leading-tight">{t('settle.results')}</p>
 					</div>
-					<span className="settings-mono text-[10px] opacity-90">{t('settle.excludeSettled')}</span>
+					<div className="flex flex-col items-end gap-1">
+						<button type="button" onClick={() => setIsCalculationModalOpen(true)} className="app-btn-compact px-2 py-1 text-[10px]">
+							{t('settle.detail.button')}
+						</button>
+						<span className="settings-mono text-[10px] opacity-90">{t('settle.excludeSettled')}</span>
+					</div>
 				</div>
 				<table className="app-data-table app-settle-results-table">
 					<thead>
@@ -428,6 +400,8 @@ function SettlePageContent() {
 						: t('settle.ratesSameCurrency')}
 				</div>
 			) : null}
+
+			<SettleCalculationModal isOpen={isCalculationModalOpen} onClose={() => setIsCalculationModalOpen(false)} detail={settleCalculation} />
 
 			<div className="settings-barcode mt-3 rounded-sm" aria-hidden />
 		</AppShell>

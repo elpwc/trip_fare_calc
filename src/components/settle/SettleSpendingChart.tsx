@@ -122,6 +122,9 @@ export default function SettleSpendingChart({
 		<section className="app-panel app-settle-chart-panel mt-2 overflow-hidden">
 			<div className="app-settle-chart-head">
 				<span className="app-label">{t('settle.chartTitle')}</span>
+				<span className="app-inline-tip" title={t('settle.chartTotalHintTitle')}>
+					{t('settle.chartTotalHint')}
+				</span>
 			</div>
 
 			<div className="app-settle-chart-controls">
@@ -210,7 +213,16 @@ export default function SettleSpendingChart({
 								))}
 								<text
 									x={CX}
-									y={CY - 4}
+									y={CY - 10}
+									textAnchor="middle"
+									className="fill-[#6b6458] text-[7px] dark:fill-[#a89f8f]"
+									style={{ fontFamily: 'var(--font-geist-mono), ui-monospace, monospace' }}
+								>
+									{t('settle.chartShareTotal')}
+								</text>
+								<text
+									x={CX}
+									y={CY + 4}
 									textAnchor="middle"
 									className="fill-[#1a1814] text-[11px] font-bold dark:fill-[#f4efe4]"
 									style={{ fontFamily: 'var(--font-geist-sans), sans-serif' }}
@@ -219,9 +231,9 @@ export default function SettleSpendingChart({
 								</text>
 								<text
 									x={CX}
-									y={CY + 12}
+									y={CY + 18}
 									textAnchor="middle"
-									className="fill-[#6b6458] text-[8px] dark:fill-[#a89f8f]"
+									className="fill-[#6b6458] text-[7px] dark:fill-[#a89f8f]"
 									style={{ fontFamily: 'var(--font-geist-mono), ui-monospace, monospace' }}
 								>
 									{t(DIMENSION_I18N[outerDim])} / {t(DIMENSION_I18N[innerDim])}
