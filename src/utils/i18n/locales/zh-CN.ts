@@ -205,6 +205,8 @@ export const zhCN = {
 	'bills.selectAll': '全部',
 	'bills.resetAa': '为选择的人均分(AA)',
 	'bills.shareHint': '默认 AA 均分，点击金额可修改此人的承担份额',
+	'bills.shareHintBuildTotal': '尚未填写总额时，在此输入各人金额会自动累加为账单总额',
+	'bills.amountAutoSum': '由分摊自动合计',
 	'bills.shareCustom': '自定义',
 	'bills.shareTotal': '已分配 {assigned} / {total}',
 	'bills.shareMismatch': '各人承担金额之和必须等于账单总额',

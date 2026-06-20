@@ -117,6 +117,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 
 	const [isPaymentMethodModalOpen, setIsPaymentMethodModalOpen] = useState(false);
 	const [isCurrencyModalOpen, setIsCurrencyModalOpen] = useState(false);
+	const [amountIsManual, setAmountIsManual] = useState(Boolean(billId));
 
 	const acquireLocation = () => {
 		if (!navigator.geolocation) {
@@ -197,6 +198,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 			setRecordThisBillLocation(tripAllowsLocation && hasStoredLocation);
 			setTripMembers(data.tripMembers || data.trip?.members || []);
 			setEffectiveTripId(data.tripId || tripId);
+			setAmountIsManual(true);
 			setIsLoaded(true);
 		} catch (error) {
 			console.error('Failed to fetch bill:', error);
@@ -241,7 +243,13 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 
 	const clearShareDrafts = () => setShareDrafts({});
 
+	const applyShareTotalToAmount = (shares: OwedShareInput[]) => {
+		const total = sharesTotal(shares);
+		setAmount(total > 0 ? String(total) : '');
+	};
+
 	const handleAmountChange = (value: string) => {
+		setAmountIsManual(true);
 		setAmount(value);
 		clearShareDrafts();
 		const nextTotal = roundMoney(Number(value) || 0);
@@ -250,23 +258,22 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 
 	const handleSelectAllFriends = () => {
 		clearShareDrafts();
-		setOwedShares(
-			resetAllToAa(
-				billTotal,
-				tripMembers.map((friend) => friend.id),
-			),
-		);
+		const friendIds = tripMembers.map((friend) => friend.id);
+		if (amountIsManual) {
+			setOwedShares(resetAllToAa(billTotal, friendIds));
+			return;
+		}
+		setOwedShares(friendIds.map((friendId) => ({ friendId, shareAmount: 0, isCustomShare: false })));
+		setAmount('');
 	};
 
 	const handleResetAa = () => {
 		if (owedShares.length === 0) return;
 		clearShareDrafts();
-		setOwedShares(
-			resetAllToAa(
-				billTotal,
-				owedShares.map((entry) => entry.friendId),
-			),
-		);
+		const total = amountIsManual ? billTotal : sharesTotal(owedShares);
+		setAmountIsManual(true);
+		setAmount(total > 0 ? String(total) : '');
+		setOwedShares(resetAllToAa(total, owedShares.map((entry) => entry.friendId)));
 	};
 
 	const handleToggleFriend = (friendId: string) => {
@@ -277,13 +284,18 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 			return next;
 		});
 		setOwedShares((prev) => {
+			let next: OwedShareInput[];
 			if (prev.some((entry) => entry.friendId === friendId)) {
-				return recalculateAaShares(
-					billTotal,
-					prev.filter((entry) => entry.friendId !== friendId),
-				);
+				next = prev.filter((entry) => entry.friendId !== friendId);
+			} else {
+				next = [...prev, { friendId, shareAmount: 0, isCustomShare: false }];
 			}
-			return recalculateAaShares(billTotal, [...prev, { friendId, shareAmount: 0, isCustomShare: false }]);
+			if (amountIsManual) {
+				next = recalculateAaShares(billTotal, next);
+			} else {
+				applyShareTotalToAmount(next);
+			}
+			return next;
 		});
 	};
 
@@ -301,7 +313,11 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 		const parsed = value === '' || value === '.' ? 0 : roundMoney(Number(value));
 		setOwedShares((prev) => {
 			const next = prev.map((entry) => (entry.friendId === friendId ? { ...entry, shareAmount: parsed, isCustomShare: true } : entry));
-			return recalculateAaShares(billTotal, next);
+			if (amountIsManual) {
+				return recalculateAaShares(billTotal, next);
+			}
+			applyShareTotalToAmount(next);
+			return next;
 		});
 	};
 
@@ -433,6 +449,7 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 						<span className="app-currency-btn-code">{currency}</span>
 					</button>
 				</div>
+				{!amountIsManual ? <p className="settings-mono px-1 text-[10px] text-[#2a9d8f] dark:text-[#5fd3c4]">{t('bills.amountAutoSum')}</p> : null}
 
 				<div className="app-panel overflow-hidden p-1">
 					<div className="grid grid-cols-5 gap-0">
@@ -487,7 +504,9 @@ function NewBillPageContent({ billId }: { billId?: string } = {}) {
 							</button>
 						</div>
 					</div>
-					<p className="mb-2 text-[11px] leading-relaxed text-app-muted">{t('bills.shareHint')}</p>
+					<p className="mb-2 text-[11px] leading-relaxed text-app-muted">
+						{amountIsManual ? t('bills.shareHint') : t('bills.shareHintBuildTotal')}
+					</p>
 					{owedShares.length > 0 ? (
 						<p className={`settings-mono mb-2 text-[10px] ${isSharesBalanced(billTotal, owedShares) ? 'text-[#2a9d8f]' : 'text-app-danger'}`}>
 							{t('bills.shareTotal', { assigned: assignedTotal.toFixed(2), total: billTotal.toFixed(2) })}

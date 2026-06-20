@@ -205,6 +205,8 @@ export const ja = {
 	'bills.selectAll': 'すべて',
 	'bills.resetAa': '選択者に均等割(AA)',
 	'bills.shareHint': '初期状態は AA 均等割。金額をタップして個別に変更できます。',
+	'bills.shareHintBuildTotal': '合計が未定のときは、ここで各人の金額を入力すると請求総額に自動で加算されます。',
+	'bills.amountAutoSum': '分担から自動合計',
 	'bills.shareCustom': 'カスタム',
 	'bills.shareTotal': '割当 {assigned} / {total}',
 	'bills.shareMismatch': '各人の負担額の合計は請求額と一致する必要があります',

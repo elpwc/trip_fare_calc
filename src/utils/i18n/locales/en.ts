@@ -205,6 +205,8 @@ export const en = {
 	'bills.selectAll': 'All',
 	'bills.resetAa': 'Split equally (AA)',
 	'bills.shareHint': 'Default is equal split. Tap an amount to customize someone\'s share.',
+	'bills.shareHintBuildTotal': 'If the total is unknown, enter each person\'s share here and the bill total will add up automatically.',
+	'bills.amountAutoSum': 'Total from shares',
 	'bills.shareCustom': 'Custom',
 	'bills.shareTotal': 'Assigned {assigned} / {total}',
 	'bills.shareMismatch': 'Individual shares must add up to the bill total',
