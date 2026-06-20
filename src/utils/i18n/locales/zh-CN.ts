@@ -364,6 +364,13 @@ export const zhCN = {
 	'friends.isSelf': '这是我本人',
 	'friends.isSelfSelected': '这是我本人（已选择）',
 	'friends.emptyList': '还没有旅伴，点击右下角添加',
+	'friends.layout.ring': '环形',
+	'friends.layout.layered': '由内向外',
+	'friends.layout.grid': '网格',
+	'friends.layout.toggleAria': '切换排布方式，当前：{mode}',
+	'friends.layout.tripMeta': '{count} 次 · {date}',
+	'friends.layout.tripMetaCount': '{count} 次',
+	'friends.layout.lastTrip': '上回: {date}',
 
 	'share.invalidLink': '无效的分享链接',
 	'share.passwordError': '密码错误或链接无效',

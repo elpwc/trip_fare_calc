@@ -364,6 +364,13 @@ export const ja = {
 	'friends.isSelf': 'これは自分です',
 	'friends.isSelfSelected': 'これは自分です（選択済み）',
 	'friends.emptyList': 'まだ友達がいません。右下のボタンから追加してください',
+	'friends.layout.ring': 'リング',
+	'friends.layout.layered': '同心円',
+	'friends.layout.grid': 'グリッド',
+	'friends.layout.toggleAria': 'レイアウトを切り替え、現在：{mode}',
+	'friends.layout.tripMeta': '{count} 回 · {date}',
+	'friends.layout.tripMetaCount': '{count} 回',
+	'friends.layout.lastTrip': '前回: {date}',
 
 	'share.invalidLink': '無効な共有リンク',
 	'share.passwordError': 'パスワードが間違っているか、リンクが無効です',

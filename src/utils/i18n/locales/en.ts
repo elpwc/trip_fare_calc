@@ -364,6 +364,13 @@ export const en = {
 	'friends.isSelf': 'This is me',
 	'friends.isSelfSelected': 'This is me (selected)',
 	'friends.emptyList': 'No friends yet — tap the button below to add',
+	'friends.layout.ring': 'Ring',
+	'friends.layout.layered': 'Layers',
+	'friends.layout.grid': 'Grid',
+	'friends.layout.toggleAria': 'Switch layout, current: {mode}',
+	'friends.layout.tripMeta': '{count} trips · {date}',
+	'friends.layout.tripMetaCount': '{count} trips',
+	'friends.layout.lastTrip': 'Last: {date}',
 
 	'share.invalidLink': 'Invalid share link',
 	'share.passwordError': 'Wrong password or invalid link',
