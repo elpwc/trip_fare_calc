@@ -169,6 +169,7 @@ export default function HomePage() {
 			return {
 				id: bill.id,
 				name: bill.name,
+				category: bill.category,
 				amount: bill.amount,
 				latitude: bill.latitude,
 				longitude: bill.longitude,

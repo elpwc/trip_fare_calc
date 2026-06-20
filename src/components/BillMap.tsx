@@ -2,12 +2,14 @@
 
 import { useEffect, useRef } from 'react';
 import type { Map as LeafletMap } from 'leaflet';
+import { getBillCategoryLabelKey } from '@/src/utils/bill-category';
 import { usePreferences } from '@/src/utils/preferences-provider';
 import { buildBillMapMarkerHtml } from '@/src/utils/map-marker-html';
 
 export type BillMapBill = {
 	id: string;
 	name: string;
+	category?: string;
 	amount: number;
 	latitude: number | null;
 	longitude: number | null;
@@ -90,10 +92,11 @@ export default function BillMap({ bills, interactive = false, tileLayer = 'osm',
 			validPoints.forEach((bill) => {
 				const lat = bill.latitude!;
 				const lng = bill.longitude!;
-				const popupHtml = `<div class="text-sm"><strong>${bill.name}</strong><br/>¥${bill.amount}${bill.payerName ? `<br/><span style="color:#6b6458">${bill.payerName}</span>` : ''}</div>`;
+				const displayName = bill.name.trim() || t(getBillCategoryLabelKey(bill.category ?? '其他'));
+				const popupHtml = `<div class="text-sm"><strong>${displayName}</strong><br/>¥${bill.amount}${bill.payerName ? `<br/><span style="color:#6b6458">${bill.payerName}</span>` : ''}</div>`;
 
 				if (showBillMarkers && bill.payerName) {
-					const html = buildBillMapMarkerHtml(bill.name, bill.payerName, bill.payerIsSelf ?? false, selfLabel);
+					const html = buildBillMapMarkerHtml(displayName, bill.payerName, bill.payerIsSelf ?? false, selfLabel);
 					const icon = L.divIcon({
 						html,
 						className: 'bill-map-marker-icon',
@@ -144,7 +147,7 @@ export default function BillMap({ bills, interactive = false, tileLayer = 'osm',
 				mapRef.current = null;
 			}
 		};
-	}, [bills, interactive, tileLayer, showBillMarkers, selfLabel]);
+	}, [bills, interactive, tileLayer, showBillMarkers, selfLabel, t]);
 
 	return <div ref={mapContainerRef} className={className} onClick={onClick} style={{ minHeight: '100%', width: '100%' }} />;
 }
