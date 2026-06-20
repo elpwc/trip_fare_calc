@@ -24,8 +24,8 @@ type LayoutFriend = Member & {
 	trips?: { id: string; name: string; startDate?: string | null; createdAt: string }[];
 };
 
-type FriendLayoutBoardProps = {
-	friends: LayoutFriend[];
+type FriendLayoutBoardProps<T extends LayoutFriend = LayoutFriend> = {
+	friends: T[];
 	scaleByParticipation?: boolean;
 	showTripMeta?: boolean;
 	showLayoutToggle?: boolean;
@@ -34,7 +34,7 @@ type FriendLayoutBoardProps = {
 	className?: string;
 	ringRadius?: number;
 	selectedFriends?: string[];
-	onFriendClick?: (friend: LayoutFriend) => void;
+	onFriendClick?: (friend: T) => void;
 	onToggleFriend?: (friendId: string) => void;
 };
 
@@ -77,7 +77,7 @@ function FriendMeta({
 	);
 }
 
-export default function FriendLayoutBoard({
+export default function FriendLayoutBoard<T extends LayoutFriend>({
 	friends,
 	scaleByParticipation = false,
 	showTripMeta = true,
@@ -89,7 +89,7 @@ export default function FriendLayoutBoard({
 	selectedFriends = [],
 	onFriendClick,
 	onToggleFriend,
-}: FriendLayoutBoardProps) {
+}: FriendLayoutBoardProps<T>) {
 	const { t, locale } = usePreferences();
 	const [layoutMode, setLayoutMode] = useState<FriendLayoutMode>('grid');
 	const dateLocale = DATE_LOCALE_MAP[locale];
@@ -122,7 +122,7 @@ export default function FriendLayoutBoard({
 
 	const nameClassName = showTripMeta ? '' : variant === 'selector' ? 'mt-1 max-w-16 truncate text-[10px] font-semibold' : 'mt-1 max-w-16 truncate text-center text-xs';
 
-	const renderFriendIcon = (friend: LayoutFriend, index: number, isSelected: boolean) => {
+	const renderFriendIcon = (friend: T, index: number, isSelected: boolean) => {
 		const customSize = iconSizes[index];
 		const iconStyle = customSize
 			? { width: customSize, height: customSize, fontSize: Math.max(10, Math.round(customSize * 0.24)) }
@@ -157,7 +157,7 @@ export default function FriendLayoutBoard({
 		);
 	};
 
-	const renderAbsoluteItem = (friend: LayoutFriend, index: number) => {
+	const renderAbsoluteItem = (friend: T, index: number) => {
 		const position = getFriendLayoutPosition(layoutMode, index, friends.length, {
 			ringRadius,
 			withMeta: showTripMeta,
@@ -196,7 +196,7 @@ export default function FriendLayoutBoard({
 		);
 	};
 
-	const renderGridItem = (friend: LayoutFriend, index: number) => {
+	const renderGridItem = (friend: T, index: number) => {
 		const isSelected = selectedFriends.includes(friend.id);
 		const itemClassName =
 			variant === 'selector'
