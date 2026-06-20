@@ -123,6 +123,36 @@ export async function grantTripAccess(tripId: string, userId: string) {
   }
 
   await recordCollaboratorHistory(tripId, userId);
+  await addUserSelfFriendToTrip(tripId, userId);
+}
+
+async function addUserSelfFriendToTrip(tripId: string, userId: string) {
+  const selfFriend = await prisma.friend.findFirst({
+    where: { userId, isSelf: true, isDeleted: false },
+  });
+
+  if (!selfFriend) return;
+
+  const existingMember = await prisma.tripMember.findUnique({
+    where: {
+      tripId_friendId: {
+        tripId,
+        friendId: selfFriend.id,
+      },
+    },
+  });
+
+  if (existingMember) return;
+
+  await prisma.$transaction([
+    prisma.tripMember.create({
+      data: { tripId, friendId: selfFriend.id },
+    }),
+    prisma.friend.update({
+      where: { id: selfFriend.id },
+      data: { participationCount: { increment: 1 } },
+    }),
+  ]);
 }
 
 export async function canInviteCoeditor(ownerUserId: string, tripId: string, targetUserId: string) {

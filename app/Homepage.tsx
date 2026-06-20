@@ -590,6 +590,13 @@ export default function HomePage() {
 						</div>
 						<div className="modal-field">
 							<label className="app-label">{t('home.modal.selectMembers')}</label>
+							<button
+								type="button"
+								onClick={() => setIsAddFriendModalOpen(true)}
+								className="mb-2 flex w-full items-center justify-center gap-1 border border-dashed border-[#1a1814]/30 py-2 text-xs text-app-muted transition hover:border-[#2a9d8f]/50 hover:text-[#2a9d8f] dark:border-[#f4efe4]/25 dark:hover:border-[#5fd3c4]/50 dark:hover:text-[#5fd3c4]"
+							>
+								+ {t('home.modal.addNewCompanion')}
+							</button>
 							<FriendSelector
 								friends={friends}
 								selectedFriends={selectedFriendsForTrip}
@@ -609,6 +616,14 @@ export default function HomePage() {
 						</div>
 					</div>
 				</Modal>
+				<AddFriendModal
+					isOpen={isAddFriendModalOpen}
+					onClose={() => setIsAddFriendModalOpen(false)}
+					onAdded={(newFriend) => {
+						setFriends((prev) => [...prev, newFriend]);
+						setSelectedFriendsForTrip((prev) => (prev.includes(newFriend.id) ? prev : [...prev, newFriend.id]));
+					}}
+				/>
 				{AuthRequiredModal}
 				<TripBillToastStack toasts={toasts} onDismiss={dismissToast} />
 			</AppShell>
@@ -820,6 +835,13 @@ export default function HomePage() {
 					</div>
 					<div className="modal-field">
 						<label className="app-label">{t('home.modal.selectMembers')}</label>
+						<button
+							type="button"
+							onClick={() => setIsAddFriendModalOpen(true)}
+							className="mb-2 flex w-full items-center justify-center gap-1 border border-dashed border-[#1a1814]/30 py-2 text-xs text-app-muted transition hover:border-[#2a9d8f]/50 hover:text-[#2a9d8f] dark:border-[#f4efe4]/25 dark:hover:border-[#5fd3c4]/50 dark:hover:text-[#5fd3c4]"
+						>
+							+ {t('home.modal.addNewCompanion')}
+						</button>
 						<FriendSelector
 							friends={friends}
 							selectedFriends={selectedFriendsForTrip}
@@ -853,8 +875,12 @@ export default function HomePage() {
 			>
 				<div className="modal-stack">
 					<p className="modal-hint">{t('home.modal.addMembersHint')}</p>
-					<button type="button" onClick={() => setIsAddFriendModalOpen(true)} className="settings-btn-ghost w-full py-2.5 text-sm">
-						{t('home.modal.addNewCompanion')}
+					<button
+						type="button"
+						onClick={() => setIsAddFriendModalOpen(true)}
+						className="flex w-full items-center justify-center gap-1 border border-dashed border-[#1a1814]/30 py-2 text-xs text-app-muted transition hover:border-[#2a9d8f]/50 hover:text-[#2a9d8f] dark:border-[#f4efe4]/25 dark:hover:border-[#5fd3c4]/50 dark:hover:text-[#5fd3c4]"
+					>
+						+ {t('home.modal.addNewCompanion')}
 					</button>
 					<FriendSelector
 						friends={friends.filter((f) => !(currentTrip?.members || []).some((m) => m.id === f.id))}
