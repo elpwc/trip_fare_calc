@@ -894,6 +894,7 @@ html.dark .app-header-add:hover {
 .app-nav {
 	@apply border-t-2 border-[#1a1814] bg-[#fffdf8] dark:border-[#f4efe4] dark:bg-[#1c1a18];
 	box-shadow: 0 -3px 0 rgba(26, 24, 20, 0.06);
+	padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 .app-nav-link {
