@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState, useEffect, useCallback } from 'react';
+import { useMemo, useState, useEffect, useCallback, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Modal } from '@/src/components/Modal';
 import AppShell from '@/src/components/layout/AppShell';
@@ -38,7 +38,7 @@ const DATE_LOCALE_MAP: Record<Locale, string> = {
 export default function HomePage() {
 	const router = useRouter();
 	const { t, locale } = usePreferences();
-	const { user } = useAuth();
+	const { user, loading: authLoading } = useAuth();
 	const { guardAuth, AuthRequiredModal } = useRequireAuth();
 	const { toasts, pushToast, dismissToast } = useTripBillToasts();
 	const dateLocale = DATE_LOCALE_MAP[locale];
@@ -75,6 +75,7 @@ export default function HomePage() {
 	const [editTripNameError, setEditTripNameError] = useState('');
 
 	const searchParams = useSearchParams();
+	const lastResolvedUserRef = useRef<string | null>(null);
 
 	const fetchTrips = useCallback(async () => {
 		try {
@@ -112,16 +113,30 @@ export default function HomePage() {
 	}, [fetchTrips]);
 
 	useEffect(() => {
-		if (trips.length === 0) return;
+		if (trips.length === 0 || authLoading) return;
+
+		const shouldRestorePersisted = user?.id !== lastResolvedUserRef.current;
 
 		setSelectedTripId((current) => {
-			if (current && trips.some((trip) => trip.id === current)) {
-				return current;
-			}
-
 			const queryTripId = searchParams.get('tripId');
 			if (queryTripId && trips.some((trip) => trip.id === queryTripId)) {
+				if (user?.id) lastResolvedUserRef.current = user.id;
 				return queryTripId;
+			}
+
+			if (shouldRestorePersisted) {
+				const savedTripId = user?.id ? getStoredSelectedTripId(user.id) : null;
+				if (savedTripId && trips.some((trip) => trip.id === savedTripId)) {
+					lastResolvedUserRef.current = user?.id ?? null;
+					return savedTripId;
+				}
+				lastResolvedUserRef.current = user?.id ?? null;
+				if (current && trips.some((trip) => trip.id === current)) return current;
+				return trips[0].id;
+			}
+
+			if (current && trips.some((trip) => trip.id === current)) {
+				return current;
 			}
 
 			const savedTripId = user?.id ? getStoredSelectedTripId(user.id) : null;
@@ -129,9 +144,9 @@ export default function HomePage() {
 				return savedTripId;
 			}
 
-			return trips[0].id;
+			return trips[0]?.id ?? null;
 		});
-	}, [trips, searchParams, user?.id]);
+	}, [trips, searchParams, user?.id, authLoading]);
 
 	useEffect(() => {
 		if (user?.id && selectedTripId) {
